@@ -5,6 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
 using UnityStandardAssets.CrossPlatformInput;
+
 public class PlayerController : MonoBehaviourPunCallbacks
 {
     [HideInInspector]
