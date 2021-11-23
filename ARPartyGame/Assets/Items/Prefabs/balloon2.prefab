@@ -108,6 +108,7 @@ GameObject:
   - component: {fileID: 2876936032421981342}
   - component: {fileID: 8417341500370931815}
   - component: {fileID: -7503824285740320945}
+  - component: {fileID: -2416614001878656596}
   m_Layer: 0
   m_Name: balloon2
   m_TagString: Untagged
@@ -192,3 +193,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   counter: 0
+--- !u!65 &-2416614001878656596
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7848843361691722939}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.030200262, y: 0.0400492, z: 0.030200262}
+  m_Center: {x: 0, y: 0.020082077, z: 4.656613e-10}

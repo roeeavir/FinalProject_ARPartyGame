@@ -7,7 +7,7 @@ public class ShootScript : MonoBehaviour
 
     public GameObject arCamera;
     public GameObject smoke;
-  
+
 
     public void Shoot()
     {
