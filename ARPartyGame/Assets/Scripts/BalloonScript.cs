@@ -10,9 +10,11 @@ public class BalloonScript : MonoBehaviour
     {
         counter++;
         transform.Translate(Vector3.up * Time.deltaTime * 0.2f);
-       /* if((counter/800)%2 == 0)
-            transform.Translate(Vector3.right * Time.deltaTime * 0.1f);
-        else
-            transform.Translate(Vector3.left * Time.deltaTime * 0.1f);*/
+        /* if((counter/800)%2 == 0)
+             transform.Translate(Vector3.right * Time.deltaTime * 0.1f);
+         else
+             transform.Translate(Vector3.left * Time.deltaTime * 0.1f);*/
     }
+
+
 }
