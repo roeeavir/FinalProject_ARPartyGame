@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     //instance
     public static GameManager instance;
 
-    private DefaultObserverEventHandler defaultObserverEventHandler;
+    // private DefaultObserverEventHandler defaultObserverEventHandler;
     private void Awake()
     {
         instance = this;
