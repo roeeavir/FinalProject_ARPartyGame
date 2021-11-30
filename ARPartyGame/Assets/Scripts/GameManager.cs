@@ -4,6 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Linq;
+using Vuforia;
 public class GameManager : MonoBehaviourPunCallbacks
 {
     [Header("Status")]
@@ -18,8 +19,6 @@ public class GameManager : MonoBehaviourPunCallbacks
     public GameObject imageTarget;
     //instance
     public static GameManager instance;
-
-    // private DefaultObserverEventHandler defaultObserverEventHandler;
     private void Awake()
     {
         instance = this;
@@ -29,12 +28,11 @@ public class GameManager : MonoBehaviourPunCallbacks
         pickedSpawnIndex = new List<int>();
         players = new PlayerController[PhotonNetwork.PlayerList.Length];
         photonView.RPC("ImInGame", RpcTarget.AllBuffered);
-
-        // DefaultObserverEventHandler = false;
+        DefaultObserverEventHandler.isTracking = false;
     }
     private void Update()
     {
-        // Debug.Log("is tracking " + DefaultObserverEventHandler.isTracking);
+        Debug.Log("is tracking " + DefaultObserverEventHandler.isTracking);
         foreach (GameObject gameObj in GameObject.FindObjectsOfType(typeof(GameObject)))
         {
             if (gameObj.name == "Player(Clone)")
@@ -44,7 +42,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
         for (int i = 1; i < imageTarget.transform.childCount; i++)
         {
-            // imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
+            imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
         }
     }
     [PunRPC]
