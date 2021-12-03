@@ -17,8 +17,11 @@ public class PlayerController : MonoBehaviourPunCallbacks
     [SerializeField]
     private float speed = 0.2f;
     [PunRPC]
+
+    public Text debugText;
     public void Initialize(Player player)
     {
+        debugText.text += "InitializePlayer " + player.NickName + "\n";
         photonPlayer = player;
         id = player.ActorNumber;
         speed = 0.2f;
