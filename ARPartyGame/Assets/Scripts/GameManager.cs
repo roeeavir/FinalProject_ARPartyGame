@@ -70,19 +70,30 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
     void SpawnPlayer()
     {
-        debugText.text += "SpawnPlayer\n";
+
         int rand = Random.Range(0, spawnPoints.Length); // random spawn point
         while (pickedSpawnIndex.Contains(rand)) // check if the random spawn point is already picked
         {
             rand = Random.Range(0, spawnPoints.Length); // random spawn point
         }
         pickedSpawnIndex.Add(rand); // add the random spawn point to the list
+        debugText.text += "SpawnPlayer1\n";
+        debugText.text += spawnPoints[rand].position + "\n";
+        debugText.text += Quaternion.identity + "\n";
+        GameObject playerObject = null;
+        try
+        {
+            playerObject = (GameObject)PhotonNetwork.Instantiate(playerPrefabLocation, spawnPoints[rand].position, Quaternion.identity); // spawn player
+        }
+        catch (System.Exception e)
+        {
+            debugText.text += "Sevel\n";
+            debugText.text += e.StackTrace + "\n";
+        }
         debugText.text += "SpawnPlayer2\n";
-        GameObject playerObject = PhotonNetwork.Instantiate(playerPrefabLocation, spawnPoints[rand].position, Quaternion.identity); // spawn player
-        debugText.text += "SpawnPlayer3\n";
         //intialize the player
         PlayerController playerScript = playerObject.GetComponent<PlayerController>();
-        debugText.text += "SpawnPlayer4\n";
+        debugText.text += "SpawnPlayer3\n";
         playerScript.photonView.RPC("Initialize", RpcTarget.All, PhotonNetwork.LocalPlayer);
 
         foreach (PlayerController player in players)
@@ -92,6 +103,8 @@ public class GameManager : MonoBehaviourPunCallbacks
                 listOfPlayers.text += player.photonView.Owner.NickName + "\n"; // add player to the list
             }
         }
+
+
     }
     public PlayerController GetPlayer(int playerID)
     {
