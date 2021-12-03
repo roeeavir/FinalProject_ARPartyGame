@@ -38,7 +38,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             if (player != null)
             {
-                debugText.text += player.photonView.Owner.NickName + "\n"; // add player to the list
+                listOfPlayers.text += player.photonView.Owner.NickName + "\n"; // add player to the list
             }
         }
     }
@@ -77,34 +77,16 @@ public class GameManager : MonoBehaviourPunCallbacks
             rand = Random.Range(0, spawnPoints.Length); // random spawn point
         }
         pickedSpawnIndex.Add(rand); // add the random spawn point to the list
-        debugText.text += "SpawnPlayer1\n";
         debugText.text += spawnPoints[rand].position + "\n";
         debugText.text += Quaternion.identity + "\n";
         GameObject playerObject = null;
-        try
-        {
-            playerObject = (GameObject)PhotonNetwork.Instantiate(playerPrefabLocation, spawnPoints[rand].position, Quaternion.identity); // spawn player
-        }
-        catch (System.Exception e)
-        {
-            debugText.text += "Sevel\n";
-            debugText.text += e.StackTrace + "\n";
-        }
-        debugText.text += "SpawnPlayer2\n";
+        playerObject = (GameObject)PhotonNetwork.Instantiate(playerPrefabLocation, spawnPoints[rand].position, Quaternion.identity); // spawn player
         //intialize the player
         PlayerController playerScript = playerObject.GetComponent<PlayerController>();
-        debugText.text += "SpawnPlayer3\n";
+        players[PhotonNetwork.LocalPlayer.ActorNumber - 1] = playerScript;
+        debugText.text += "SpawnPlayer1\n";
         playerScript.photonView.RPC("Initialize", RpcTarget.All, PhotonNetwork.LocalPlayer);
-
-        foreach (PlayerController player in players)
-        {
-            if (player != null)
-            {
-                listOfPlayers.text += player.photonView.Owner.NickName + "\n"; // add player to the list
-            }
-        }
-
-
+        debugText.text += "SpawnPlayer2\n";
     }
     public PlayerController GetPlayer(int playerID)
     {

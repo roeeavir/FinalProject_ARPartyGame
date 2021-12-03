@@ -113,9 +113,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   id: 0
-  rig: {fileID: 0}
+  rig: {fileID: 666785404078706223}
   playerNickName: {fileID: 0}
   speed: 0.2
+  debugText: {fileID: 0}
 --- !u!114 &5198723397138808510
 MonoBehaviour:
   m_ObjectHideFlags: 0

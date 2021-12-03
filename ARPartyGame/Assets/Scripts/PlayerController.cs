@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
     [PunRPC]
 
     public Text debugText;
+
+    private int count1 = 0, count2 = 0;
     public void Initialize(Player player)
     {
         debugText.text += "InitializePlayer " + player.NickName + "\n";
@@ -36,12 +38,18 @@ public class PlayerController : MonoBehaviourPunCallbacks
         speed = 0.2f;
         rig.isKinematic = true;
         playerNickName.text = photonPlayer.NickName;
+        debugText = GameObject.Find("Debug").GetComponent<Text>();
     }
 
     private void Update()
     {
         if (photonPlayer.IsLocal)
         {
+            if (count1 == 0 && debugText != null)
+            {
+                debugText.text += "first Update(), photonPlayer name: " + photonPlayer.NickName + "\n";
+                count1++;
+            }
             Movements();
             if (Input.GetKey(KeyCode.LeftControl) || CrossPlatformInputManager.GetButton("Shoot"))
             {
@@ -57,11 +65,16 @@ public class PlayerController : MonoBehaviourPunCallbacks
         float verti = Input.GetAxis("Vertical");
         if (horizontal != 0 || vertical != 0 || hori != 0 || verti != 0)
         {
-            speed = 0.2f;
+            if (count2 == 0 && debugText != null)
+            {
+                debugText.text += "Movements(), photonPlayer name: " + photonPlayer.NickName + "\n";
+                count2++;
+            }
+            speed = 2f;
         }
         else
         {
-            speed = 0;
+            speed = 1f;
         }
         if ((horizontal > 0 && vertical > 0) || (hori > 0 && verti > 0))
         {

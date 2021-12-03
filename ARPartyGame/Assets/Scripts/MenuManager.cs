@@ -50,6 +50,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
     {
         SetMenu(lobbyMenu);
         photonView.RPC("UpdateLobbyUI", RpcTarget.All);
+        photonView.RPC("UpdateLobbyUI", RpcTarget.Others); // Maybe baby
     }
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
