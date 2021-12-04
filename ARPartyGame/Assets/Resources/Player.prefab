@@ -116,7 +116,6 @@ MonoBehaviour:
   rig: {fileID: 7078694657003746020}
   playerNickName: {fileID: 0}
   speed: 0.2
-  debugText: {fileID: 0}
 --- !u!114 &8711134882154767048
 MonoBehaviour:
   m_ObjectHideFlags: 0

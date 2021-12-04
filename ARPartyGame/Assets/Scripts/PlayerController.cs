@@ -19,13 +19,13 @@ public class PlayerController : MonoBehaviourPunCallbacks
     [PunRPC]
 
 
-    private int count1 = 0, count2 = 0;
     public void Initialize(Player player)
     {
         photonPlayer = player;
         id = player.ActorNumber;
         speed = 0.2f;
         GameManager.instance.players[id - 1] = this;
+        // playerNickName.text = photonPlayer.NickName;
         if (!photonView.IsMine)
         {
             rig.isKinematic = true;
@@ -35,7 +35,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         speed = 0.2f;
         rig.isKinematic = true;
-        playerNickName.text = photonPlayer.NickName;
     }
 
     private void Update()
@@ -51,58 +50,66 @@ public class PlayerController : MonoBehaviourPunCallbacks
     }
     void Movements()
     {
-        float horizontal = CrossPlatformInputManager.GetAxisRaw("Horizontal");
-        float vertical = CrossPlatformInputManager.GetAxisRaw("Vertical");
-        float hori = Input.GetAxis("Horizontal");
-        float verti = Input.GetAxis("Vertical");
-        if (horizontal != 0 || vertical != 0 || hori != 0 || verti != 0)
+        try
         {
-            speed = 2f;
+            float horizontal = CrossPlatformInputManager.GetAxisRaw("Horizontal");
+            float vertical = CrossPlatformInputManager.GetAxisRaw("Vertical");
+            float hori = Input.GetAxis("Horizontal");
+            float verti = Input.GetAxis("Vertical");
+            if (horizontal != 0 || vertical != 0 || hori != 0 || verti != 0)
+            {
+                speed = 2f;
+            }
+            else
+            {
+                speed = 1f;
+            }
+            if ((horizontal > 0 && vertical > 0) || (hori > 0 && verti > 0))
+            {
+                transform.localEulerAngles = new Vector3(0, 45, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
+            else if ((horizontal > 0 && vertical < 0) || (hori > 0 && verti < 0))
+            {
+                transform.localEulerAngles = new Vector3(0, 135, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
+            else if ((horizontal < 0 && vertical < 0) || (hori < 0 && verti < 0))
+            {
+                transform.localEulerAngles = new Vector3(0, -135, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
+            else if ((horizontal < 0 && vertical > 0) || (hori < 0 && verti > 0))
+            {
+                transform.localEulerAngles = new Vector3(0, -45, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
+            else if ((horizontal > 0 && vertical == 0) || (hori > 0 && verti == 0))
+            {
+                transform.localEulerAngles = new Vector3(0, 90, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
+            else if ((horizontal < 0 && vertical == 0) || (hori < 0 && verti == 0))
+            {
+                transform.localEulerAngles = new Vector3(0, -90, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
+            else if ((vertical > 0 && horizontal == 0) || (verti > 0 && hori == 0))
+            {
+                transform.localEulerAngles = new Vector3(0, 0, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
+            else if ((vertical < 0 && horizontal == 0) || (verti < 0 && hori == 0))
+            {
+                transform.localEulerAngles = new Vector3(0, 180, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
         }
-        else
+        catch (System.Exception e)
         {
-            speed = 1f;
+            Debug.LogWarning("Yese " + e.StackTrace);
         }
-        if ((horizontal > 0 && vertical > 0) || (hori > 0 && verti > 0))
-        {
-            transform.localEulerAngles = new Vector3(0, 45, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if ((horizontal > 0 && vertical < 0) || (hori > 0 && verti < 0))
-        {
-            transform.localEulerAngles = new Vector3(0, 135, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if ((horizontal < 0 && vertical < 0) || (hori < 0 && verti < 0))
-        {
-            transform.localEulerAngles = new Vector3(0, -135, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if ((horizontal < 0 && vertical > 0) || (hori < 0 && verti > 0))
-        {
-            transform.localEulerAngles = new Vector3(0, -45, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if ((horizontal > 0 && vertical == 0) || (hori > 0 && verti == 0))
-        {
-            transform.localEulerAngles = new Vector3(0, 90, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if ((horizontal < 0 && vertical == 0) || (hori < 0 && verti == 0))
-        {
-            transform.localEulerAngles = new Vector3(0, -90, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if ((vertical > 0 && horizontal == 0) || (verti > 0 && hori == 0))
-        {
-            transform.localEulerAngles = new Vector3(0, 0, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if ((vertical < 0 && horizontal == 0) || (verti < 0 && hori == 0))
-        {
-            transform.localEulerAngles = new Vector3(0, 180, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
+
     }
 
     [PunRPC]

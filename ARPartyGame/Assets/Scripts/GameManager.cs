@@ -45,11 +45,11 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
     private void Update()
     {
-        Debug.Log("is tracking " + DefaultObserverEventHandler.isTracking);
+        // Debug.LogWarning("is tracking " + DefaultObserverEventHandler.isTracking);
 
         foreach (GameObject gameObj in GameObject.FindObjectsOfType(typeof(GameObject)))
         {
-            if (gameObj.name == "Player(Clone)")
+            if (gameObj.name == "Player(Clone)" && imageTarget != null)
             {
                 gameObj.transform.SetParent(imageTarget.transform);
             }
