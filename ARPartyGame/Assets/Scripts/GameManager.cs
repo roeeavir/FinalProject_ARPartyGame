@@ -31,7 +31,8 @@ public class GameManager : MonoBehaviourPunCallbacks
         pickedSpawnIndex = new List<int>();
         players = new PlayerController[PhotonNetwork.PlayerList.Length];
         photonView.RPC("ImInGame", RpcTarget.AllBuffered);
-        debugText.text += "Started\nPlayers: " + PhotonNetwork.PlayerList.Length + "\n";
+        debugText.text += "Number of Players: " + PhotonNetwork.PlayerList.Length + "\n";
+        Debug.Log("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
 
         foreach (PlayerController player in players)
@@ -83,10 +84,10 @@ public class GameManager : MonoBehaviourPunCallbacks
         playerObject = (GameObject)PhotonNetwork.Instantiate(playerPrefabLocation, spawnPoints[rand].position, Quaternion.identity); // spawn player
         //intialize the player
         PlayerController playerScript = playerObject.GetComponent<PlayerController>();
-        players[PhotonNetwork.LocalPlayer.ActorNumber - 1] = playerScript;
         debugText.text += "SpawnPlayer1\n";
         playerScript.photonView.RPC("Initialize", RpcTarget.All, PhotonNetwork.LocalPlayer);
         debugText.text += "SpawnPlayer2\n";
+        players[PhotonNetwork.LocalPlayer.ActorNumber - 1] = playerScript;
     }
     public PlayerController GetPlayer(int playerID)
     {
