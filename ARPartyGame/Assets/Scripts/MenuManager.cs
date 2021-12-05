@@ -16,10 +16,15 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public Text roomName;
     public Text playerList;
     public Button startGameBtn;
+
+    public Text debugText;
+
     private void Start()
     {
         createRoomBtn.interactable = false;
         joinRoomBtn.interactable = false;
+        Debug.LogWarning("MenuManager Start Address: " + PhotonNetwork.NetworkingClient.GameServerAddress);
+        debugText.text = "MenuManager Start Address: " + PhotonNetwork.NetworkingClient.GameServerAddress;
     }
     public override void OnConnectedToMaster()
     {
@@ -34,11 +39,13 @@ public class MenuManager : MonoBehaviourPunCallbacks
     }
     public void OnCreateRoomBtn(Text roomNameInput)
     {
+        Debug.LogWarning("Creating Room" + roomNameInput.text);
         NetworkManager.instance.CreateRoom(roomNameInput.text);
         roomName.text = roomNameInput.text;
     }
     public void OnJoinRoomBtn(Text roomNameInput)
     {
+        Debug.LogWarning("Joining room: " + roomNameInput.text);
         NetworkManager.instance.JoinRoom(roomNameInput.text);
         roomName.text = roomNameInput.text;
     }
@@ -50,7 +57,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
     {
         SetMenu(lobbyMenu);
         photonView.RPC("UpdateLobbyUI", RpcTarget.All);
-        photonView.RPC("UpdateLobbyUI", RpcTarget.Others); // Maybe baby
     }
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
@@ -60,8 +66,10 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public void UpdateLobbyUI()
     {
         playerList.text = "";
+        playerList.text += "PlayerList size: " + PhotonNetwork.PlayerList.Length + "\n";
         foreach (Player player in PhotonNetwork.PlayerList)
         {
+            Debug.LogWarning("UpdateLobbyUI() Iterating Players, Player name: " + player.NickName);
             if (player.IsMasterClient)
             {
                 playerList.text += player.NickName + " (Host) \n";

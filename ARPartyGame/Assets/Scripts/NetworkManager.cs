@@ -31,6 +31,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.JoinRoom(roomName);
         }
+        else
+        {
+            Debug.LogWarning("Room is full");
+        }
     }
     [PunRPC]
     public void ChangeScene(string sceneName)
