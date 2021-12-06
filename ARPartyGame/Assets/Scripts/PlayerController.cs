@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
             }
             else
             {
-                speed = 1f;
+                speed = 0;
             }
             if ((horizontal > 0 && vertical > 0) || (hori > 0 && verti > 0))
             {
@@ -119,7 +119,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         bullet.name = photonPlayer.NickName;
         Rigidbody rb = bullet.GetComponent<Rigidbody>();
         bullet.transform.localPosition = transform.position;
-        bullet.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+        bullet.transform.localScale = new Vector3(0.02f, 0.02f, 0.02f);
         rb.AddForce(this.transform.forward * 300f);
         Destroy(bullet, 1);
     }
