@@ -120,7 +120,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         Rigidbody rb = bullet.GetComponent<Rigidbody>();
         bullet.transform.localPosition = transform.position;
         bullet.transform.localScale = new Vector3(0.02f, 0.02f, 0.02f);
-        rb.AddForce(this.transform.forward * 300f);
+        rb.AddForce(this.transform.forward * 200f);
         Destroy(bullet, 1);
     }
 

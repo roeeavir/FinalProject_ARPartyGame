@@ -35,11 +35,17 @@ public class GameManager : MonoBehaviourPunCallbacks
         Debug.Log("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
 
+
+
         foreach (PlayerController player in players)
         {
             if (player != null)
             {
                 listOfPlayers.text += player.photonView.Owner.NickName + "\n"; // add player to the list
+            }
+            else
+            {
+                listOfPlayers.text += "null\n";
             }
         }
     }
