@@ -34,20 +34,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         debugText.text += "Number of Players: " + PhotonNetwork.PlayerList.Length + "\n";
         Debug.Log("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
-
-
-
-        foreach (PlayerController player in players)
-        {
-            if (player != null)
-            {
-                listOfPlayers.text += player.photonView.Owner.NickName + "\n"; // add player to the list
-            }
-            else
-            {
-                listOfPlayers.text += "null\n";
-            }
-        }
     }
     private void Update()
     {
@@ -73,6 +59,18 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (playersInGame == PhotonNetwork.PlayerList.Length)
         {
             SpawnPlayer();
+
+            foreach (PlayerController player in players)
+            {
+                if (player != null)
+                {
+                    listOfPlayers.text += player.photonView.Owner.NickName + "\n"; // add player to the list
+                }
+                else
+                {
+                    listOfPlayers.text += "null\n";
+                }
+            }
         }
     }
     void SpawnPlayer()
@@ -90,17 +88,19 @@ public class GameManager : MonoBehaviourPunCallbacks
         playerObject = (GameObject)PhotonNetwork.Instantiate(playerPrefabLocation, spawnPoints[rand].position, Quaternion.identity); // spawn player
         //intialize the player
         PlayerController playerScript = playerObject.GetComponent<PlayerController>();
-        debugText.text += "SpawnPlayer1\n";
         playerScript.photonView.RPC("Initialize", RpcTarget.All, PhotonNetwork.LocalPlayer);
-        debugText.text += "SpawnPlayer2\n";
         players[PhotonNetwork.LocalPlayer.ActorNumber - 1] = playerScript;
+
+        debugText.text += "SpawnPlayer\n";
     }
     public PlayerController GetPlayer(int playerID)
     {
+        Debug.LogWarning("GetPlayer with id: " + playerID);
         return players.First(x => x.id == playerID);
     }
     public PlayerController GetPlayer(GameObject playerObj)
     {
+        Debug.LogWarning("GetPlayer with object: " + playerObj.GetComponent<PlayerController>().id);
         return players.First(x => x.gameObject == playerObj);
     }
 }
