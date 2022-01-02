@@ -39,6 +39,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     [PunRPC]
     public void ChangeScene(string sceneName)
     {
+        PhotonNetwork.AutomaticallySyncScene = true; // Maybe Baby
         PhotonNetwork.LoadLevel(sceneName);
     }
 }

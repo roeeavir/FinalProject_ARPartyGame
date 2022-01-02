@@ -56,24 +56,22 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
     [PunRPC]
-    void ImInGame()
+    IEnumerator ImInGame()
     {
         debugText.text += "ImInGame\n";
         playersInGame++;
-        if (playersInGame == PhotonNetwork.PlayerList.Length)
+        while (playersInGame != PhotonNetwork.PlayerList.Length) { } // Metunaf
+        SpawnPlayer();
+        yield return new WaitForSeconds(1f);
+        foreach (PlayerController player in players)
         {
-            SpawnPlayer();
-
-            foreach (PlayerController player in players)
+            if (player != null)
             {
-                if (player != null)
-                {
-                    listOfPlayers.text += player.photonView.Owner.NickName + "\n"; // add player to the list
-                }
-                else
-                {
-                    listOfPlayers.text += "null\n";
-                }
+                listOfPlayers.text += player.photonView.Owner.NickName + "\n"; // add player to the list
+            }
+            else
+            {
+                listOfPlayers.text += "null\n";
             }
         }
     }
@@ -92,13 +90,16 @@ public class GameManager : MonoBehaviourPunCallbacks
         debugText.text += spawnPoints[rand].position + "\n";
         debugText.text += Quaternion.identity + "\n";
         GameObject playerObject = null;
+        debugText.text += "SpawnPlayer1\n";
         playerObject = (GameObject)PhotonNetwork.Instantiate(playerPrefabLocation, spawnPoints[rand].position, Quaternion.identity); // spawn player
         //intialize the player
         PlayerController playerScript = playerObject.GetComponent<PlayerController>();
+        debugText.text += "SpawnPlayer2\n";
         playerScript.photonView.RPC("Initialize", RpcTarget.All, PhotonNetwork.LocalPlayer);
+        debugText.text += "SpawnPlayer3\n";
         players[PhotonNetwork.LocalPlayer.ActorNumber - 1] = playerScript;
 
-        debugText.text += "SpawnPlayer\n";
+        debugText.text += "SpawnPlayer4\n";
     }
     public PlayerController GetPlayer(int playerID)
     {

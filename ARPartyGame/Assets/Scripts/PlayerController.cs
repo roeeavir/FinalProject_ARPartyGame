@@ -18,6 +18,10 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private float speed = 0.2f;
     private float fireRate = 2f;
     private float nextTimeToFire = 0f;
+
+    private Target target = null;
+
+    private bool isDead = false;
     [PunRPC]
 
     public void Initialize(Player player)
@@ -25,6 +29,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         photonPlayer = player;
         id = player.ActorNumber;
         speed = 0.2f;
+        target = GameObject.FindObjectOfType<Target>();
         GameManager.instance.players[id - 1] = this;
         // playerNickName.text = photonPlayer.NickName;
         if (!photonView.IsMine)
@@ -42,15 +47,18 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         try
         {
-            if (photonPlayer.IsLocal)
+            if (photonPlayer.IsLocal && target != null & target.isAlive())
             {
-                Movements();
-                if ((Input.GetKey(KeyCode.LeftControl) || CrossPlatformInputManager.GetButton("Shoot")) && Time.time >= nextTimeToFire)
-                {
-                    //  && Time.time >= nextTimeToFire
-                    nextTimeToFire = Time.time + 1f / fireRate;
-                    photonView.RPC("Fire", RpcTarget.All);
-                }
+                    Movements();
+                    if ((Input.GetKey(KeyCode.LeftControl) || CrossPlatformInputManager.GetButton("Shoot")) && Time.time >= nextTimeToFire)
+                    {
+                        //  && Time.time >= nextTimeToFire
+                        nextTimeToFire = Time.time + 1f / fireRate;
+                        photonView.RPC("Fire", RpcTarget.All);
+                    }
+            } else if (target != null & !target.isAlive() && !isDead){
+                isDead = true;
+                StartCoroutine(PlayerColorChange(Color.red));
             }
         }
         catch (System.Exception e)
@@ -142,14 +150,16 @@ public class PlayerController : MonoBehaviourPunCallbacks
             if (other.name != photonPlayer.NickName)
             {
                 Debug.Log("hit");
-                StartCoroutine(PlayerColorChange());
+                StartCoroutine(PlayerColorChange(Color.yellow));
             }
         }
     }
-    IEnumerator PlayerColorChange()
+    IEnumerator PlayerColorChange(Color color)
     {
-        this.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
-        yield return new WaitForSeconds(2);
-        this.gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
+        this.gameObject.GetComponent<MeshRenderer>().material.color = color;
+        if (!isDead) {
+            yield return new WaitForSeconds(2);
+            this.gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
+        }
     }
 }
