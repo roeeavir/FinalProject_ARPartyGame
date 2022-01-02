@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     //instance
     public static GameManager instance;
 
-    public Text listOfPlayers, debugText;
+    public Text listOfPlayers, debugText, health;
     private void Awake()
     {
         instance = this;
@@ -49,6 +49,10 @@ public class GameManager : MonoBehaviourPunCallbacks
         for (int i = 1; i < imageTarget.transform.childCount; i++)
         {
             imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
+            if (!health.enabled)
+            {
+                health.enabled = DefaultObserverEventHandler.isTracking;
+            }
         }
     }
     [PunRPC]
@@ -75,7 +79,10 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
     void SpawnPlayer()
     {
-
+        if (!photonView.IsMine)
+        {
+            return;
+        }
         int rand = Random.Range(0, spawnPoints.Length); // random spawn point
         while (pickedSpawnIndex.Contains(rand)) // check if the random spawn point is already picked
         {

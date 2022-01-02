@@ -16,8 +16,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public Text playerNickName;
     [SerializeField]
     private float speed = 0.2f;
+    private float fireRate = 2f;
+    private float nextTimeToFire = 0f;
     [PunRPC]
-
 
     public void Initialize(Player player)
     {
@@ -39,14 +40,24 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     private void Update()
     {
-        if (photonPlayer.IsLocal)
+        try
         {
-            Movements();
-            if (Input.GetKey(KeyCode.LeftControl) || CrossPlatformInputManager.GetButton("Shoot"))
+            if (photonPlayer.IsLocal)
             {
-                photonView.RPC("Fire", RpcTarget.All);
+                Movements();
+                if ((Input.GetKey(KeyCode.LeftControl) || CrossPlatformInputManager.GetButton("Shoot")) && Time.time >= nextTimeToFire)
+                {
+                    //  && Time.time >= nextTimeToFire
+                    nextTimeToFire = Time.time + 1f / fireRate;
+                    photonView.RPC("Fire", RpcTarget.All);
+                }
             }
         }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning(e.StackTrace);
+        }
+
     }
     void Movements()
     {
