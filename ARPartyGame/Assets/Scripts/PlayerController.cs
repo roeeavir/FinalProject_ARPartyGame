@@ -16,16 +16,22 @@ public class PlayerController : MonoBehaviourPunCallbacks
     public Text playerNickName;
     [SerializeField]
     private float speed = 0.2f;
+    private float fireRate = 2f;
+    private float nextTimeToFire = 0f;
+
+    private Target target = null;
+
+    private bool isDead = false;
     [PunRPC]
 
-    public Text debugText;
     public void Initialize(Player player)
     {
-        debugText.text += "InitializePlayer " + player.NickName + "\n";
         photonPlayer = player;
         id = player.ActorNumber;
         speed = 0.2f;
+        target = GameObject.FindObjectOfType<Target>();
         GameManager.instance.players[id - 1] = this;
+        // playerNickName.text = photonPlayer.NickName;
         if (!photonView.IsMine)
         {
             rig.isKinematic = true;
@@ -35,74 +41,94 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         speed = 0.2f;
         rig.isKinematic = true;
-        playerNickName.text = photonPlayer.NickName;
     }
 
     private void Update()
     {
-        if (photonPlayer.IsLocal)
+        try
         {
-            Movements();
-            if (Input.GetKey(KeyCode.LeftControl) || CrossPlatformInputManager.GetButton("Shoot"))
+            if (photonPlayer.IsLocal && target != null & target.isAlive())
             {
-                photonView.RPC("Fire", RpcTarget.All);
+                    Movements();
+                    if ((Input.GetKey(KeyCode.LeftControl) || CrossPlatformInputManager.GetButton("Shoot")) && Time.time >= nextTimeToFire)
+                    {
+                        //  && Time.time >= nextTimeToFire
+                        nextTimeToFire = Time.time + 1f / fireRate;
+                        photonView.RPC("Fire", RpcTarget.All);
+                    }
+            } else if (target != null & !target.isAlive() && !isDead){
+                isDead = true;
+                StartCoroutine(PlayerColorChange(Color.red));
             }
         }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning(e.StackTrace);
+        }
+
     }
     void Movements()
     {
-        float horizontal = CrossPlatformInputManager.GetAxisRaw("Horizontal");
-        float vertical = CrossPlatformInputManager.GetAxisRaw("Vertical");
-        float hori = Input.GetAxis("Horizontal");
-        float verti = Input.GetAxis("Vertical");
-        if (horizontal != 0 || vertical != 0 || hori != 0 || verti != 0)
+        try
         {
-            speed = 0.2f;
+            float horizontal = CrossPlatformInputManager.GetAxisRaw("Horizontal");
+            float vertical = CrossPlatformInputManager.GetAxisRaw("Vertical");
+            float hori = Input.GetAxis("Horizontal");
+            float verti = Input.GetAxis("Vertical");
+            if (horizontal != 0 || vertical != 0 || hori != 0 || verti != 0)
+            {
+                speed = 2f;
+            }
+            else
+            {
+                speed = 0;
+            }
+            if ((horizontal > 0 && vertical > 0) || (hori > 0 && verti > 0))
+            {
+                transform.localEulerAngles = new Vector3(0, 45, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
+            else if ((horizontal > 0 && vertical < 0) || (hori > 0 && verti < 0))
+            {
+                transform.localEulerAngles = new Vector3(0, 135, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
+            else if ((horizontal < 0 && vertical < 0) || (hori < 0 && verti < 0))
+            {
+                transform.localEulerAngles = new Vector3(0, -135, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
+            else if ((horizontal < 0 && vertical > 0) || (hori < 0 && verti > 0))
+            {
+                transform.localEulerAngles = new Vector3(0, -45, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
+            else if ((horizontal > 0 && vertical == 0) || (hori > 0 && verti == 0))
+            {
+                transform.localEulerAngles = new Vector3(0, 90, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
+            else if ((horizontal < 0 && vertical == 0) || (hori < 0 && verti == 0))
+            {
+                transform.localEulerAngles = new Vector3(0, -90, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
+            else if ((vertical > 0 && horizontal == 0) || (verti > 0 && hori == 0))
+            {
+                transform.localEulerAngles = new Vector3(0, 0, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
+            else if ((vertical < 0 && horizontal == 0) || (verti < 0 && hori == 0))
+            {
+                transform.localEulerAngles = new Vector3(0, 180, 0);
+                transform.Translate(Vector3.forward * speed * Time.deltaTime);
+            }
         }
-        else
+        catch (System.Exception e)
         {
-            speed = 0;
+            Debug.LogWarning("Yese " + e.StackTrace);
         }
-        if ((horizontal > 0 && vertical > 0) || (hori > 0 && verti > 0))
-        {
-            transform.localEulerAngles = new Vector3(0, 45, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if ((horizontal > 0 && vertical < 0) || (hori > 0 && verti < 0))
-        {
-            transform.localEulerAngles = new Vector3(0, 135, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if ((horizontal < 0 && vertical < 0) || (hori < 0 && verti < 0))
-        {
-            transform.localEulerAngles = new Vector3(0, -135, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if ((horizontal < 0 && vertical > 0) || (hori < 0 && verti > 0))
-        {
-            transform.localEulerAngles = new Vector3(0, -45, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if ((horizontal > 0 && vertical == 0) || (hori > 0 && verti == 0))
-        {
-            transform.localEulerAngles = new Vector3(0, 90, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if ((horizontal < 0 && vertical == 0) || (hori < 0 && verti == 0))
-        {
-            transform.localEulerAngles = new Vector3(0, -90, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if ((vertical > 0 && horizontal == 0) || (verti > 0 && hori == 0))
-        {
-            transform.localEulerAngles = new Vector3(0, 0, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
-        else if ((vertical < 0 && horizontal == 0) || (verti < 0 && hori == 0))
-        {
-            transform.localEulerAngles = new Vector3(0, 180, 0);
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
-        }
+
     }
 
     [PunRPC]
@@ -112,8 +138,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
         bullet.name = photonPlayer.NickName;
         Rigidbody rb = bullet.GetComponent<Rigidbody>();
         bullet.transform.localPosition = transform.position;
-        bullet.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
-        rb.AddForce(this.transform.forward * 300f);
+        bullet.transform.localScale = new Vector3(0.02f, 0.02f, 0.02f);
+        rb.AddForce(this.transform.forward * 200f);
         Destroy(bullet, 1);
     }
 
@@ -124,14 +150,16 @@ public class PlayerController : MonoBehaviourPunCallbacks
             if (other.name != photonPlayer.NickName)
             {
                 Debug.Log("hit");
-                StartCoroutine(PlayerColorChange());
+                StartCoroutine(PlayerColorChange(Color.yellow));
             }
         }
     }
-    IEnumerator PlayerColorChange()
+    IEnumerator PlayerColorChange(Color color)
     {
-        this.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
-        yield return new WaitForSeconds(2);
-        this.gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
+        this.gameObject.GetComponent<MeshRenderer>().material.color = color;
+        if (!isDead) {
+            yield return new WaitForSeconds(2);
+            this.gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
+        }
     }
 }
