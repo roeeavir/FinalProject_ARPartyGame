@@ -14,26 +14,42 @@ public class GameManager : MonoBehaviourPunCallbacks
     public string playerPrefabLocation;
     public Transform[] spawnPoints;
     public PlayerController[] players;
-    private int playersInGame;
     private List<int> pickedSpawnIndex;
     [Header("Reference")]
     public GameObject imageTarget;
     //instance
     public static GameManager instance;
 
+    private bool hasBeenSpawned = false;
+
     public Text listOfPlayers, debugText, health;
     private void Awake()
     {
-        instance = this;
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
     private void Start()
     {
+        // Print every player buffered in Photon
+        foreach (Player p in PhotonNetwork.PlayerList)
+        {
+            debugText.text += p.NickName + "\n";
+            Debug.LogWarning("Buffered Player: " + p.NickName + "\n");
+        }
         pickedSpawnIndex = new List<int>();
         players = new PlayerController[PhotonNetwork.PlayerList.Length];
         photonView.RPC("ImInGame", RpcTarget.AllBuffered);
         debugText.text += "Number of Players: " + PhotonNetwork.PlayerList.Length + "\n";
-        Debug.Log("Number of Players: " + PhotonNetwork.PlayerList.Length);
+        Debug.LogWarning("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
+
+        PrintListOfPlayers();
     }
     private void Update()
     {
@@ -56,31 +72,24 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
     [PunRPC]
-    IEnumerator ImInGame()
+    void ImInGame()
     {
-        debugText.text += "ImInGame\n";
-        playersInGame++;
-        while (playersInGame != PhotonNetwork.PlayerList.Length) { } // Metunaf
-        SpawnPlayer();
-        yield return new WaitForSeconds(1f);
-        foreach (PlayerController player in players)
-        {
-            if (player != null)
-            {
-                listOfPlayers.text += player.photonView.Owner.NickName + "\n"; // add player to the list
-            }
-            else
-            {
-                listOfPlayers.text += "null\n";
-            }
-        }
-    }
-    void SpawnPlayer()
-    {
-        if (!photonView.IsMine)
+        if(hasBeenSpawned)
         {
             return;
         }
+        
+        debugText.text += "ImInGame\n";
+        SpawnPlayer();
+        hasBeenSpawned = true;
+
+    }
+    void SpawnPlayer()
+    {
+        // if (!photonView.IsMine)
+        // {
+        //     return;
+        // }
         int rand = Random.Range(0, spawnPoints.Length); // random spawn point
         while (pickedSpawnIndex.Contains(rand)) // check if the random spawn point is already picked
         {
@@ -110,5 +119,27 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         Debug.LogWarning("GetPlayer with object: " + playerObj.GetComponent<PlayerController>().id);
         return players.First(x => x.gameObject == playerObj);
+    }
+
+    // Print the list of players after waiting for 2 seconds
+    IEnumerator PrintListOfPlayers()
+    {
+        yield return new WaitForSeconds(2);
+        // // while players contails null
+        // while (players.Contains(null))
+        // {
+        //     yield return new WaitForSeconds(0.5f);
+        // }
+        foreach (PlayerController player in players)
+        {
+            if (player != null)
+            {
+                listOfPlayers.text += player.photonView.Owner.NickName + "\n"; // add player to the list
+            }
+            else
+            {
+                listOfPlayers.text += "null\n";
+            }
+        }
     }
 }
