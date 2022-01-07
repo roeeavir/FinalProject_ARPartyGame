@@ -29,10 +29,10 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             instance = this;
         }
-        else
-        {
-            Destroy(gameObject);
-        }
+        // else
+        // {
+        //     Destroy(gameObject);
+        // }
     }
     private void Start()
     {
@@ -48,8 +48,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         debugText.text += "Number of Players: " + PhotonNetwork.PlayerList.Length + "\n";
         Debug.LogWarning("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
-
-        PrintListOfPlayers();
     }
     private void Update()
     {
@@ -106,7 +104,14 @@ public class GameManager : MonoBehaviourPunCallbacks
         debugText.text += "SpawnPlayer2\n";
         playerScript.photonView.RPC("Initialize", RpcTarget.All, PhotonNetwork.LocalPlayer);
         debugText.text += "SpawnPlayer3\n";
+        Debug.LogWarning(playerScript);
         players[PhotonNetwork.LocalPlayer.ActorNumber - 1] = playerScript;
+        if (players[PhotonNetwork.LocalPlayer.ActorNumber - 1] == null)
+        {
+            Debug.LogWarning("Player is null");
+        } else {
+            Debug.LogWarning("Player is not null");
+        }
 
         debugText.text += "SpawnPlayer4\n";
     }
@@ -121,25 +126,4 @@ public class GameManager : MonoBehaviourPunCallbacks
         return players.First(x => x.gameObject == playerObj);
     }
 
-    // Print the list of players after waiting for 2 seconds
-    IEnumerator PrintListOfPlayers()
-    {
-        yield return new WaitForSeconds(2);
-        // // while players contails null
-        // while (players.Contains(null))
-        // {
-        //     yield return new WaitForSeconds(0.5f);
-        // }
-        foreach (PlayerController player in players)
-        {
-            if (player != null)
-            {
-                listOfPlayers.text += player.photonView.Owner.NickName + "\n"; // add player to the list
-            }
-            else
-            {
-                listOfPlayers.text += "null\n";
-            }
-        }
-    }
 }

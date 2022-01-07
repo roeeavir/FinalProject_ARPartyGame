@@ -1,8 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.Audio;
 using UnityEngine;
 
-public class Audio
+[System.Serializable]
+public class Sound
 {
     public string name;
     public AudioClip clip;
@@ -16,5 +16,4 @@ public class Audio
     public float spatialBlend;
 
     public bool loop;
-
 }

@@ -43,6 +43,10 @@ MonoBehaviour:
   - UpdateLobbyUI
   - ImInGame
   - Initialize
+  - PlayerDead
+  - PlayerHitColorChange
+  - ChangeColor
+  - playAudio
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
