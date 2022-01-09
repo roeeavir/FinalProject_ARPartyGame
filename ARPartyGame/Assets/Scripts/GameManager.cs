@@ -48,6 +48,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         debugText.text += "Number of Players: " + PhotonNetwork.PlayerList.Length + "\n";
         Debug.LogWarning("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
+        // set plane texture
+        GameObject plane = GameObject.Find("Yese");
+        plane.GetComponent<Renderer>().material.mainTexture = TexturesDelivery.getTexture();
     }
     private void Update()
     {

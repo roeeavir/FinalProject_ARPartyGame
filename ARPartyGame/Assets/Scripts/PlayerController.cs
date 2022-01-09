@@ -21,10 +21,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     private Target target = null;
 
-    private Color[] colors = { Color.white, Color.red, Color.black};
+    private Color[] colors = { Color.cyan, Color.grey, Color.magenta, Color.blue, Color.red, Color.black };
 
-    private bool isDead = false;
-    
     [PunRPC]
     public void Initialize(Player player)
     {
@@ -39,6 +37,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         {
             rig.isKinematic = true;
         }
+        photonView.RPC("ChangeColor", RpcTarget.AllBuffered, id - 1);
+
     }
     private void Start()
     {
@@ -165,27 +165,27 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
                 if (this.target.isAlive())
                 {
-                    StartCoroutine(PlayerHitColorChange(1));
+                    StartCoroutine(PlayerColorChange(4));
                 }
                 else
                 {
                     Debug.Log("dead");
-                    StartCoroutine(PlayerHitColorChange(2));
+                    StartCoroutine(PlayerColorChange(5));
                 }
             }
         }
     }
-    private IEnumerator PlayerHitColorChange(int colorID)
+    private IEnumerator PlayerColorChange(int colorID)
     {
         // change this player color for everyother player
-        Debug.Log("PlayerHitColorChange " + colors[colorID]);
+        Debug.Log("PlayerColorChange " + colors[colorID]);
         photonView.RPC("ChangeColor", RpcTarget.AllBuffered, colorID);
 
         // Is player that has been hit by bullet is alive
         if (this.target.isAlive())
         {
             yield return new WaitForSeconds(1f);
-            photonView.RPC("ChangeColor", RpcTarget.AllBuffered, 0);
+            photonView.RPC("ChangeColor", RpcTarget.AllBuffered, id - 1);
         }
 
     }

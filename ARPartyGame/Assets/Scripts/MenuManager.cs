@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
+using NativeGalleryNamespace;
+
 public class MenuManager : MonoBehaviourPunCallbacks
 {
     [Header(" — -Menus — -")]
@@ -17,7 +19,11 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public Text playerList;
     public Button startGameBtn;
 
+    public Button setAnchorBtn;
+
     public Text debugText;
+
+    public GameObject textureDelivery;	
 
     private void Start()
     {
@@ -81,11 +87,13 @@ public class MenuManager : MonoBehaviourPunCallbacks
         }
         if (PhotonNetwork.IsMasterClient)
         {
-            startGameBtn.interactable = true;
+            startGameBtn.interactable = false;
+            setAnchorBtn.interactable = true;
         }
         else
         {
             startGameBtn.interactable = false;
+            setAnchorBtn.interactable = false;
         }
     }
     public void OnLeaveLobbyBtn()
@@ -96,5 +104,72 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public void OnStartGameBtn()
     {
         NetworkManager.instance.photonView.RPC("ChangeScene", RpcTarget.All, "Game");
+    }
+
+
+    public void OnSetAnchorPhoto()
+    {
+        NativeGallery.Permission permission = NativeGallery.GetImageFromGallery((path) =>
+       {
+           Debug.Log("Image path: " + path);
+           if (path != null)
+           {
+               // Create Texture from selected image
+               Texture2D texture = NativeGallery.LoadImageAtPath(path, 512, false);
+               if (texture == null)
+               {
+                   Debug.Log("Couldn't load texture from " + path);
+                   return;
+               }
+
+               //    // Assign texture to a temporary quad and destroy it after 5 seconds
+               //    GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+               //    quad.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 2.5f;
+               //    quad.transform.forward = Camera.main.transform.forward;
+               //    quad.transform.localScale = new Vector3(1f, texture.height / (float)texture.width, 1f);
+
+               //    Material material = quad.GetComponent<Renderer>().material;
+               //    if (!material.shader.isSupported) // happens when Standard shader is not included in the build
+               //        material.shader = Shader.Find("Legacy Shaders/Diffuse");
+
+               //    material.mainTexture = texture;
+
+               // get TexturesDelivery Component
+            //    TexturesDelivery delivery = textureDelivery.GetComponent<TexturesDelivery>();
+            //    if (delivery == null)
+            //    {
+            //        Debug.Log("TexturesDelivery not found");
+            //        return;
+            //    } else
+            //    {
+            //        Debug.Log("TexturesDelivery found");
+            //        delivery.photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, texture.EncodeToPNG());
+            //    }
+               NetworkManager.instance.photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, texture.EncodeToPNG());
+
+
+               //    Destroy(quad, 5f);
+
+               //    // If a procedural texture is not destroyed manually, 
+               //    // it will only be freed after a scene change
+               //    Destroy(texture, 5f);
+           }
+       });
+
+        Debug.Log("Permission result: " + permission);
+
+        if (permission == NativeGallery.Permission.Denied)
+        {
+            Debug.Log("Permission denied");
+        }
+        else if (permission == NativeGallery.Permission.ShouldAsk)
+        {
+            Debug.Log("Permission denied");
+        }
+        else if (permission == NativeGallery.Permission.Granted)
+        {
+            startGameBtn.interactable = true;
+            Debug.Log("Permission granted");
+        }
     }
 }
