@@ -29,6 +29,14 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     WebCamTexture webCamTexture;
 
+    public GameObject photoCanvas;
+
+    public Camera mainCamera;
+
+    public GameObject photoBtn;
+
+    public GameObject photo;
+
     private void Start()
     {
         createRoomBtn.interactable = false;
@@ -194,35 +202,51 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public void OnSetAnchorPhotoFromCamera()
     {
         Debug.LogWarning("OnSetAnchorPhotoFromCamera()");
-        webCamTexture = new WebCamTexture();
-        GetComponent<Renderer>().material.mainTexture = webCamTexture; //Add Mesh Renderer to the GameObject to which this script is attached to
-        webCamTexture.Play();
-        StartCoroutine(TakePhoto());
+        photoCanvas.SetActive(true);
+        photoBtn.SetActive(true);
+        photo.GetComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+        mainCamera.GetComponent<PhoneCamera>().enabled = true;
     }
 
-    IEnumerator TakePhoto()  // Start this Coroutine on some button click
-    {
 
-        // NOTE - you almost certainly have to do this here:
+    public void OnPhotoBtn()
+    {
+        Debug.LogWarning("OnPhotoBtn()");
+        StartCoroutine(TakeScreenshot());
+    }
+
+    private IEnumerator TakeScreenshot()
+    {
+        photo.GetComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
 
         yield return new WaitForEndOfFrame();
 
-        // it's a rare case where the Unity doco is pretty clear,
-        // http://docs.unity3d.com/ScriptReference/WaitForEndOfFrame.html
-        // be sure to scroll down to the SECOND long example on that doco page 
+        Texture2D screenTexture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
+        screenTexture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+        screenTexture = ResizeTexture(screenTexture, 512, 512);
+        screenTexture.Apply();
 
-        Texture2D photo = new Texture2D(webCamTexture.width, webCamTexture.height);
-        photo.SetPixels(webCamTexture.GetPixels());
-        photo.Apply();
-
-        NetworkManager.instance.photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, photo.EncodeToPNG());
+        NetworkManager.instance.photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, screenTexture.EncodeToPNG());
 
         startGameBtn.interactable = true;
 
-        // //Encode to a PNG
-        // byte[] bytes = photo.EncodeToPNG();
-        // //Write out the PNG. Of course you have to substitute your_path for something sensible
-        // File.WriteAllBytes(your_path + "photo.png", bytes);
+        photoBtn.SetActive(false);
+
+        anchorCanvas.SetActive(false);
     }
 
+    Texture2D ResizeTexture(Texture2D texture2D, int targetX, int targetY)
+    {
+        Texture2D result = new Texture2D(targetX, targetY, texture2D.format, true);
+        Color[] rpixels = result.GetPixels(0);
+        float incX = (1.0f / (float)targetX);
+        float incY = (1.0f / (float)targetY);
+        for (int px = 0; px < rpixels.Length; px++)
+        {
+            rpixels[px] = texture2D.GetPixelBilinear(incX * ((float)px % targetX), incY * ((float)Mathf.Floor(px / targetX)));
+        }
+        result.SetPixels(rpixels, 0);
+        result.Apply();
+        return result;
+    }
 }

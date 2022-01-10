@@ -70,6 +70,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
         material.mainTexture = texture;
 
-        TexturesDelivery.setTexture(texture);
+        TexturesFunctions.setTexture(texture);
     }
 }

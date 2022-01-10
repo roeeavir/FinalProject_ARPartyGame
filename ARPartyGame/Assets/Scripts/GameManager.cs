@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         DefaultObserverEventHandler.isTracking = false;
         // set plane texture
         GameObject plane = GameObject.Find("Yese");
-        plane.GetComponent<Renderer>().material.mainTexture = TexturesDelivery.getTexture();
+        plane.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.getTexture();
     }
     private void Update()
     {

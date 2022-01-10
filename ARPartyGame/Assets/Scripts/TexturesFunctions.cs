@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class TexturesDelivery : MonoBehaviourPunCallbacks
+public class TexturesFunctions : MonoBehaviourPunCallbacks
 {
     private static Texture2D texture;
 
@@ -41,6 +41,6 @@ public class TexturesDelivery : MonoBehaviourPunCallbacks
 
     public static void setTexture(Texture2D texture)
     {
-        TexturesDelivery.texture = texture;
+        TexturesFunctions.texture = texture;
     }
 }
