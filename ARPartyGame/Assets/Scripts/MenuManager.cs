@@ -233,6 +233,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
         photoBtn.SetActive(false);
 
         anchorCanvas.SetActive(false);
+
+        mainCamera.GetComponent<PhoneCamera>().enabled = false;
     }
 
     Texture2D ResizeTexture(Texture2D texture2D, int targetX, int targetY)

@@ -42,6 +42,7 @@ public class PhoneCamera : MonoBehaviour
         background.texture = backCam;
 
         camAvailable = true;
+
     }
 
     private void Update(){
@@ -56,6 +57,10 @@ public class PhoneCamera : MonoBehaviour
 
         int orient = -backCam.videoRotationAngle;
         background.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
+    }
+
+    private void OnDisable(){
+        backCam.Stop();
     }
 
     
