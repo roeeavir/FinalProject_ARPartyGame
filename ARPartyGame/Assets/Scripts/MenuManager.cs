@@ -23,7 +23,11 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public Text debugText;
 
-    public GameObject textureDelivery;	
+    public GameObject textureDelivery;
+
+    public GameObject anchorCanvas;
+
+    WebCamTexture webCamTexture;
 
     private void Start()
     {
@@ -106,8 +110,19 @@ public class MenuManager : MonoBehaviourPunCallbacks
         NetworkManager.instance.photonView.RPC("ChangeScene", RpcTarget.All, "Game");
     }
 
+    public void onOpenAnchorCanvas()
+    {
+        Debug.LogWarning("onOpenAnchorCanvas()");
+        anchorCanvas.SetActive(true);
+    }
 
-    public void OnSetAnchorPhoto()
+    public void onCloseAnchorCanvas()
+    {
+        Debug.LogWarning("onCloseAnchorCanvas()");
+        anchorCanvas.SetActive(false);
+    }
+
+    public void OnSetAnchorPhotoFromGallery()
     {
         NativeGallery.Permission permission = NativeGallery.GetImageFromGallery((path) =>
        {
@@ -135,18 +150,19 @@ public class MenuManager : MonoBehaviourPunCallbacks
                //    material.mainTexture = texture;
 
                // get TexturesDelivery Component
-            //    TexturesDelivery delivery = textureDelivery.GetComponent<TexturesDelivery>();
-            //    if (delivery == null)
-            //    {
-            //        Debug.Log("TexturesDelivery not found");
-            //        return;
-            //    } else
-            //    {
-            //        Debug.Log("TexturesDelivery found");
-            //        delivery.photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, texture.EncodeToPNG());
-            //    }
+               //    TexturesDelivery delivery = textureDelivery.GetComponent<TexturesDelivery>();
+               //    if (delivery == null)
+               //    {
+               //        Debug.Log("TexturesDelivery not found");
+               //        return;
+               //    } else
+               //    {
+               //        Debug.Log("TexturesDelivery found");
+               //        delivery.photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, texture.EncodeToPNG());
+               //    }
                NetworkManager.instance.photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, texture.EncodeToPNG());
 
+               startGameBtn.interactable = true;
 
                //    Destroy(quad, 5f);
 
@@ -168,8 +184,45 @@ public class MenuManager : MonoBehaviourPunCallbacks
         }
         else if (permission == NativeGallery.Permission.Granted)
         {
-            startGameBtn.interactable = true;
+
             Debug.Log("Permission granted");
         }
+
+        anchorCanvas.SetActive(false);
     }
+
+    public void OnSetAnchorPhotoFromCamera()
+    {
+        Debug.LogWarning("OnSetAnchorPhotoFromCamera()");
+        webCamTexture = new WebCamTexture();
+        GetComponent<Renderer>().material.mainTexture = webCamTexture; //Add Mesh Renderer to the GameObject to which this script is attached to
+        webCamTexture.Play();
+        StartCoroutine(TakePhoto());
+    }
+
+    IEnumerator TakePhoto()  // Start this Coroutine on some button click
+    {
+
+        // NOTE - you almost certainly have to do this here:
+
+        yield return new WaitForEndOfFrame();
+
+        // it's a rare case where the Unity doco is pretty clear,
+        // http://docs.unity3d.com/ScriptReference/WaitForEndOfFrame.html
+        // be sure to scroll down to the SECOND long example on that doco page 
+
+        Texture2D photo = new Texture2D(webCamTexture.width, webCamTexture.height);
+        photo.SetPixels(webCamTexture.GetPixels());
+        photo.Apply();
+
+        NetworkManager.instance.photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, photo.EncodeToPNG());
+
+        startGameBtn.interactable = true;
+
+        // //Encode to a PNG
+        // byte[] bytes = photo.EncodeToPNG();
+        // //Write out the PNG. Of course you have to substitute your_path for something sensible
+        // File.WriteAllBytes(your_path + "photo.png", bytes);
+    }
+
 }

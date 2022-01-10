@@ -8,6 +8,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
     private Texture2D texture;
 
+    GameObject quad = null;
+
     private void Awake()
     {
         if (instance != null && instance != this)
@@ -49,11 +51,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     [PunRPC]
     public void SetAnchorPhoto(byte[] receivedByte)
     {
+        if (quad != null)
+        {
+            Destroy(quad);
+        }
         texture = new Texture2D(1, 1);
         texture.LoadImage(receivedByte);
 
         // Assign texture to a temporary quad and destroy it after 5 seconds
-        GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
         quad.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 2.5f;
         quad.transform.forward = Camera.main.transform.forward;
         quad.transform.localScale = new Vector3(1f, texture.height / (float)texture.width, 1f);
