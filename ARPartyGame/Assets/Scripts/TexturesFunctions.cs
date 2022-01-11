@@ -43,4 +43,12 @@ public class TexturesFunctions : MonoBehaviourPunCallbacks
     {
         TexturesFunctions.texture = texture;
     }
+
+    public static Texture2D changeTextureFormat(Texture2D texture, TextureFormat newFormat)
+    {
+        Texture2D newTexture = new Texture2D(512, 512, newFormat, false);
+        newTexture.SetPixels(texture.GetPixels());
+        newTexture.Apply();
+        return newTexture;
+    }
 }
