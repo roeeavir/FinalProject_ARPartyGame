@@ -15,12 +15,15 @@ public class GameManager : MonoBehaviourPunCallbacks
     public Transform[] spawnPoints;
     public PlayerController[] players;
     private List<int> pickedSpawnIndex;
-    [Header("Reference")]
-    public GameObject imageTarget;
+    // [Header("Reference")]
+    // public GameObject imageTarget;
+    private GameObject imageTarget;
+
     //instance
     public static GameManager instance;
 
     private bool hasBeenSpawned = false;
+
 
     public Text listOfPlayers, debugText, health;
     private void Awake()
@@ -53,31 +56,40 @@ public class GameManager : MonoBehaviourPunCallbacks
     private void Update()
     {
         // Debug.LogWarning("is tracking " + DefaultObserverEventHandler.isTracking);
+        if (imageTarget != null)
+        {
+            foreach (GameObject gameObj in GameObject.FindObjectsOfType(typeof(GameObject)))
+            {
+                if (gameObj.name == "Player(Clone)" && imageTarget != null)
+                {
+                    gameObj.transform.SetParent(imageTarget.transform);
+                }
+            }
+            for (int i = 1; i < imageTarget.transform.childCount; i++)
+            {
+                imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
+                if (!health.enabled)
+                {
+                    health.enabled = DefaultObserverEventHandler.isTracking;
+                }
+            }
+        }
+        else
+        {
+            // set imageTarget to from SideLoadImageTarget script
+            imageTarget = GameObject.Find("DynamicImageTarget");
+            // imageTarget = SideLoadImageTarget.GetImageTarget();
+        }
 
-        foreach (GameObject gameObj in GameObject.FindObjectsOfType(typeof(GameObject)))
-        {
-            if (gameObj.name == "Player(Clone)" && imageTarget != null)
-            {
-                gameObj.transform.SetParent(imageTarget.transform);
-            }
-        }
-        for (int i = 1; i < imageTarget.transform.childCount; i++)
-        {
-            imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
-            if (!health.enabled)
-            {
-                health.enabled = DefaultObserverEventHandler.isTracking;
-            }
-        }
     }
     [PunRPC]
     void ImInGame()
     {
-        if(hasBeenSpawned)
+        if (hasBeenSpawned)
         {
             return;
         }
-        
+
         debugText.text += "ImInGame\n";
         SpawnPlayer();
         hasBeenSpawned = true;
@@ -85,10 +97,6 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
     void SpawnPlayer()
     {
-        // if (!photonView.IsMine)
-        // {
-        //     return;
-        // }
         int rand = Random.Range(0, spawnPoints.Length); // random spawn point
         while (pickedSpawnIndex.Contains(rand)) // check if the random spawn point is already picked
         {
@@ -110,7 +118,9 @@ public class GameManager : MonoBehaviourPunCallbacks
         if (players[PhotonNetwork.LocalPlayer.ActorNumber - 1] == null)
         {
             Debug.LogWarning("Player is null");
-        } else {
+        }
+        else
+        {
             Debug.LogWarning("Player is not null");
         }
 

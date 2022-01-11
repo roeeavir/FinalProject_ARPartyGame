@@ -145,6 +145,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
                    return;
                }
 
+               texture = ResizeTexture(texture, 512, 512);
+               texture.Apply();
+
                //    // Assign texture to a temporary quad and destroy it after 5 seconds
                //    GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
                //    quad.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 2.5f;

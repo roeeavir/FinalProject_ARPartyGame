@@ -8,6 +8,8 @@ public class SideLoadImageTarget : MonoBehaviour
     public float printedTargetSize = 0.32f;
     public string targetName = "DynamicImageTarget";
 
+    private static ImageTargetBehaviour mTarget = null;
+
 
     void Start()
     {
@@ -29,7 +31,7 @@ public class SideLoadImageTarget : MonoBehaviour
 
         textureFile = TexturesFunctions.changeTextureFormat(textureFile, TextureFormat.RGB24);
 
-        var mTarget = VuforiaBehaviour.Instance.ObserverFactory.CreateImageTarget(
+        ImageTargetBehaviour mTarget = VuforiaBehaviour.Instance.ObserverFactory.CreateImageTarget(
             textureFile,
             printedTargetSize,
             targetName);
@@ -45,12 +47,16 @@ public class SideLoadImageTarget : MonoBehaviour
         plane.transform.localScale = new Vector3(0.4f, 1f, 0.4f);
         // Add plane to the newly created game object
         // Instantiate(GameObject.CreatePrimitive(PrimitiveType.Plane), mTarget.transform);
-        
+
         // Place the plane as mTarget's child
         plane.transform.parent = mTarget.transform;
 
         Debug.Log("Instant Image Target created " + mTarget.TargetName);
     }
 
+    public static ImageTargetBehaviour GetImageTarget()
+    {
+        return mTarget;
+    }
 
 }
