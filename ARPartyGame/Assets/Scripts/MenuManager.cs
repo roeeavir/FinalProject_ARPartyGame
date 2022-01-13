@@ -35,31 +35,42 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public GameObject photoBtn;
 
-    public GameObject photo;
+    public RawImage photo;
+
+    private ExitGames.Client.Photon.Hashtable customeProperties = new ExitGames.Client.Photon.Hashtable();
+
+    private Texture2D texture;
+
+    GameObject quad = null;
+
+    private bool firstConnect = true;
 
     private void Start()
     {
-        createRoomBtn.interactable = false;
-        joinRoomBtn.interactable = false;
+        createRoomBtn.interactable = false; // disable create room button
+        joinRoomBtn.interactable = false; // disable join room button
         Debug.LogWarning("MenuManager Start Address: " + PhotonNetwork.NetworkingClient.GameServerAddress);
         debugText.text = "MenuManager Start Address: " + PhotonNetwork.NetworkingClient.GameServerAddress;
+
+        customeProperties["isReady"] = false;
+        PhotonNetwork.LocalPlayer.SetCustomProperties(customeProperties);
     }
     public override void OnConnectedToMaster()
     {
-        createRoomBtn.interactable = true;
-        joinRoomBtn.interactable = true;
+        createRoomBtn.interactable = true; // enable create room button
+        joinRoomBtn.interactable = true; // enable join room button
     }
     void SetMenu(GameObject menu)
     {
-        mainMenu.SetActive(false);
-        lobbyMenu.SetActive(false);
-        menu.SetActive(true);
+        mainMenu.SetActive(false); // disable main menu
+        lobbyMenu.SetActive(false); // disable lobby menu
+        menu.SetActive(true); // enable selected menu
     }
     public void OnCreateRoomBtn(Text roomNameInput)
     {
         Debug.LogWarning("Creating Room" + roomNameInput.text);
-        NetworkManager.instance.CreateRoom(roomNameInput.text);
-        roomName.text = roomNameInput.text;
+        NetworkManager.instance.CreateRoom(roomNameInput.text); // create room
+        roomName.text = "Room Name: " + roomNameInput.text;
     }
     public void OnJoinRoomBtn(Text roomNameInput)
     {
@@ -80,6 +91,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
     {
         UpdateLobbyUI();
     }
+    // Prints the player list
     [PunRPC]
     public void UpdateLobbyUI()
     {
@@ -90,27 +102,44 @@ public class MenuManager : MonoBehaviourPunCallbacks
             Debug.LogWarning("UpdateLobbyUI() Iterating Players, Player name: " + player.NickName);
             if (player.IsMasterClient)
             {
-                playerList.text += player.NickName + " (Host) \n";
+                playerList.text += player.NickName + " (Host)";
             }
             else
             {
-                playerList.text += player.NickName + "\n";
+                playerList.text += player.NickName;
+            }
+            if (player.CustomProperties["isReady"] != null)
+            {
+                if ((bool)player.CustomProperties["isReady"])
+                {
+                    playerList.text += " R\n"; // Ready
+                }
+                else
+                {
+                    playerList.text += " NR\n"; // Not Ready
+                }
             }
         }
-        if (PhotonNetwork.IsMasterClient)
-        {
-            startGameBtn.interactable = false;
-            setAnchorBtn.interactable = true;
-        }
-        else
-        {
-            startGameBtn.interactable = false;
-            setAnchorBtn.interactable = false;
+        if (firstConnect) {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                setAnchorBtn.interactable = true; // enable set anchor button
+            }
+            else
+            {
+                setAnchorBtn.interactable = false; // disable set anchor button
+            }
+            startGameBtn.interactable = false; // disable start game button
+            firstConnect = false;
         }
     }
     public void OnLeaveLobbyBtn()
     {
         PhotonNetwork.LeaveRoom();
+        if (quad != null)
+        {
+            Destroy(quad);
+        }
         SetMenu(mainMenu);
     }
     public void OnStartGameBtn()
@@ -130,6 +159,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
         anchorCanvas.SetActive(false);
     }
 
+    // Sets the anchor image texture from the gallery
     public void OnSetAnchorPhotoFromGallery()
     {
         NativeGallery.Permission permission = NativeGallery.GetImageFromGallery((path) =>
@@ -145,41 +175,14 @@ public class MenuManager : MonoBehaviourPunCallbacks
                    return;
                }
 
-               texture = ResizeTexture(texture, 512, 512);
+               texture = TexturesFunctions.ResizeTexture(texture, TexturesFunctions.getWidth(), TexturesFunctions.getHeight());
                texture.Apply();
 
-               //    // Assign texture to a temporary quad and destroy it after 5 seconds
-               //    GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-               //    quad.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 2.5f;
-               //    quad.transform.forward = Camera.main.transform.forward;
-               //    quad.transform.localScale = new Vector3(1f, texture.height / (float)texture.width, 1f);
+               startGameBtn.interactable = false; // disable start game button
 
-               //    Material material = quad.GetComponent<Renderer>().material;
-               //    if (!material.shader.isSupported) // happens when Standard shader is not included in the build
-               //        material.shader = Shader.Find("Legacy Shaders/Diffuse");
+               photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, texture.EncodeToPNG());
 
-               //    material.mainTexture = texture;
 
-               // get TexturesDelivery Component
-               //    TexturesDelivery delivery = textureDelivery.GetComponent<TexturesDelivery>();
-               //    if (delivery == null)
-               //    {
-               //        Debug.Log("TexturesDelivery not found");
-               //        return;
-               //    } else
-               //    {
-               //        Debug.Log("TexturesDelivery found");
-               //        delivery.photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, texture.EncodeToPNG());
-               //    }
-               NetworkManager.instance.photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, texture.EncodeToPNG());
-
-               startGameBtn.interactable = true;
-
-               //    Destroy(quad, 5f);
-
-               //    // If a procedural texture is not destroyed manually, 
-               //    // it will only be freed after a scene change
-               //    Destroy(texture, 5f);
            }
        });
 
@@ -199,7 +202,10 @@ public class MenuManager : MonoBehaviourPunCallbacks
             Debug.Log("Permission granted");
         }
 
+        photoCanvas.SetActive(false);
+
         anchorCanvas.SetActive(false);
+
     }
 
     public void OnSetAnchorPhotoFromCamera()
@@ -207,7 +213,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
         Debug.LogWarning("OnSetAnchorPhotoFromCamera()");
         photoCanvas.SetActive(true);
         photoBtn.SetActive(true);
-        photo.GetComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+        // photo.GetComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.FitInParent;
         mainCamera.GetComponent<PhoneCamera>().enabled = true;
     }
 
@@ -215,43 +221,138 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public void OnPhotoBtn()
     {
         Debug.LogWarning("OnPhotoBtn()");
-        StartCoroutine(TakeScreenshot());
+        StartCoroutine(TakeSnapshot());
     }
 
-    private IEnumerator TakeScreenshot()
+    //     private IEnumerator TakeScreenshot()
+    //     {
+    //         // photo.GetComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+
+    //         // photo.GetComponent<AspectRatioFitter>().aspectRatio = 0.55f;
+
+    //         // set photoCanvas to fit whole screen
+    //         // photoCanvas.GetComponent<RectTransform>().sizeDelta = new Vector2(Screen.height, Screen.width);
+    //         // photo.GetComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.None;
+    //         // photo.GetComponent<RectTransform>().sizeDelta = new Vector2(Screen.height, photo.GetComponent<RectTransform>().sizeDelta.x);
+    //         // set left of photo to 0
+    //         // photoCanvas.transform.localScale = new Vector3(1f, 1f, 1f);
+
+    //         // RectTransformFunctions.SetLeft(photo.GetComponent<RectTransform>(), 0f);
+    //         // RectTransformFunctions.SetRight(photo.GetComponent<RectTransform>(), 0f);
+    //         // RectTransformFunctions.SetBottom(photo.GetComponent<RectTransform>(), 0f);
+
+    //         // fit photo to screen
+    //         // photo.GetComponent<AspectRatioFitter>().aspectRatio = 0.55f;
+
+
+    //         yield return new WaitForEndOfFrame();
+    // // wait 2 seconds for the texture to be updated
+    //         yield return new WaitForSeconds(2);
+
+    //         Texture2D screenTexture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
+    //         screenTexture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+    //         screenTexture = ResizeTexture(screenTexture, 512, 512);
+    //         screenTexture.Apply();
+
+    //         NetworkManager.instance.photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, screenTexture.EncodeToPNG());
+
+    //         startGameBtn.interactable = true;
+
+    //         photoBtn.SetActive(false);
+
+    //         anchorCanvas.SetActive(false);
+
+    //         mainCamera.GetComponent<PhoneCamera>().enabled = false;
+    //     }
+
+
+    // Sets the anchor image texture from the camera
+    private IEnumerator TakeSnapshot()
     {
-        photo.GetComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+        yield return new WaitForEndOfFrame(); // wait for screen to be rendered
 
-        yield return new WaitForEndOfFrame();
+        WebCamTexture webCamTexture = mainCamera.GetComponent<PhoneCamera>().GetWebCamTexture(); // get the WebCamTexture
 
-        Texture2D screenTexture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
-        screenTexture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
-        screenTexture = ResizeTexture(screenTexture, 512, 512);
-        screenTexture.Apply();
+        Texture2D snap = new Texture2D(webCamTexture.width, webCamTexture.height, TextureFormat.RGB24, false); // create a new texture
 
-        NetworkManager.instance.photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, screenTexture.EncodeToPNG());
 
-        startGameBtn.interactable = true;
+        snap.SetPixels(webCamTexture.GetPixels()); // copy the pixels from the WebCamTexture to the new texture
+        snap = TexturesFunctions.ResizeTexture(snap, TexturesFunctions.getWidth(), TexturesFunctions.getHeight()); // resize the texture
+        snap = TexturesFunctions.RotateTexture(snap, 90); // rotate the texture 90 degrees
+        snap.Apply(); // apply the changes to the texture
+
+        startGameBtn.interactable = false; // disable start game button
+
+        photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, snap.EncodeToPNG()); // send the texture to every player
+
 
         photoBtn.SetActive(false);
+
+        photoCanvas.SetActive(false);
 
         anchorCanvas.SetActive(false);
 
         mainCamera.GetComponent<PhoneCamera>().enabled = false;
+
+        Debug.Log("Waiting for players to be ready");
+        yield return new WaitForSeconds(2);
+        while (!ArePlayersReady())
+        {
+            Debug.Log("Not all players are ready, waiting 2 more seconds");
+            yield return new WaitForSeconds(2);
+        }
+        startGameBtn.interactable = true;
     }
 
-    Texture2D ResizeTexture(Texture2D texture2D, int targetX, int targetY)
+    // Check if all players are ready
+    // Are all players ready?
+    public bool ArePlayersReady()
     {
-        Texture2D result = new Texture2D(targetX, targetY, texture2D.format, true);
-        Color[] rpixels = result.GetPixels(0);
-        float incX = (1.0f / (float)targetX);
-        float incY = (1.0f / (float)targetY);
-        for (int px = 0; px < rpixels.Length; px++)
+        photonView.RPC("UpdateLobbyUI", RpcTarget.All); // update the lobby UI
+        foreach (Player player in PhotonNetwork.PlayerList)
         {
-            rpixels[px] = texture2D.GetPixelBilinear(incX * ((float)px % targetX), incY * ((float)Mathf.Floor(px / targetX)));
+            if (!(bool)player.CustomProperties["isReady"]) // if any player is not ready
+            {
+                return false;
+            }
         }
-        result.SetPixels(rpixels, 0);
-        result.Apply();
-        return result;
+        return true;
     }
+
+    [PunRPC]
+    public void SetAnchorPhoto(byte[] receivedByte)
+    {
+        customeProperties["isReady"] = false; // set player as not ready
+        PhotonNetwork.LocalPlayer.SetCustomProperties(customeProperties); // update player properties
+        photonView.RPC("UpdateLobbyUI", RpcTarget.All); // update the lobby UI
+
+        if (quad != null) // if quad exists
+        {
+            Destroy(quad); // destroy quad
+        }
+        texture = new Texture2D(1, 1); // create a new texture
+        texture.LoadImage(receivedByte); // load the texture from the byte array
+
+        // Assign texture to a temporary quad and destroy it after 5 seconds
+        quad = GameObject.CreatePrimitive(PrimitiveType.Quad); // create a quad object
+        quad.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 2.5f;
+        quad.transform.forward = Camera.main.transform.forward;
+        quad.transform.localScale = new Vector3(1f, texture.height / (float)texture.width, 1f);
+
+        Material material = quad.GetComponent<Renderer>().material;
+        if (!material.shader.isSupported) // happens when Standard shader is not included in the build
+            material.shader = Shader.Find("Legacy Shaders/Diffuse");
+
+        material.mainTexture = texture;
+
+        TexturesFunctions.setTexture(texture);// set texture to TexturesFunctions
+
+        Debug.Log("Texture set for player " + PhotonNetwork.LocalPlayer.ActorNumber);
+
+        customeProperties["isReady"] = true; // set player as ready
+        PhotonNetwork.LocalPlayer.SetCustomProperties(customeProperties);// update player properties
+
+        Debug.Log("Player " + PhotonNetwork.LocalPlayer.ActorNumber + " is ready");
+    }
+
 }

@@ -42,6 +42,15 @@ public class SideLoadImageTarget : MonoBehaviour
         // add the ImageTargetBehaviour to the newly created game object
         mTarget.gameObject.AddComponent<ImageTargetBehaviour>();
 
+        // add mesh renderer to the newly created game object
+        mTarget.gameObject.AddComponent<MeshRenderer>();
+
+        // add turnoffbehaviour to the newly created game object
+        mTarget.gameObject.AddComponent<TurnOffBehaviour>();
+
+        // // add image target mesh 177266 to the newly created game object
+        // mTarget.gameObject.AddComponent<ImageTargetMesh177266>();
+
         // Create plane at the origin
         GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
         plane.transform.localScale = new Vector3(0.4f, 1f, 0.4f);

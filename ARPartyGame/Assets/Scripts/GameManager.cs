@@ -85,6 +85,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     [PunRPC]
     void ImInGame()
     {
+        // Check if the player has been spawned already
         if (hasBeenSpawned)
         {
             return;

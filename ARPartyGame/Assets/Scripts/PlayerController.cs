@@ -67,6 +67,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         }
 
     }
+    // Control the player movements
     private void Movements()
     {
         try
@@ -135,13 +136,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     void Fire()
     {
         GameObject bullet = Instantiate(Resources.Load("bullet", typeof(GameObject))) as GameObject;
-        FindObjectOfType<SoundController>().Play("shoot");
-        bullet.name = photonPlayer.NickName;
-        Rigidbody rb = bullet.GetComponent<Rigidbody>();
-        bullet.transform.localPosition = transform.position;
-        bullet.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f);
-        rb.AddForce(this.transform.forward * 200f);
-        Destroy(bullet, 1);
+        FindObjectOfType<SoundController>().Play("shoot"); // play sound
+        bullet.name = photonPlayer.NickName; // set name
+        Rigidbody rb = bullet.GetComponent<Rigidbody>(); // get rigidbody
+        bullet.transform.localPosition = transform.position; // set position
+        bullet.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f); // set scale
+        rb.AddForce(this.transform.forward * 200f); // add force
+        Destroy(bullet, 1); // destroy after 1 second
     }
 
     private void OnTriggerEnter(Collider other)
@@ -165,12 +166,12 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
                 if (this.target.isAlive())
                 {
-                    StartCoroutine(PlayerColorChange(4));
+                    StartCoroutine(PlayerColorChange(4)); // change color to red
                 }
                 else
                 {
                     Debug.Log("dead");
-                    StartCoroutine(PlayerColorChange(5));
+                    StartCoroutine(PlayerColorChange(5)); // change color to black
                 }
             }
         }
@@ -203,7 +204,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     //     yield return new WaitForSeconds(2);
     //     this.gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
     // }
-    private void TakeDamage(int damage)
+    private void TakeDamage(int damage) // this is called by the player that is hit by the bullet
     {
         this.target.TakeDamage(damage);
     }
