@@ -162,6 +162,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
     // Sets the anchor image texture from the gallery
     public void OnSetAnchorPhotoFromGallery()
     {
+        ResetPlayersReady();
         NativeGallery.Permission permission = NativeGallery.GetImageFromGallery((path) =>
        {
            Debug.Log("Image path: " + path);
@@ -269,6 +270,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
     // Sets the anchor image texture from the camera
     private IEnumerator TakeSnapshot()
     {
+        ResetPlayersReady();
+
         yield return new WaitForEndOfFrame(); // wait for screen to be rendered
 
         WebCamTexture webCamTexture = mainCamera.GetComponent<PhoneCamera>().GetWebCamTexture(); // get the WebCamTexture
@@ -319,12 +322,21 @@ public class MenuManager : MonoBehaviourPunCallbacks
         return true;
     }
 
+    // Set all players customProperty "isReady" to false
+    public void ResetPlayersReady()
+    {
+        foreach (Player player in PhotonNetwork.PlayerList)
+        {
+            customeProperties["isReady"] = false; // set player as not ready
+            player.SetCustomProperties(customeProperties);
+        }
+    }
+
+
+
     [PunRPC]
     public void SetAnchorPhoto(byte[] receivedByte)
     {
-        customeProperties["isReady"] = false; // set player as not ready
-        PhotonNetwork.LocalPlayer.SetCustomProperties(customeProperties); // update player properties
-        photonView.RPC("UpdateLobbyUI", RpcTarget.All); // update the lobby UI
 
         if (quad != null) // if quad exists
         {
