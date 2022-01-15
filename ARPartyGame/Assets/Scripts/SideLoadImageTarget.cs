@@ -17,24 +17,24 @@ public class SideLoadImageTarget : MonoBehaviour
         textureFile = TexturesFunctions.GetTexture();
         // Use Vuforia Application to invoke the function after Vuforia Engine is initialized
         VuforiaApplication.Instance.OnVuforiaStarted += CreateImageTargetFromSideloadedTexture;
-        VuforiaApplication.Instance.OnVuforiaPaused += RepeatCreateImageTargetFromSideloadedTexture;
+        // VuforiaApplication.Instance.OnVuforiaPaused += RepeatCreateImageTargetFromSideloadedTexture;
 
     }
 
-    // void OnEnable()
-    // {
-    //     Debug.Log("OnEnable");
-    //     mTarget = null;
-    //     CreateImageTargetFromSideloadedTexture();
-    // }
+    void OnEnable()
+    {
+        Debug.Log("OnEnable");
+        mTarget = null;
+        CreateImageTargetFromSideloadedTexture();
+    }
 
     void OnDisable()
     {
         Debug.Log("OnDisable");
         VuforiaApplication.Instance.OnVuforiaStarted -= CreateImageTargetFromSideloadedTexture;
         Debug.Log("CreateImageTargetFromSideloadedTexture is done");
-        VuforiaApplication.Instance.OnVuforiaPaused -= RepeatCreateImageTargetFromSideloadedTexture;
-        Debug.Log("RepeatCreateImageTargetFromSideloadedTexture is done");
+        // VuforiaApplication.Instance.OnVuforiaPaused -= RepeatCreateImageTargetFromSideloadedTexture;
+        // Debug.Log("RepeatCreateImageTargetFromSideloadedTexture is done");
     }
     
 
@@ -79,16 +79,16 @@ public class SideLoadImageTarget : MonoBehaviour
 
     }
 
-    void RepeatCreateImageTargetFromSideloadedTexture(bool b){
-        if (b)
-        {
-            Debug.Log("Vuforia is paused");
-        } else {
-            mTarget = null;
-            CreateImageTargetFromSideloadedTexture();
-            Debug.Log("RepeatCreateImageTargetFromSideloadedTexture is done");
-        }
-    }
+    // void RepeatCreateImageTargetFromSideloadedTexture(bool b){
+    //     if (b)
+    //     {
+    //         Debug.Log("Vuforia is paused");
+    //     } else {
+    //         mTarget = null;
+    //         CreateImageTargetFromSideloadedTexture();
+    //         Debug.Log("RepeatCreateImageTargetFromSideloadedTexture is done");
+    //     }
+    // }
 
     void CreateImageTargetFromTexture()
     {

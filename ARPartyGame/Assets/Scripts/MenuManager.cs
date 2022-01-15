@@ -365,10 +365,10 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         if (testTarget != null)
         {
-            // GetComponent<SideLoadImageTarget>().enabled = false;
+            GetComponent<SideLoadImageTarget>().enabled = false;
             Destroy(GameObject.Find("TestImageTarget" + (testCounter - 1)));
             Debug.Log("TestImageTarget destroyed");
-            // GetComponent<SideLoadImageTarget>().enabled = true;
+            GetComponent<SideLoadImageTarget>().enabled = true;
         }
 
         mainCamera.SetActive(false);
