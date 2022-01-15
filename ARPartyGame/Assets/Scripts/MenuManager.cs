@@ -51,6 +51,10 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     GameObject cube = null;
 
+    GameObject testTarget = null;
+
+    int testCounter = 0;
+
 
     private void Start()
     {
@@ -61,6 +65,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         customProperties["isReady"] = false;
         PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
+
+
     }
     public override void OnConnectedToMaster()
     {
@@ -153,6 +159,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public void OnStartGameBtn()
     {
         Debug.LogWarning("Starting Game");
+        GetComponent<SideLoadImageTarget>().enabled = false;
         NetworkManager.instance.photonView.RPC("ChangeScene", RpcTarget.All, "Game");
     }
 
@@ -195,7 +202,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
                texture = TexturesFunctions.ResizeTexture(texture, TexturesFunctions.GetWidth(), TexturesFunctions.GetHeight());
                texture.Apply();
 
-               checkImageTargetFunctionality(texture);
+               checkImageTargetFunctionality();
            }
        });
 
@@ -251,7 +258,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         yield return new WaitForSeconds(1f);
 
-        checkImageTargetFunctionality(texture);
+        checkImageTargetFunctionality();
     }
 
     private void DisableAnchorCanvasView()
@@ -302,8 +309,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
         }
     }
 
-
-
     [PunRPC]
     public void SetAnchorPhoto(byte[] receivedByte)
     {
@@ -337,20 +342,34 @@ public class MenuManager : MonoBehaviourPunCallbacks
         Debug.Log("Player " + PhotonNetwork.LocalPlayer.ActorNumber + " is ready");
     }
 
-    private void checkImageTargetFunctionality(Texture2D texture)
+    private void checkImageTargetFunctionality()
     {
         if (texture == null)
         {
-            Debug.Log("Image target is null");
+            Debug.Log("texture is null");
             return;
+        }
+        else
+        {
+            Debug.Log("texture is not null");
         }
         if (texture.width == 0 || texture.height == 0)
         {
-            Debug.Log("Image target is empty");
+            Debug.Log("texture is empty");
             return;
         }
 
-        GetComponent<SideLoadImageTarget>().SetTexture(texture, "TestImageTarget"); // set texture to SideLoadImageTarget
+        testCounter++;
+
+        GetComponent<SideLoadImageTarget>().SetTexture(texture, "TestImageTarget" + testCounter); // set texture to SideLoadImageTarget
+
+        if (testTarget != null)
+        {
+            // GetComponent<SideLoadImageTarget>().enabled = false;
+            Destroy(GameObject.Find("TestImageTarget" + (testCounter - 1)));
+            Debug.Log("TestImageTarget destroyed");
+            // GetComponent<SideLoadImageTarget>().enabled = true;
+        }
 
         mainCamera.SetActive(false);
 
@@ -360,15 +379,17 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         testMenu.SetActive(true);
 
-        GameObject testTarget = GameObject.Find("TestImageTarget");
+
+        testTarget = GameObject.Find("TestImageTarget" + testCounter);
 
         if (testTarget == null)
         {
-            Debug.Log("TestImageTarget target is null");
+            Debug.Log("TestImageTarget" + testCounter + " target is null");
             return;
-        } else
+        }
+        else
         {
-            Debug.Log("TestImageTarget target is not null");
+            Debug.Log("TestImageTarget" + testCounter + " target is not null");
         }
 
         cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -376,6 +397,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         // Place the cube as testTarget's child
         cube.transform.parent = testTarget.transform;
+        cube.transform.localPosition = new Vector3(0, 0, 0);
+
+        Debug.Log("cube created inside TestImageTarget" + testCounter);
     }
 
     public void onGoodImageTargetBtnClick()

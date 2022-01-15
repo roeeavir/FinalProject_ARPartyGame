@@ -17,11 +17,34 @@ public class SideLoadImageTarget : MonoBehaviour
         textureFile = TexturesFunctions.GetTexture();
         // Use Vuforia Application to invoke the function after Vuforia Engine is initialized
         VuforiaApplication.Instance.OnVuforiaStarted += CreateImageTargetFromSideloadedTexture;
+        VuforiaApplication.Instance.OnVuforiaPaused += RepeatCreateImageTargetFromSideloadedTexture;
 
     }
 
+    // void OnEnable()
+    // {
+    //     Debug.Log("OnEnable");
+    //     mTarget = null;
+    //     CreateImageTargetFromSideloadedTexture();
+    // }
+
+    void OnDisable()
+    {
+        Debug.Log("OnDisable");
+        VuforiaApplication.Instance.OnVuforiaStarted -= CreateImageTargetFromSideloadedTexture;
+        Debug.Log("CreateImageTargetFromSideloadedTexture is done");
+        VuforiaApplication.Instance.OnVuforiaPaused -= RepeatCreateImageTargetFromSideloadedTexture;
+        Debug.Log("RepeatCreateImageTargetFromSideloadedTexture is done");
+    }
+    
+
     void CreateImageTargetFromSideloadedTexture()
     {
+        if (mTarget != null)
+        {
+            Debug.Log("Image Target already created");
+            return;
+        }
         Debug.Log("Yese of Sufferings");
 
         if (textureFile == null)
@@ -48,44 +71,23 @@ public class SideLoadImageTarget : MonoBehaviour
             plane.transform.parent = mTarget.transform;
         }
 
-        VuforiaApplication.Instance.OnVuforiaStarted -= CreateImageTargetFromSideloadedTexture;
-
+        // VuforiaApplication.Instance.OnVuforiaStarted -= CreateImageTargetFromSideloadedTexture;
+        // Debug.Log("CreateImageTargetFromSideloadedTexture is done");
 
 
         Debug.Log("Instant Image Target created " + mTarget.TargetName);
 
     }
 
-    public ImageTargetBehaviour GetTestImageTarget(Texture2D texture, string tName)
-    {
-        textureFile = texture;
-        targetName = tName;
-        if (textureFile == null)
+    void RepeatCreateImageTargetFromSideloadedTexture(bool b){
+        if (b)
         {
-            Debug.Log("Texture file is null");
-            return null;
+            Debug.Log("Vuforia is paused");
+        } else {
+            mTarget = null;
+            CreateImageTargetFromSideloadedTexture();
+            Debug.Log("RepeatCreateImageTargetFromSideloadedTexture is done");
         }
-        Debug.Log("Texture file is not null");
-        // CreateImageTargetFromTexture();
-        VuforiaApplication.Instance.OnVuforiaStarted += CreateImageTargetFromTexture;
-        // ImageTargetBehaviour target = mTarget;
-        // mTarget = null;
-        // Debug.Log("Image Target created " + mTarget.TargetName);
-        if (mTarget == null)
-        {
-            Debug.Log("Image Target is null");
-            // return null;
-        }
-        // while (mTarget == null)
-        // {
-        // //     // CreateImageTargetFromSideloadedTexture();
-        // //     // Debug.Log("Waiting for Image Target");
-        // //     // yield return new WaitForSeconds(0.5f);
-        // }
-
-        // VuforiaBehaviour.Instance.enabled = true;
-
-        return mTarget;
     }
 
     void CreateImageTargetFromTexture()
@@ -104,13 +106,6 @@ public class SideLoadImageTarget : MonoBehaviour
             Debug.Log("VuforiaBehaviour is null");
         }
 
-        // if (VuforiaBehaviour.Instance.ObserverFactory == null)
-        // {
-        //     Debug.Log("Observer Factory is null");
-        // } else
-        // {
-        //     Debug.Log("Observer Factory is not null");
-        // }
 
         ImageTargetBehaviour target = VuforiaBehaviour.Instance.ObserverFactory.CreateImageTarget(
                    textureFile,
@@ -131,16 +126,13 @@ public class SideLoadImageTarget : MonoBehaviour
         // add turnoffbehaviour to the newly created game object
         target.gameObject.AddComponent<TurnOffBehaviour>();
 
-        // add image target mesh 177266 to the newly created game object
-        // target.gameObject.AddComponent<ImageTargetMesh177266>();
-
         if (target == null)
         {
-            Debug.Log("Image Target is null");
+            Debug.Log("Image Target of name " + targetName +  " is null");
         }
         else
         {
-            Debug.Log("Image Target is not null");
+            Debug.Log("Image Target of name " + targetName + " is not null");
         }
 
         mTarget = target;
