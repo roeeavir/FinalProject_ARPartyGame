@@ -5,7 +5,7 @@ using Photon.Pun;
 
 public class TexturesFunctions : MonoBehaviourPunCallbacks
 {
-    private static Texture2D texture;
+    private static Texture2D texture = null;
 
     private static int width = 512;
 
@@ -38,17 +38,17 @@ public class TexturesFunctions : MonoBehaviourPunCallbacks
         material.mainTexture = texture;
     }
 
-    public static Texture2D getTexture()
+    public static Texture2D GetTexture()
     {
         return texture;
     }
 
-    public static void setTexture(Texture2D texture)
+    public static void SetTexture(Texture2D texture)
     {
         TexturesFunctions.texture = texture;
     }
 
-    public static Texture2D changeTextureFormat(Texture2D texture, TextureFormat newFormat)
+    public static Texture2D ChangeTextureFormat(Texture2D texture, TextureFormat newFormat)
     {
         Texture2D newTexture = new Texture2D(width, height, newFormat, false);
         newTexture.SetPixels(texture.GetPixels());
@@ -56,12 +56,12 @@ public class TexturesFunctions : MonoBehaviourPunCallbacks
         return newTexture;
     }
 
-    public static int getWidth()
+    public static int GetWidth()
     {
         return width;
     }
 
-    public static int getHeight()
+    public static int GetHeight()
     {
         return height;
     }

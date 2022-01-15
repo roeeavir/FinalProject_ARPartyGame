@@ -50,7 +50,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     {
         try
         {
-            if (photonPlayer.IsLocal && target != null & target.isAlive())
+            if (photonPlayer.IsLocal && target != null & target.IsAlive())
             {
                 Movements();
                 if ((Input.GetKey(KeyCode.LeftControl) || CrossPlatformInputManager.GetButton("Shoot")) && Time.time >= nextTimeToFire)
@@ -161,10 +161,10 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                     return;
                 }
 
-                if (this.target.isAlive())
+                if (this.target.IsAlive())
                     TakeDamage(5);
 
-                if (this.target.isAlive())
+                if (this.target.IsAlive())
                 {
                     StartCoroutine(PlayerColorChange(4)); // change color to red
                 }
@@ -183,7 +183,7 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
         photonView.RPC("ChangeColor", RpcTarget.AllBuffered, colorID);
 
         // Is player that has been hit by bullet is alive
-        if (this.target.isAlive())
+        if (this.target.IsAlive())
         {
             yield return new WaitForSeconds(1f);
             photonView.RPC("ChangeColor", RpcTarget.AllBuffered, id - 1);

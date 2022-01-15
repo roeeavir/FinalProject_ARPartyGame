@@ -35,7 +35,7 @@ public class Target : MonoBehaviour
         isDead = true;
     }
 
-    public bool isAlive()
+    public bool IsAlive()
     {
         return !isDead;
     }
