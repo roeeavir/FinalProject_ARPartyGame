@@ -93,9 +93,7 @@ public class SideLoadImageTarget : MonoBehaviour
     void CreateImageTargetFromTexture()
     {
         textureFile = TexturesFunctions.ChangeTextureFormat(textureFile, TextureFormat.RGB24);
-
         Debug.Log("Texture format changed");
-
 
         if (VuforiaBehaviour.Instance == null)
         {
@@ -105,15 +103,12 @@ public class SideLoadImageTarget : MonoBehaviour
         {
             Debug.Log("VuforiaBehaviour is null");
         }
-
-
         ImageTargetBehaviour target = VuforiaBehaviour.Instance.ObserverFactory.CreateImageTarget(
                    textureFile,
                    printedTargetSize,
                    targetName);
 
         Debug.Log("Image Target created");
-
         // add the Default Observer Event Handler to the newly created game object
         target.gameObject.AddComponent<DefaultObserverEventHandler>();
 
@@ -134,7 +129,6 @@ public class SideLoadImageTarget : MonoBehaviour
         {
             Debug.Log("Image Target of name " + targetName + " is not null");
         }
-
         mTarget = target;
     }
 
