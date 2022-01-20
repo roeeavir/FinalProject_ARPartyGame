@@ -16,7 +16,6 @@ public class GameManager : MonoBehaviourPunCallbacks
     public PlayerController[] players;
     private List<int> pickedSpawnIndex;
     // [Header("Reference")]
-    // public GameObject imageTarget;
     private GameObject imageTarget;
 
     //instance
@@ -62,6 +61,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             {
                 if (gameObj.name == "Player(Clone)" && imageTarget != null)
                 {
+                    Debug.LogWarning("Player(Clone) found");
                     gameObj.transform.SetParent(imageTarget.transform);
                 }
             }
@@ -77,7 +77,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         else
         {
             // set imageTarget to from SideLoadImageTarget script
-            imageTarget = GameObject.Find("DynamicImageTarget");
+            imageTarget = GameObject.Find("DemoDynamicImageTarget");
             // imageTarget = SideLoadImageTarget.GetImageTarget();
         }
 
@@ -109,6 +109,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         GameObject playerObject = null;
         debugText.text += "SpawnPlayer1\n";
         playerObject = (GameObject)PhotonNetwork.Instantiate(playerPrefabLocation, spawnPoints[rand].position, Quaternion.identity); // spawn player
+        // playerObject.gameObject.SetActive(DefaultObserverEventHandler.isTracking);
         //intialize the player
         PlayerController playerScript = playerObject.GetComponent<PlayerController>();
         debugText.text += "SpawnPlayer2\n";

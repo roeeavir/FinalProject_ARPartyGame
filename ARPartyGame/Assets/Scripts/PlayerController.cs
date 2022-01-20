@@ -198,12 +198,6 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     }
 
 
-    // IEnumerator PlayerColorChange()
-    // {
-    //     this.gameObject.GetComponent<MeshRenderer>().material.color = Color.red;
-    //     yield return new WaitForSeconds(2);
-    //     this.gameObject.GetComponent<MeshRenderer>().material.color = Color.green;
-    // }
     private void TakeDamage(int damage) // this is called by the player that is hit by the bullet
     {
         this.target.TakeDamage(damage);

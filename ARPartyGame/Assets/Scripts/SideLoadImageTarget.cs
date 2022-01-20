@@ -55,7 +55,7 @@ public class SideLoadImageTarget : MonoBehaviour
 
         CreateImageTargetFromTexture();
 
-        if (targetName.Equals("DynamicImageTarget"))
+        if (targetName.Equals("DemoDynamicImageTarget"))
         {
             GameObject yese_plane = GameObject.Find("Yese");
             yese_plane.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.GetTexture();
@@ -69,6 +69,25 @@ public class SideLoadImageTarget : MonoBehaviour
 
             // Place the plane as mTarget's child
             plane.transform.parent = mTarget.transform;
+        } 
+        else if (targetName.Equals("DynamicImageTarget"))
+        {
+            GameObject yese_plane = GameObject.Find("Yese");
+            yese_plane.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.GetTexture();
+            Debug.Log("Plane Yese set to texture");
+
+            // Create plane at the origin
+            GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            plane.transform.localScale = new Vector3(0.4f, 1f, 0.4f);
+            // Add plane to the newly created game object
+            // Instantiate(GameObject.CreatePrimitive(PrimitiveType.Plane), mTarget.transform);
+
+            // Place the plane as mTarget's child
+            plane.transform.parent = mTarget.transform;
+        }
+        else
+        {
+            Debug.Log("Target name is not valid");
         }
 
         // VuforiaApplication.Instance.OnVuforiaStarted -= CreateImageTargetFromSideloadedTexture;
@@ -93,7 +112,9 @@ public class SideLoadImageTarget : MonoBehaviour
     void CreateImageTargetFromTexture()
     {
         textureFile = TexturesFunctions.ChangeTextureFormat(textureFile, TextureFormat.RGB24);
+
         Debug.Log("Texture format changed");
+
 
         if (VuforiaBehaviour.Instance == null)
         {
@@ -103,12 +124,15 @@ public class SideLoadImageTarget : MonoBehaviour
         {
             Debug.Log("VuforiaBehaviour is null");
         }
+
+
         ImageTargetBehaviour target = VuforiaBehaviour.Instance.ObserverFactory.CreateImageTarget(
                    textureFile,
                    printedTargetSize,
                    targetName);
 
         Debug.Log("Image Target created");
+
         // add the Default Observer Event Handler to the newly created game object
         target.gameObject.AddComponent<DefaultObserverEventHandler>();
 
@@ -129,6 +153,7 @@ public class SideLoadImageTarget : MonoBehaviour
         {
             Debug.Log("Image Target of name " + targetName + " is not null");
         }
+
         mTarget = target;
     }
 

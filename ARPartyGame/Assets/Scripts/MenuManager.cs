@@ -21,6 +21,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public Text playerList;
     public Button startGameBtn;
 
+    public Button startARGameBtn;
+
     public Button setAnchorBtn;
 
     public Text debugText;
@@ -144,6 +146,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
                 setAnchorBtn.interactable = false; // disable set anchor button
             }
             startGameBtn.interactable = false; // disable start game button
+            startARGameBtn.interactable = false; // disable start AR game button
             firstConnect = false;
         }
     }
@@ -156,11 +159,18 @@ public class MenuManager : MonoBehaviourPunCallbacks
         }
         SetMenu(mainMenu);
     }
-    public void OnStartGameBtn()
+    public void OnStartGameBtn(string sceneName)
     {
-        Debug.LogWarning("Starting Game");
-        GetComponent<SideLoadImageTarget>().enabled = false;
-        NetworkManager.instance.photonView.RPC("ChangeScene", RpcTarget.All, "Game");
+        if (PhotonNetwork.IsMasterClient)
+        {
+            Debug.LogWarning("Starting " + sceneName);
+            GetComponent<SideLoadImageTarget>().enabled = false;
+            // PhotonNetwork.CurrentRoom.IsOpen = false;
+            // PhotonNetwork.CurrentRoom.IsVisible = false;
+            NetworkManager.instance.photonView.RPC("ChangeScene", RpcTarget.All, sceneName);
+        } else {
+            Debug.LogWarning("Not master client");
+        }
     }
 
     public void OnOpenAnchorCanvas()
@@ -282,6 +292,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
             yield return new WaitForSeconds(1);
         }
         startGameBtn.interactable = true;
+        startARGameBtn.interactable = true;
     }
 
     // Check if all players are ready
@@ -358,8 +369,11 @@ public class MenuManager : MonoBehaviourPunCallbacks
             Debug.Log("texture is empty");
             return;
         }
+
         testCounter++;
+
         GetComponent<SideLoadImageTarget>().SetTexture(texture, "TestImageTarget" + testCounter); // set texture to SideLoadImageTarget
+
         if (testTarget != null)
         {
             GetComponent<SideLoadImageTarget>().enabled = false;
@@ -367,11 +381,18 @@ public class MenuManager : MonoBehaviourPunCallbacks
             Debug.Log("TestImageTarget destroyed");
             GetComponent<SideLoadImageTarget>().enabled = true;
         }
+
         mainCamera.SetActive(false);
+
         testARCamera.SetActive(true);
+
         lobbyMenu.SetActive(false);
+
         testMenu.SetActive(true);
+
+
         testTarget = GameObject.Find("TestImageTarget" + testCounter);
+
         if (testTarget == null)
         {
             Debug.Log("TestImageTarget" + testCounter + " target is null");
@@ -381,11 +402,14 @@ public class MenuManager : MonoBehaviourPunCallbacks
         {
             Debug.Log("TestImageTarget" + testCounter + " target is not null");
         }
+
         cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
         cube.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+
         // Place the cube as testTarget's child
         cube.transform.parent = testTarget.transform;
         cube.transform.localPosition = new Vector3(0, 0, 0);
+
         Debug.Log("cube created inside TestImageTarget" + testCounter);
     }
 
@@ -397,6 +421,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
         testARCamera.SetActive(false);
 
         startGameBtn.interactable = false; // disable start game button
+        startARGameBtn.interactable = false; // disable start AR game button
 
         DisableAnchorCanvasView();
 
@@ -424,5 +449,46 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         DisableAnchorCanvasView();
     }
+
+    //     private IEnumerator TakeScreenshot()
+    //     {
+    //         // photo.GetComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+
+    //         // photo.GetComponent<AspectRatioFitter>().aspectRatio = 0.55f;
+
+    //         // set photoCanvas to fit whole screen
+    //         // photoCanvas.GetComponent<RectTransform>().sizeDelta = new Vector2(Screen.height, Screen.width);
+    //         // photo.GetComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.None;
+    //         // photo.GetComponent<RectTransform>().sizeDelta = new Vector2(Screen.height, photo.GetComponent<RectTransform>().sizeDelta.x);
+    //         // set left of photo to 0
+    //         // photoCanvas.transform.localScale = new Vector3(1f, 1f, 1f);
+
+    //         // RectTransformFunctions.SetLeft(photo.GetComponent<RectTransform>(), 0f);
+    //         // RectTransformFunctions.SetRight(photo.GetComponent<RectTransform>(), 0f);
+    //         // RectTransformFunctions.SetBottom(photo.GetComponent<RectTransform>(), 0f);
+
+    //         // fit photo to screen
+    //         // photo.GetComponent<AspectRatioFitter>().aspectRatio = 0.55f;
+
+
+    //         yield return new WaitForEndOfFrame();
+    // // wait 2 seconds for the texture to be updated
+    //         yield return new WaitForSeconds(2);
+
+    //         Texture2D screenTexture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
+    //         screenTexture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+    //         screenTexture = ResizeTexture(screenTexture, 512, 512);
+    //         screenTexture.Apply();
+
+    //         NetworkManager.instance.photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, screenTexture.EncodeToPNG());
+
+    //         startGameBtn.interactable = true;
+
+    //         photoBtn.SetActive(false);
+
+    //         anchorCanvas.SetActive(false);
+
+    //         mainCamera.GetComponent<PhoneCamera>().enabled = false;
+    //     }
 
 }

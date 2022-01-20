@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SpawnScript : MonoBehaviour
 {
-    public Transform[] spawnPoints;
+    private Transform[] spawnPoints;
     public GameObject[] ballons;
 
     // Start is called before the first frame update
@@ -16,12 +16,20 @@ public class SpawnScript : MonoBehaviour
     IEnumerator StartSpawning()
     {
         yield return new WaitForSeconds(3);
-
-        for (int i = 0; i < 3; i++)
+        
+        if (spawnPoints != null)
         {
-            Instantiate(ballons[i], spawnPoints[i].position, Quaternion.identity);
+            for (int i = 0; i < 3; i++)
+            {
+                Instantiate(ballons[i], spawnPoints[i].position, Quaternion.identity);
+            }
         }
 
         StartCoroutine(StartSpawning());
+    }
+
+    public void setSpawnPoints(Transform[] spawnPoints)
+    {
+        this.spawnPoints = spawnPoints;
     }
 }

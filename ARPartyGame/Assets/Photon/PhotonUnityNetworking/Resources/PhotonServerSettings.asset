@@ -48,6 +48,7 @@ MonoBehaviour:
   - ChangeColor
   - playAudio
   - SetAnchorPhoto
+  - ImInARGame
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
