@@ -29,6 +29,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     public GameObject spawnManager = null;
 
+    public GameObject playerUI = null;
+
     private void Awake()
     {
         if (instance == null)
@@ -63,6 +65,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         // Debug.LogWarning("is tracking " + DefaultObserverEventHandler.isTracking);
         if (imageTarget != null)
         {
+
             // foreach (GameObject gameObj in GameObject.FindObjectsOfType(typeof(GameObject)))
             // {
             //     if (gameObj.name == "Player(Clone)" && imageTarget != null)
@@ -70,27 +73,47 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             //         gameObj.transform.SetParent(imageTarget.transform);
             //     }
             // }
-            for (int i = 1; i < imageTarget.transform.childCount; i++)
+            // for (int i = 1; i < imageTarget.transform.childCount; i++)
+            // {
+            if (DefaultObserverEventHandler.isTracking && !gameStarted)
             {
-                if (DefaultObserverEventHandler.isTracking && !gameStarted)
+                if (!gameStarted)
                 {
-                    // Enable SpawnManager
-                    spawnManager.GetComponent<SpawnScript>().enabled = true;
-                    spawnManager.GetComponent<SpawnScript>().setSpawnPoints(spawnPoints);
-                    gameStarted = true;
+                    Debug.LogWarning("Game Started. Enabling SpawnScript");
                 }
-                // imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
-                // if (!health.enabled)
-                // {
-                //     health.enabled = DefaultObserverEventHandler.isTracking;
-                // }
+                if (playerUI != null)
+                {
+                    playerUI.SetActive(true);
+                }
+                Debug.LogWarning("PlayerUI enabled");
+                // Enable SpawnManager
+                spawnManager.GetComponent<SpawnScript>().enabled = true;
+                spawnManager.GetComponent<SpawnScript>().setSpawnPoints(spawnPoints);
+
+                gameStarted = true;
             }
+            // imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
+            // if (!health.enabled)
+            // {
+            //     health.enabled = DefaultObserverEventHandler.isTracking;
+            // }
+            // }
         }
         else
         {
             // set imageTarget to from SideLoadImageTarget script
+
+
+            Debug.LogWarning("Image Target yet to be set");
             imageTarget = GameObject.Find("DynamicImageTarget");
-            // imageTarget = SideLoadImageTarget.GetImageTarget();
+            if (imageTarget != null)
+            {
+                Debug.LogWarning("Image Target found");
+            }
+            else
+            {
+                Debug.LogWarning("Image Target not found");
+            }
         }
 
     }
@@ -123,10 +146,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         }
         // Spawn the player
         debugText.text += "SpawnPlayer2\n";
-        // Enable player UI
-        GameObject.Find("PlayerUI").SetActive(true);
-        // ARPlayerController playerScript =
-
 
     }
 }
