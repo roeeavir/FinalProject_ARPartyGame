@@ -8,6 +8,8 @@ public class ShootScript : MonoBehaviour
     public GameObject arCamera;
     public GameObject smoke;
 
+    public static int score = 0;
+
 
     public void Shoot()
     {
@@ -20,8 +22,25 @@ public class ShootScript : MonoBehaviour
             {
                 Destroy(hit.transform.gameObject);
 
+                AddScore();
+
                 Instantiate(smoke, hit.point, Quaternion.LookRotation(hit.normal));
             }
         }
+    }
+
+    public void AddScore()
+    {
+        score++;
+    }
+
+    public void ResetScore()
+    {
+        score = 0;
+    }
+
+    public int GetScore()
+    {
+        return score;
     }
 }

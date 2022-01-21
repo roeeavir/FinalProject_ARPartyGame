@@ -17,7 +17,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     public ARPlayerController[] players;
     private List<int> pickedSpawnIndex;
 
-    public Text debugText;
 
     private GameObject imageTarget;
 
@@ -31,6 +30,21 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     public GameObject playerUI = null;
 
+    private Text debugText, objectiveText, scoreText;
+
+    private SpawnScript spawnScript = null;
+
+    private ShootScript shootScript = null;
+
+    private ExitGames.Client.Photon.Hashtable customProperties = new ExitGames.Client.Photon.Hashtable();
+
+    private bool wait = false;
+
+    public TextMesh PlayersScores;
+
+
+
+    private int score = 0;
     private void Awake()
     {
         if (instance == null)
@@ -45,6 +59,13 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     private void Start()
     {
+        // Set debugText from the canvas
+        debugText = GameObject.Find("DebugText").GetComponent<Text>();
+        objectiveText = GameObject.Find("ObjectiveText").GetComponent<Text>();
+        spawnScript = spawnManager.GetComponent<SpawnScript>();
+
+        customProperties["isReady"] = false;
+        PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
         // Print every player buffered in Photon
         foreach (Player p in PhotonNetwork.PlayerList)
         {
@@ -57,6 +78,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         debugText.text += "Number of Players: " + PhotonNetwork.PlayerList.Length + "\n";
         Debug.LogWarning("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
+
+
 
     }
 
@@ -75,23 +98,43 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             // }
             // for (int i = 1; i < imageTarget.transform.childCount; i++)
             // {
-            if (DefaultObserverEventHandler.isTracking && !gameStarted)
+            if (DefaultObserverEventHandler.isTracking)
             {
-                if (!gameStarted)
+                if (!gameStarted && !wait)
                 {
-                    Debug.LogWarning("Game Started. Enabling SpawnScript");
-                }
-                if (playerUI != null)
-                {
-                    playerUI.SetActive(true);
-                }
-                Debug.LogWarning("PlayerUI enabled");
-                // Enable SpawnManager
-                spawnManager.GetComponent<SpawnScript>().enabled = true;
-                spawnManager.GetComponent<SpawnScript>().setSpawnPoints(spawnPoints);
+                    customProperties["isReady"] = true;
+                    PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
+                    if (ArePlayersReady())
+                    {
+                        StartBalloonGame();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Not all players are ready");
+                        StartCoroutine(WaitForPlayers());
+                    }
 
-                gameStarted = true;
+                }
+
+
+
+
+
+
             }
+            // if (!gameStarted)
+            // {
+            //     customProperties["isReady"] = false;
+            //     PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
+            // }
+
+            if (shootScript != null)
+            {
+                score = shootScript.GetScore();
+                scoreText.text = score.ToString();
+                PlayersScores.text = score.ToString();
+            }
+
             // imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
             // if (!health.enabled)
             // {
@@ -103,12 +146,12 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         {
             // set imageTarget to from SideLoadImageTarget script
 
-
             Debug.LogWarning("Image Target yet to be set");
             imageTarget = GameObject.Find("DynamicImageTarget");
             if (imageTarget != null)
             {
                 Debug.LogWarning("Image Target found");
+
             }
             else
             {
@@ -147,5 +190,57 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         // Spawn the player
         debugText.text += "SpawnPlayer2\n";
 
+    }
+
+    private void StartBalloonGame()
+    {
+        Debug.LogWarning("Game Started. Enabling SpawnScript");
+        // Enable SpawnManager
+        spawnScript.enabled = true;
+        spawnScript.setSpawnPoints(spawnPoints);
+        objectiveText.text = "Shoot the balloons and earn the most points!!";
+        shootScript = GameObject.Find("ShootManager").GetComponent<ShootScript>();
+
+        if (playerUI != null)
+        {
+            playerUI.SetActive(true);
+            Debug.LogWarning("PlayerUI enabled");
+            scoreText = playerUI.GetComponentInChildren<Text>();
+        }
+        else
+        {
+            Debug.LogWarning("PlayerUI not found");
+        }
+
+
+
+        gameStarted = true;
+    }
+
+    public bool ArePlayersReady()
+    {
+        foreach (Player player in PhotonNetwork.PlayerList)
+        {
+            if (!(bool)player.CustomProperties["isReady"]) // if any player is not ready
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private IEnumerator WaitForPlayers()
+    {
+        wait = true;
+
+        string temp = objectiveText.text;
+
+        objectiveText.text = temp + "\nWaiting for other players to be ready";
+
+        yield return new WaitForSeconds(5);
+
+        objectiveText.text = temp;
+
+        wait = false;
     }
 }

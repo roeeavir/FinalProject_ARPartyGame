@@ -58,10 +58,6 @@ public class SideLoadImageTarget : MonoBehaviour
 
         if (targetName.Equals("DemoDynamicImageTarget"))
         {
-            GameObject yese_plane = GameObject.Find("Yese");
-            yese_plane.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.GetTexture();
-            Debug.Log("Plane Yese set to texture");
-
             // Create plane at the origin
             GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
             plane.transform.localScale = new Vector3(0.4f, 1f, 0.4f);
@@ -73,18 +69,17 @@ public class SideLoadImageTarget : MonoBehaviour
         } 
         else if (targetName.Equals("DynamicImageTarget"))
         {
-            // GameObject yese_plane = GameObject.Find("Yese");
+            GameObject playersScores = GameObject.Find("PlayersScores");
             // yese_plane.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.GetTexture();
             // Debug.Log("Plane Yese set to texture");
 
-            // // Create plane at the origin
-            // GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            // plane.transform.localScale = new Vector3(0.4f, 1f, 0.4f);
-            // // Add plane to the newly created game object
-            // // Instantiate(GameObject.CreatePrimitive(PrimitiveType.Plane), mTarget.transform);
+            // Create plane at the origin
+            playersScores.transform.localScale = new Vector3(0.4f, 1f, 0.4f);
+            // Add plane to the newly created game object
+            // Instantiate(GameObject.CreatePrimitive(PrimitiveType.Plane), mTarget.transform);
 
-            // // Place the plane as mTarget's child
-            // plane.transform.parent = mTarget.transform;
+            // Place the plane as mTarget's child
+            playersScores.transform.parent = mTarget.transform;
             Debug.Log("Main AR game anchor has been created");
         }
         else
