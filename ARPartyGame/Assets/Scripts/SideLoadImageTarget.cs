@@ -69,17 +69,27 @@ public class SideLoadImageTarget : MonoBehaviour
         } 
         else if (targetName.Equals("DynamicImageTarget"))
         {
-            GameObject playersScores = GameObject.Find("PlayersScores");
-            // yese_plane.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.GetTexture();
-            // Debug.Log("Plane Yese set to texture");
+            GameObject playersScores = GameObject.Find("Scores Background");
+            if (playersScores != null)
+            {
+                // Debug.Log("Plane Yese set to texture");
+                Debug.Log("Plane Scores Background is not null");
+                // playersScores.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.GetTexture();
+            }
+            else
+            {
+                Debug.Log("Plane Scores Background is null");
+            }
 
-            // Create plane at the origin
-            playersScores.transform.localScale = new Vector3(0.4f, 1f, 0.4f);
-            // Add plane to the newly created game object
-            // Instantiate(GameObject.CreatePrimitive(PrimitiveType.Plane), mTarget.transform);
+            // playersScores.transform.localScale = new Vector3(-1f, 1f, 1f);
 
             // Place the plane as mTarget's child
             playersScores.transform.parent = mTarget.transform;
+
+            playersScores.transform.position = new Vector3(0f, 0f, 0f);
+            playersScores.transform.localScale = new Vector3(0.1f, 1f, 0.1f);
+            playersScores.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+
             Debug.Log("Main AR game anchor has been created");
         }
         else

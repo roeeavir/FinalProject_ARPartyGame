@@ -40,7 +40,9 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private bool wait = false;
 
-    public TextMesh PlayersScores;
+    public Text PlayersScores;
+
+    private const string PLAYERS_SCORES = "Players Scores:\n";
 
 
 
@@ -100,28 +102,37 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             // {
             if (DefaultObserverEventHandler.isTracking)
             {
-                if (!gameStarted && !wait)
+                for (int i = 0; i < imageTarget.transform.childCount; i++)
                 {
-                    customProperties["isReady"] = true;
-                    PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
+                    imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
+                    // if (!gameStarted)
+                    //     imageTarget.transform.GetChild(i).gameObject.transform.LookAt(Camera.main.transform);
+                }
+                if (!gameStarted)
+                {
+                    if (!(bool)PhotonNetwork.LocalPlayer.CustomProperties["isReady"])
+                    {
+                        customProperties["isReady"] = true;
+                        customProperties["score"] = score;
+                        PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
+                    }
+
                     if (ArePlayersReady())
                     {
                         StartBalloonGame();
                     }
                     else
                     {
-                        Debug.LogWarning("Not all players are ready");
-                        StartCoroutine(WaitForPlayers());
+                        if (!wait)
+                        {
+                            Debug.LogWarning("Not all players are ready");
+                            StartCoroutine(WaitForPlayers());
+                        }
                     }
-
                 }
 
-
-
-
-
-
             }
+
             // if (!gameStarted)
             // {
             //     customProperties["isReady"] = false;
@@ -132,7 +143,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             {
                 score = shootScript.GetScore();
                 scoreText.text = score.ToString();
-                PlayersScores.text = score.ToString();
+                SetPlayersScores();
             }
 
             // imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
@@ -182,10 +193,13 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         spawnPoints = new Transform[3];
         for (int i = 0; i < spawnPoints.Length; i++)
         {
-            GameObject newObj = new GameObject("SpawnPoint" + i);
+            string spawnPointName = "SpawnPoint" + PhotonNetwork.LocalPlayer.ActorNumber + "-" + i;
+            GameObject newObj = new GameObject(spawnPointName);
             newObj.transform.position = new Vector3(Random.Range(-5, 5), Random.Range(-5, 5), Random.Range(-5, 5));
             pickedSpawnIndex.Add(i); // add the random spawn point to the list
-            spawnPoints[i] = GameObject.Find("SpawnPoint" + i).transform;
+            spawnPoints[i] = GameObject.Find(spawnPointName).transform;
+            Debug.LogWarning(spawnPointName + ": " + spawnPoints[i].position);
+            debugText.text += spawnPointName + ": " + spawnPoints[i].position + "\n";
         }
         // Spawn the player
         debugText.text += "SpawnPlayer2\n";
@@ -233,14 +247,24 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     {
         wait = true;
 
-        string temp = objectiveText.text;
-
-        objectiveText.text = temp + "\nWaiting for other players to be ready";
+        objectiveText.text += "\nWaiting for other players to be ready";
 
         yield return new WaitForSeconds(5);
 
-        objectiveText.text = temp;
-
         wait = false;
+    }
+
+    private void SetPlayersScores()
+    {
+        customProperties["score"] = score;
+        PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
+        PlayersScores.text = PLAYERS_SCORES;
+        foreach (Player player in PhotonNetwork.PlayerList)
+        {
+            // if (player.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
+            // {
+            PlayersScores.text += player.NickName + "'s Score: " + (int)player.CustomProperties["score"];
+            // }
+        }
     }
 }
