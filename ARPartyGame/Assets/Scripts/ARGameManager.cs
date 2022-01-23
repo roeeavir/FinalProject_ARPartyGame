@@ -5,6 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Linq;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 
 public class ARGameManager : MonoBehaviourPunCallbacks
@@ -53,10 +54,11 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         {
             instance = this;
         }
-        // else
-        // {
-        //     Destroy(gameObject);
-        // }
+        else
+        {
+            Destroy(instance);
+            instance = this;
+        }
     }
     // Start is called before the first frame update
     private void Start()
@@ -90,24 +92,27 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         // Debug.LogWarning("is tracking " + DefaultObserverEventHandler.isTracking);
         if (imageTarget != null)
         {
+            for (int i = 0; i < imageTarget.transform.childCount; i++)
+            {
+                imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
+                // if (!gameStarted)
+                //     imageTarget.transform.GetChild(i).gameObject.transform.LookAt(Camera.main.transform);
+            }
+            if (shootScript != null)
+            {
+                score = shootScript.GetScore();
+                scoreText.text = score.ToString();
+                SetPlayersScores();
+                CheckGameStatus();
+            }
+            if (gameEnded)
+            {
+                return;
+            }
 
-            // foreach (GameObject gameObj in GameObject.FindObjectsOfType(typeof(GameObject)))
-            // {
-            //     if (gameObj.name == "Player(Clone)" && imageTarget != null)
-            //     {
-            //         gameObj.transform.SetParent(imageTarget.transform);
-            //     }
-            // }
-            // for (int i = 1; i < imageTarget.transform.childCount; i++)
-            // {
+
             if (DefaultObserverEventHandler.isTracking)
             {
-                for (int i = 0; i < imageTarget.transform.childCount; i++)
-                {
-                    imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
-                    // if (!gameStarted)
-                    //     imageTarget.transform.GetChild(i).gameObject.transform.LookAt(Camera.main.transform);
-                }
                 if (!gameStarted)
                 {
                     if (!(bool)PhotonNetwork.LocalPlayer.CustomProperties["isReady"])
@@ -130,28 +135,9 @@ public class ARGameManager : MonoBehaviourPunCallbacks
                         }
                     }
                 }
-
             }
 
-            // if (!gameStarted)
-            // {
-            //     customProperties["isReady"] = false;
-            //     PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
-            // }
 
-            if (shootScript != null)
-            {
-                score = shootScript.GetScore();
-                scoreText.text = score.ToString();
-                SetPlayersScores();
-            }
-
-            // imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
-            // if (!health.enabled)
-            // {
-            //     health.enabled = DefaultObserverEventHandler.isTracking;
-            // }
-            // }
         }
         else
         {
@@ -195,7 +181,16 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         {
             string spawnPointName = "SpawnPoint" + PhotonNetwork.LocalPlayer.ActorNumber + "-" + i;
             GameObject newObj = new GameObject(spawnPointName);
-            newObj.transform.position = new Vector3(Random.Range(-5, 5), Random.Range(-5, 5), Random.Range(-5, 5));
+            // Randomly set the position of the spawn point without the value of 0
+            // Random number between -1 and 1 without a value of 0
+            float x = Random.Range(-i - 2, i + 2);
+            x = x == 0 ? Random.Range(1, i + 2) : x;
+            float y = Random.Range(-i - 2, i + 2);
+            y = y == 0 ? Random.Range(1, i + 2) : y;
+            float z = Random.Range(-i - 2, i + 2);
+            z = z == 0 ? Random.Range(1, i + 2) : z;
+
+            newObj.transform.position = new Vector3(x, y, z);
             pickedSpawnIndex.Add(i); // add the random spawn point to the list
             spawnPoints[i] = GameObject.Find(spawnPointName).transform;
             Debug.LogWarning(spawnPointName + ": " + spawnPoints[i].position);
@@ -212,7 +207,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         // Enable SpawnManager
         spawnScript.enabled = true;
         spawnScript.setSpawnPoints(spawnPoints);
-        objectiveText.text = "Shoot the balloons and earn the most points!!";
+        objectiveText.text = "Shoot the balloons and earn the most points!\nThe first to get to 100 points wins!";
         shootScript = GameObject.Find("ShootManager").GetComponent<ShootScript>();
 
         if (playerUI != null)
@@ -261,10 +256,40 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         PlayersScores.text = PLAYERS_SCORES;
         foreach (Player player in PhotonNetwork.PlayerList)
         {
-            // if (player.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
-            // {
             PlayersScores.text += player.NickName + "'s Score: " + (int)player.CustomProperties["score"];
-            // }
         }
     }
+
+    private void CheckGameStatus()
+    {
+        if (score >= 100)
+        {
+            Debug.LogWarning("A winner has been decided!");
+            photonView.RPC("SetGameEnded", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.NickName);
+        }
+    }
+
+    [PunRPC]
+    private void SetGameEnded(string winnerName)
+    {
+        gameEnded = true;
+        objectiveText.text = winnerName + " has won the game!";
+        playerUI.SetActive(false);
+        Destroy(NetworkManager.instance.gameObject);
+        StartCoroutine(WaitForGameEnd());
+    }
+
+    private IEnumerator WaitForGameEnd()
+    {
+        Debug.LogWarning("Waiting for game end");
+        yield return new WaitForSeconds(5);
+        Debug.LogWarning("Game ended");
+        PhotonNetwork.LeaveRoom();
+        while(PhotonNetwork.InRoom)
+        {
+            yield return new WaitForSeconds(1);
+        }
+        SceneManager.LoadScene("Main", LoadSceneMode.Single);
+    }
+
 }

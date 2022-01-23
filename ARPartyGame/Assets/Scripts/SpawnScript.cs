@@ -15,7 +15,7 @@ public class SpawnScript : MonoBehaviour
 
     IEnumerator StartSpawning()
     {
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(2.5f);
         
         if (spawnPoints != null)
         {

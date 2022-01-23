@@ -20,18 +20,18 @@ public class ShootScript : MonoBehaviour
             if (hit.transform.name == "balloon1(Clone)" || hit.transform.name == "balloon2(Clone)"
                 || hit.transform.name == "balloon3(Clone)")
             {
-                Destroy(hit.transform.gameObject);
+                AddScore(hit.transform.gameObject);
 
-                AddScore();
+                Destroy(hit.transform.gameObject);
 
                 Instantiate(smoke, hit.point, Quaternion.LookRotation(hit.normal));
             }
         }
     }
 
-    public void AddScore()
+    public void AddScore(GameObject balloon)
     {
-        score++;
+        score += balloon.GetComponent<BalloonScript>().GetScore();
     }
 
     public void ResetScore()
