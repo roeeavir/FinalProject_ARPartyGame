@@ -8,8 +8,12 @@ public class ShootScript : MonoBehaviour
     public GameObject arCamera;
     public GameObject smoke;
 
-    public static int score = 0;
+    private int score = 0;
 
+    private void Start()
+    {
+        score = 0;
+    }
 
     public void Shoot()
     {
@@ -42,5 +46,10 @@ public class ShootScript : MonoBehaviour
     public int GetScore()
     {
         return score;
+    }
+
+    public void SetScore(int s)
+    {
+        score = s;
     }
 }

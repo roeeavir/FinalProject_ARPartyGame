@@ -31,7 +31,7 @@ public class BalloonScript : MonoBehaviour
     void Start()
     {
         // Choose state at random
-        state = (BalloonMovementState)Random.Range(groupId*2-2, groupId * 2);
+        state = (BalloonMovementState)Random.Range(groupId * 2 - 2, groupId * 2);
         score = (int)state + 1;
     }
 

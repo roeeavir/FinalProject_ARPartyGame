@@ -45,18 +45,13 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private const string PLAYERS_SCORES = "Players Scores:\n";
 
-
+    private bool restartTrack = true;
 
     private int score = 0;
     private void Awake()
     {
         if (instance == null)
         {
-            instance = this;
-        }
-        else
-        {
-            Destroy(instance);
             instance = this;
         }
     }
@@ -89,21 +84,27 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private void Update()
     {
-        // Debug.LogWarning("is tracking " + DefaultObserverEventHandler.isTracking);
         if (imageTarget != null)
         {
-            for (int i = 0; i < imageTarget.transform.childCount; i++)
-            {
-                imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
-                // if (!gameStarted)
-                //     imageTarget.transform.GetChild(i).gameObject.transform.LookAt(Camera.main.transform);
-            }
+
+
             if (shootScript != null)
             {
                 score = shootScript.GetScore();
                 scoreText.text = score.ToString();
                 SetPlayersScores();
                 CheckGameStatus();
+            }
+            if (restartTrack)
+            {
+                for (int i = 0; i < imageTarget.transform.childCount; i++)
+                {
+                    imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
+                    // if (!gameStarted)
+                    //     imageTarget.transform.GetChild(i).gameObject.transform.LookAt(Camera.main.transform);
+                }
+                restartTrack = false;
+                StartCoroutine(WaitForTrack());
             }
             if (gameEnded)
             {
@@ -148,7 +149,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             if (imageTarget != null)
             {
                 Debug.LogWarning("Image Target found");
-
             }
             else
             {
@@ -256,7 +256,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         PlayersScores.text = PLAYERS_SCORES;
         foreach (Player player in PhotonNetwork.PlayerList)
         {
-            PlayersScores.text += player.NickName + "'s Score: " + (int)player.CustomProperties["score"];
+            PlayersScores.text += player.NickName + "'s Score: " + (int)player.CustomProperties["score"] + "\n";
         }
     }
 
@@ -285,11 +285,27 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(5);
         Debug.LogWarning("Game ended");
         PhotonNetwork.LeaveRoom();
-        while(PhotonNetwork.InRoom)
+        while (PhotonNetwork.InRoom)
         {
             yield return new WaitForSeconds(1);
         }
+        customProperties["score"] = 0;
+        PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
         SceneManager.LoadScene("Main", LoadSceneMode.Single);
+        Destroy(gameObject);
     }
+
+    private IEnumerator WaitForTrack()
+    {
+        yield return new WaitForSeconds(3);
+        for (int i = 0; i < imageTarget.transform.childCount; i++)
+        {
+            imageTarget.transform.GetChild(i).gameObject.SetActive(false);
+            // if (!gameStarted)
+            //     imageTarget.transform.GetChild(i).gameObject.transform.LookAt(Camera.main.transform);
+        }
+        restartTrack = true;
+    }
+
 
 }

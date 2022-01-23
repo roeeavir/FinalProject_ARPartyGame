@@ -37,7 +37,7 @@ public class SideLoadImageTarget : MonoBehaviour
         // VuforiaApplication.Instance.OnVuforiaPaused -= RepeatCreateImageTargetFromSideloadedTexture;
         // Debug.Log("RepeatCreateImageTargetFromSideloadedTexture is done");
     }
-    
+
 
     void CreateImageTargetFromSideloadedTexture()
     {
@@ -66,9 +66,14 @@ public class SideLoadImageTarget : MonoBehaviour
 
             // Place the plane as mTarget's child
             plane.transform.parent = mTarget.transform;
-        } 
+        }
         else if (targetName.Equals("DynamicImageTarget"))
         {
+            GameObject camera = GameObject.Find("ARCamera");
+            if (camera != null)
+            {
+                camera.GetComponent<VuforiaBehaviour>().SetWorldCenter(WorldCenterMode.SPECIFIC_TARGET, mTarget.GetComponent<ImageTargetBehaviour>());
+            }
             GameObject playersScores = GameObject.Find("Scores Background");
             if (playersScores != null)
             {
@@ -154,7 +159,7 @@ public class SideLoadImageTarget : MonoBehaviour
 
         if (target == null)
         {
-            Debug.Log("Image Target of name " + targetName +  " is null");
+            Debug.Log("Image Target of name " + targetName + " is null");
         }
         else
         {

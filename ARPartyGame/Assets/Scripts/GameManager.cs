@@ -31,11 +31,6 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             instance = this;
         }
-        else
-        {
-            Destroy(instance);
-            instance = this;
-        }
     }
     private void Start()
     {

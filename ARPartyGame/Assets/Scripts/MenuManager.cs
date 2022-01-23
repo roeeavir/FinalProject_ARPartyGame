@@ -51,7 +51,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     private bool firstConnect = true;
 
-    GameObject cube = null;
+    GameObject testBoard = null;
 
     GameObject testTarget = null;
 
@@ -67,6 +67,15 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         customProperties["isReady"] = false;
         PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
+
+        if (ARGameManager.instance != null)
+        {
+            Destroy(ARGameManager.instance.gameObject);
+        }
+        if (GameManager.instance != null)
+        {
+            Destroy(GameManager.instance.gameObject);
+        }
 
 
     }
@@ -168,7 +177,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
             // PhotonNetwork.CurrentRoom.IsOpen = false;
             // PhotonNetwork.CurrentRoom.IsVisible = false;
             NetworkManager.instance.photonView.RPC("ChangeScene", RpcTarget.All, sceneName);
-        } else {
+        }
+        else
+        {
             Debug.LogWarning("Not master client");
         }
     }
@@ -403,14 +414,35 @@ public class MenuManager : MonoBehaviourPunCallbacks
             Debug.Log("TestImageTarget" + testCounter + " target is not null");
         }
 
-        cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        cube.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+        GameObject testBoard = GameObject.Find("Test Board");
+        if (testBoard != null)
+        {
+            // Debug.Log("Plane Yese set to texture");
+            Debug.Log("Plane Scores Background is not null");
+            // playersScores.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.GetTexture();
+        }
+        else
+        {
+            Debug.Log("Plane Scores Background is null");
+        }
 
-        // Place the cube as testTarget's child
-        cube.transform.parent = testTarget.transform;
-        cube.transform.localPosition = new Vector3(0, 0, 0);
+        // playersScores.transform.localScale = new Vector3(-1f, 1f, 1f);
 
-        Debug.Log("cube created inside TestImageTarget" + testCounter);
+        // Place the plane as mTarget's child
+        testBoard.transform.parent = testTarget.transform;
+
+        testBoard.transform.position = new Vector3(0f, 0f, 0f);
+        testBoard.transform.localScale = new Vector3(0.01f, 1f, 0.02f);
+        testBoard.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+
+        // cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        // cube.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+
+        // // Place the cube as testTarget's child
+        // cube.transform.parent = testTarget.transform;
+        // cube.transform.localPosition = new Vector3(0, 0, 0);
+
+        Debug.Log("TestBoard created inside TestImageTarget" + testCounter);
     }
 
     public void onGoodImageTargetBtnClick()
@@ -427,9 +459,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, texture.EncodeToPNG());
 
-        if (cube != null)
+        if (testBoard != null)
         {
-            Destroy(cube);
+            testBoard.SetActive(false);
         }
 
         StartCoroutine(WaitForPlayersReady());
@@ -442,9 +474,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
         mainCamera.SetActive(true);
         testARCamera.SetActive(false);
 
-        if (cube != null)
+        if (testBoard != null)
         {
-            Destroy(cube);
+            testBoard.SetActive(false);
         }
 
         DisableAnchorCanvasView();
