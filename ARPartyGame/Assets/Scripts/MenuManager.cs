@@ -196,54 +196,53 @@ public class MenuManager : MonoBehaviourPunCallbacks
         anchorCanvas.SetActive(false);
     }
 
-
-    public void OnPhotoBtn()
-    {
-        Debug.LogWarning("OnPhotoBtn()");
-        StartCoroutine(TakeSnapshot());
-    }
-
-    // Sets the anchor image texture from the gallery
-    public void OnSetAnchorPhotoFromGallery()
-    {
+    public void OnSetAnchorPhotoFromGallery(){
         ResetPlayersReady();
+         
         NativeGallery.Permission permission = NativeGallery.GetImageFromGallery((path) =>
        {
-           Debug.Log("Image path: " + path);
-           if (path != null)
-           {
-               // Create Texture from selected image
-               texture = NativeGallery.LoadImageAtPath(path, 512, false);
-               if (texture == null)
-               {
-                   Debug.Log("Couldn't load texture from " + path);
-                   return;
-               }
+           texture = GetComponent<AnchorManager>().SetAnchorPhotoFromGallery(path);
 
-               texture = TexturesFunctions.ResizeTexture(texture, TexturesFunctions.GetWidth(), TexturesFunctions.GetHeight());
-               texture.Apply();
-
-               checkImageTargetFunctionality();
-           }
+           checkImageTargetFunctionality();
        });
 
-        Debug.Log("Permission result: " + permission);
-
-        if (permission == NativeGallery.Permission.Denied)
+        if (permission == NativeGallery.Permission.Denied || permission == NativeGallery.Permission.ShouldAsk)
         {
-            Debug.Log("Permission denied");
-        }
-        else if (permission == NativeGallery.Permission.ShouldAsk)
-        {
-            Debug.Log("Permission denied");
+            Debug.Log("Permission denied or should ask");
+            texture = null;
         }
         else if (permission == NativeGallery.Permission.Granted)
         {
-
             Debug.Log("Permission granted");
         }
     }
 
+
+    public void OnPhotoBtn()
+    {
+
+        Debug.LogWarning("OnPhotoBtn()");
+        StartCoroutine(OnPhotoBtnClicked());
+    }
+
+    private IEnumerator OnPhotoBtnClicked(){
+        ResetPlayersReady();
+
+        yield return new WaitForEndOfFrame(); // wait for screen to be rendered
+
+        WebCamTexture webCamTexture = mainCamera.GetComponent<PhoneCamera>().GetWebCamTexture(); // get the WebCamTexture
+
+        texture = GetComponent<AnchorManager>().TakeSnapshot(webCamTexture);
+        mainCamera.GetComponent<PhoneCamera>().enabled = false; // disable the camera
+
+        photoBtn.SetActive(false);
+
+        yield return new WaitForSeconds(1f);
+
+        // checkImageTargetFunctionality();
+
+        checkImageTargetFunctionality();
+    }
 
     public void OnSetAnchorPhotoFromCamera()
     {
@@ -252,34 +251,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
         photoBtn.SetActive(true);
         // photo.GetComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.FitInParent;
         mainCamera.GetComponent<PhoneCamera>().enabled = true;
-    }
-
-
-    // Sets the anchor image texture from the camera
-    private IEnumerator TakeSnapshot()
-    {
-        ResetPlayersReady();
-
-        yield return new WaitForEndOfFrame(); // wait for screen to be rendered
-
-        WebCamTexture webCamTexture = mainCamera.GetComponent<PhoneCamera>().GetWebCamTexture(); // get the WebCamTexture
-
-        texture = new Texture2D(webCamTexture.width, webCamTexture.height, TextureFormat.RGB24, false); // create a new texture
-
-
-        texture.SetPixels(webCamTexture.GetPixels()); // copy the pixels from the WebCamTexture to the new texture
-        texture = TexturesFunctions.ResizeTexture(texture, TexturesFunctions.GetWidth(), TexturesFunctions.GetHeight()); // resize the texture
-        texture = TexturesFunctions.RotateTexture(texture, 90); // rotate the texture 90 degrees
-        texture.Apply(); // apply the changes to the texture
-
-
-        mainCamera.GetComponent<PhoneCamera>().enabled = false; // disable the camera
-
-        photoBtn.SetActive(false);
-
-        yield return new WaitForSeconds(1f);
-
-        checkImageTargetFunctionality();
     }
 
     private void DisableAnchorCanvasView()
@@ -332,15 +303,15 @@ public class MenuManager : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    public void SetAnchorPhoto(byte[] receivedByte)
+    public void OnSetAnchorPhoto(byte[] receivedByte)
     {
 
         if (quad != null) // if quad exists
         {
             Destroy(quad); // destroy quad
         }
-        texture = new Texture2D(1, 1); // create a new texture
-        texture.LoadImage(receivedByte); // load the texture from the byte array
+        
+        texture = GetComponent<AnchorManager>().SetAnchorPhoto(receivedByte); // set anchor photo
 
         // Assign texture to a temporary quad and destroy it after 5 seconds
         quad = GameObject.CreatePrimitive(PrimitiveType.Quad); // create a quad object
@@ -363,6 +334,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         Debug.Log("Player " + PhotonNetwork.LocalPlayer.ActorNumber + " is ready");
     }
+
 
     private void checkImageTargetFunctionality()
     {
@@ -457,7 +429,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         DisableAnchorCanvasView();
 
-        photonView.RPC("SetAnchorPhoto", RpcTarget.AllBuffered, texture.EncodeToPNG());
+        photonView.RPC("OnSetAnchorPhoto", RpcTarget.AllBuffered, texture.EncodeToPNG());
 
         if (testBoard != null)
         {
