@@ -48,6 +48,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     private bool restartTrack = true;
 
     private int score = 0;
+
+    private string gameType = "";
     private void Awake()
     {
         if (instance == null)
@@ -87,14 +89,23 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         if (imageTarget != null)
         {
 
-
-            if (shootScript != null)
+            switch (gameType)
             {
-                score = shootScript.GetScore();
-                scoreText.text = score.ToString();
-                SetPlayersScores();
-                CheckGameStatus();
+                case "ballonGame":
+                    if (shootScript != null)
+                    {
+                        score = shootScript.GetScore();
+                        scoreText.text = score.ToString();
+                        SetPlayersScores();
+                        CheckGameStatus();
+                    } else {
+                        Debug.LogWarning("shootScript is null");
+                    }
+                    break;
+                default:
+                    break;
             }
+
             if (restartTrack)
             {
                 for (int i = 0; i < imageTarget.transform.childCount; i++)
@@ -183,12 +194,12 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             GameObject newObj = new GameObject(spawnPointName);
             // Randomly set the position of the spawn point without the value of 0
             // Random number between -1 and 1 without a value of 0
-            float x = Random.Range(-i - 2, i + 2);
-            x = x == 0 ? Random.Range(1, i + 2) : x;
-            float y = Random.Range(-i - 2, i + 2);
-            y = y == 0 ? Random.Range(1, i + 2) : y;
-            float z = Random.Range(-i - 2, i + 2);
-            z = z == 0 ? Random.Range(1, i + 2) : z;
+            float val = Random.Range(0, 2);
+            float x = val < 1 ? -i - 2 : i + 2;
+            val = Random.Range(0, 2);
+            float y = val < 1 ? -i - 2 : i + 2;
+            val = Random.Range(0, 2);
+            float z = val < 1 ? -i - 2 : i + 2;
 
             newObj.transform.position = new Vector3(x, y, z);
             pickedSpawnIndex.Add(i); // add the random spawn point to the list
@@ -221,6 +232,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             Debug.LogWarning("PlayerUI not found");
         }
 
+        gameType = "ballonGame";
 
 
         gameStarted = true;
