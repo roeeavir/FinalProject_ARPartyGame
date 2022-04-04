@@ -25,7 +25,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public Button setAnchorBtn;
 
-    public Text debugText;
 
     public GameObject textureDelivery;
 
@@ -63,7 +62,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
         createRoomBtn.interactable = false; // disable create room button
         joinRoomBtn.interactable = false; // disable join room button
         Debug.LogWarning("MenuManager Start Address: " + PhotonNetwork.NetworkingClient.GameServerAddress);
-        debugText.text = "MenuManager Start Address: " + PhotonNetwork.NetworkingClient.GameServerAddress;
 
         customProperties["isReady"] = false;
         PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
