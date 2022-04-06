@@ -16,8 +16,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     public static ARGameManager instance;
 
     public ARPlayerController[] players;
-    private List<int> pickedSpawnIndex;
-
 
     private GameObject imageTarget;
 
@@ -43,13 +41,25 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     public Text PlayersScores;
 
-    private const string PLAYERS_SCORES = "Players Scores:\n";
+    private const string PLAYERS_SCORES = " Players Scores:";
 
     private bool restartTrack = true;
 
-    private int score = 0;
+    private int levelScore = 0;
 
-    private string gameType = "";
+    private int totalScore = 0;
+
+    private int gameLevel = 0;
+
+    private int roundScoreGoal = 30;
+
+    private string winnerInLevel = "";
+
+    private string levelObjective = "";
+
+    private const string lookAtAnchor = "All players need to point their camera at the anchor object in the room";
+
+    private bool startNextRound = true;
     private void Awake()
     {
         if (instance == null)
@@ -73,55 +83,46 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             debugText.text += p.NickName + "\n";
             Debug.LogWarning("Buffered Player: " + p.NickName + "\n");
         }
-        pickedSpawnIndex = new List<int>();
         players = new ARPlayerController[PhotonNetwork.PlayerList.Length];
         photonView.RPC("ImInARGame", RpcTarget.AllBuffered);
-        debugText.text += "Number of Players: " + PhotonNetwork.PlayerList.Length + "\n";
         Debug.LogWarning("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
-
-
-
     }
 
     private void Update()
     {
-        if (imageTarget != null)
+        if (imageTarget != null && startNextRound)
         {
-
-            switch (gameType)
+            if (gameStarted)
             {
-                case "ballonGame":
-                    if (shootScript != null)
-                    {
-                        score = shootScript.GetScore();
-                        scoreText.text = score.ToString();
-                        SetPlayersScores();
-                        CheckGameStatus();
-                    } else {
-                        Debug.LogWarning("shootScript is null");
-                    }
-                    break;
-                default:
-                    break;
-            }
-
-            if (restartTrack)
-            {
-                for (int i = 0; i < imageTarget.transform.childCount; i++)
+                if (shootScript != null)
                 {
-                    imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
-                    // if (!gameStarted)
-                    //     imageTarget.transform.GetChild(i).gameObject.transform.LookAt(Camera.main.transform);
+                    levelScore = shootScript.GetScore();
+                    scoreText.text = levelScore.ToString();
+                    SetPlayersScores();
+                    CheckGameStatus();
                 }
-                restartTrack = false;
-                StartCoroutine(WaitForTrack());
-            }
-            if (gameEnded)
-            {
-                return;
-            }
+                else
+                {
+                    Debug.LogWarning("shootScript is null");
+                }
 
+                if (restartTrack)
+                {
+                    for (int i = 0; i < imageTarget.transform.childCount; i++)
+                    {
+                        imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
+                        // if (!gameStarted)
+                        //     imageTarget.transform.GetChild(i).gameObject.transform.LookAt(Camera.main.transform);
+                    }
+                    restartTrack = false;
+                    StartCoroutine(WaitForTrack());
+                }
+                if (gameEnded)
+                {
+                    return;
+                }
+            }
 
             if (DefaultObserverEventHandler.isTracking)
             {
@@ -129,14 +130,12 @@ public class ARGameManager : MonoBehaviourPunCallbacks
                 {
                     if (!(bool)PhotonNetwork.LocalPlayer.CustomProperties["isReady"])
                     {
-                        customProperties["isReady"] = true;
-                        customProperties["score"] = score;
-                        PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
+                        SetCustomProperties(true, levelScore, totalScore);
                     }
 
                     if (ArePlayersReady())
                     {
-                        StartBalloonGame();
+                        StartNextLevel();
                     }
                     else
                     {
@@ -154,17 +153,13 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         else
         {
             // set imageTarget to from SideLoadImageTarget script
-
             Debug.LogWarning("Image Target yet to be set");
             imageTarget = GameObject.Find("DynamicImageTarget");
+
             if (imageTarget != null)
-            {
                 Debug.LogWarning("Image Target found");
-            }
             else
-            {
                 Debug.LogWarning("Image Target not found");
-            }
         }
 
     }
@@ -178,22 +173,21 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         }
 
         debugText.text += "ImInARGame\n";
-        InitializePlayerReality();
+        InitializeSpawnPoints(3);
         hasBeenInitialized = true;
 
     }
 
-    void InitializePlayerReality()
+    void InitializeSpawnPoints(int size)
     {
         // Create 3 random spawn points
         debugText.text += "SpawnPlayer1\n";
-        spawnPoints = new Transform[3];
+        spawnPoints = new Transform[size];
         for (int i = 0; i < spawnPoints.Length; i++)
         {
             string spawnPointName = "SpawnPoint" + PhotonNetwork.LocalPlayer.ActorNumber + "-" + i;
             GameObject newObj = new GameObject(spawnPointName);
-            // Randomly set the position of the spawn point without the value of 0
-            // Random number between -1 and 1 without a value of 0
+            // Randomly position the spawn points
             float val = Random.Range(0, 2);
             float x = val < 1 ? -i - 2 : i + 2;
             val = Random.Range(0, 2);
@@ -202,7 +196,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             float z = val < 1 ? -i - 2 : i + 2;
 
             newObj.transform.position = new Vector3(x, y, z);
-            pickedSpawnIndex.Add(i); // add the random spawn point to the list
             spawnPoints[i] = GameObject.Find(spawnPointName).transform;
             Debug.LogWarning(spawnPointName + ": " + spawnPoints[i].position);
             debugText.text += spawnPointName + ": " + spawnPoints[i].position + "\n";
@@ -212,14 +205,17 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     }
 
+    // Starts the game each level
     private void StartBalloonGame()
     {
-        Debug.LogWarning("Game Started. Enabling SpawnScript");
-        // Enable SpawnManager
-        spawnScript.enabled = true;
+        if (!spawnScript.enabled)
+            spawnScript.enabled = true;
+
         spawnScript.setSpawnPoints(spawnPoints);
-        objectiveText.text = "Shoot the balloons and earn the most points!\nThe first to get to 100 points wins!";
-        shootScript = GameObject.Find("ShootManager").GetComponent<ShootScript>();
+        objectiveText.text = levelObjective + "\nThe first to get to " + roundScoreGoal + " points wins!";
+
+        if (shootScript == null)
+            shootScript = GameObject.Find("ShootManager").GetComponent<ShootScript>();
 
         if (playerUI != null)
         {
@@ -232,10 +228,12 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             Debug.LogWarning("PlayerUI not found");
         }
 
-        gameType = "ballonGame";
+        // gameLevel = 1;
 
 
         gameStarted = true;
+
+        Debug.LogWarning("Game started (Level " + gameLevel + ")");
     }
 
     public bool ArePlayersReady()
@@ -256,6 +254,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
         objectiveText.text += "\nWaiting for other players to be ready";
 
+        Debug.LogWarning("\nWaiting for other players to be ready");
+
         yield return new WaitForSeconds(5);
 
         wait = false;
@@ -263,33 +263,157 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private void SetPlayersScores()
     {
-        customProperties["score"] = score;
-        PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
-        PlayersScores.text = PLAYERS_SCORES;
+        SetCustomProperties((bool)customProperties["isReady"], levelScore, totalScore);
+        PlayersScores.text = "Round " + gameLevel + PLAYERS_SCORES;
         foreach (Player player in PhotonNetwork.PlayerList)
         {
             PlayersScores.text += player.NickName + "'s Score: " + (int)player.CustomProperties["score"] + "\n";
+        }
+        PlayersScores.text += "\nTotal " + PLAYERS_SCORES + " This Far\n";
+        foreach (Player player in PhotonNetwork.PlayerList)
+        {
+            PlayersScores.text += player.NickName + "'s Total Score: " + (int)player.CustomProperties["totalScore"] + "\n";
         }
     }
 
     private void CheckGameStatus()
     {
-        if (score >= 100)
+        if (levelScore >= roundScoreGoal)
         {
-            Debug.LogWarning("A winner has been decided!");
-            photonView.RPC("SetGameEnded", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.NickName);
+            Debug.LogWarning("A round winner has been decided!");
+            photonView.RPC("FinishLevel", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.NickName);
         }
+    }
+
+    [PunRPC]
+    private void FinishLevel(string winnerName)
+    {
+        gameStarted = false;
+        totalScore += levelScore;
+        SetCustomProperties(false, levelScore, totalScore);
+        Debug.LogWarning("Game level " + gameLevel + " has been finished!");
+        startNextRound = false;
+        if (gameLevel != 0)
+            setLevelWinnerString();
+        spawnScript.setSpawnPoints(null);
+        DefaultObserverEventHandler.isTracking = false;
+        destroyAllBalloons();
+        objectiveText.text = winnerName + winnerInLevel;
+        playerUI.SetActive(false);
+        StartCoroutine(WaitForNextRound());
+    }
+
+    private void StartNextLevel()
+    {
+        Debug.LogWarning("Starting next level (" + gameLevel + ")");
+        gameLevel++;
+        setLevelObjectiveString();
+        StartBalloonGame();
+    }
+
+    private void destroyAllBalloons()
+    {
+        GameObject[] balloons = GameObject.FindGameObjectsWithTag("balloon");
+        foreach (GameObject balloon in balloons)
+        {
+            Destroy(balloon);
+        }
+    }
+
+    private void setLevelWinnerString()
+    {
+        switch (gameLevel)
+        {
+            case 1:
+                winnerInLevel = " has won the first round with " + levelScore + " points!";
+                break;
+            case 2:
+                winnerInLevel = " has won the second round with " + levelScore + " points!";
+                break;
+            case 3:
+                winnerInLevel = " has won the third round with " + levelScore + " points!";
+                break;
+            case 4:
+                winnerInLevel = " has won the fourth round with " + levelScore + " points!";
+                break;
+            case 5:
+                winnerInLevel = " has won the fifth round with " + levelScore + " points!";
+                break;
+            case 6:
+                winnerInLevel = " has won the game with " + levelScore + " points!!!";
+                photonView.RPC("SetGameEnded", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.NickName);
+                break;
+            default:
+                Debug.LogWarning("Bad game level: " + gameLevel + " in setLevelWinnerString");
+                break;
+        }
+
+    }
+
+    private void setLevelObjectiveString()
+    {
+        switch (gameLevel)
+        {
+            case 1:
+                Debug.LogWarning("Game Started. Enabling SpawnScript");
+                // Enable SpawnManager
+                levelObjective = "Shoot the balloons and earn the most points!";
+                break;
+            case 2:
+                levelObjective = "Shoot the balloons in your color and earn the most points!\n Hitting other players balloons will give them points in your stead!";
+                InitializeSpawnPoints(1);
+                break;
+            case 3:
+                levelScore = 0;
+                levelObjective = "Shoot the balloons in your color and earn the most points!\n Hitting other players balloons will give them points in your stead and will make you lose points!";
+                break;
+            case 4:
+                levelScore = 0;
+                levelObjective = "Mini boss round!\n Shoot the big balloon and be the first to pop it!";
+                break;
+            case 5:
+                levelScore = 0;
+                levelObjective = "Final Round!\n Shoot the mega ultra horsing balloon and be the first to pop it!";
+                break;
+            default:
+                Debug.LogWarning("Bad game level: " + gameLevel + " in SetLevelObjectiveString");
+                break;
+        }
+        levelScore = 0;
+
+
     }
 
     [PunRPC]
     private void SetGameEnded(string winnerName)
     {
         gameEnded = true;
-        objectiveText.text = winnerName + " has won the game!";
-        playerUI.SetActive(false);
         Destroy(NetworkManager.instance.gameObject);
         StartCoroutine(WaitForGameEnd());
     }
+
+    private IEnumerator WaitForNextRound()
+    {
+        yield return new WaitForSeconds(5);
+        if (gameLevel <= 6)
+        {
+            objectiveText.text = "Starting the next round (" + gameLevel + ")\n" + lookAtAnchor;
+            shootScript.SetScore(0);
+            SetCustomProperties(false, 0, totalScore);
+            startNextRound = true;
+            // gameStarted = true;
+        }
+    }
+
+    private void SetCustomProperties(bool b, int lScore, int tScore)
+    {
+        // customProperties = new ExitGames.Client.Photon.Hashtable();
+        customProperties["isReady"] = b;
+        customProperties["score"] = levelScore;
+        customProperties["totalScore"] = tScore;
+        PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
+    }
+
 
     private IEnumerator WaitForGameEnd()
     {

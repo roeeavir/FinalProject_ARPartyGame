@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8893019289068973895}
   m_Layer: 0
   m_Name: balloon1
-  m_TagString: Untagged
+  m_TagString: balloon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -96,6 +96,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c718747d8c7f4564798b1bd0dc9bc3fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  groupId: 1
   counter: 0
 --- !u!65 &8893019289068973895
 BoxCollider:

@@ -51,6 +51,8 @@ MonoBehaviour:
   - ImInARGame
   - SetGameEnded
   - OnSetAnchorPhoto
+  - SetNextGame
+  - FinishLevel
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

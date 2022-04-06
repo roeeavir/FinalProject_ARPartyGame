@@ -7,6 +7,8 @@ public class SpawnScript : MonoBehaviour
     private Transform[] spawnPoints;
     public GameObject[] ballons;
 
+    private int numOfSpawnPoints = 3;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -19,7 +21,7 @@ public class SpawnScript : MonoBehaviour
 
         if (spawnPoints != null)
         {
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < numOfSpawnPoints; i++)
             {
                 Instantiate(ballons[i], spawnPoints[i].position, Quaternion.identity);
             }
@@ -31,5 +33,11 @@ public class SpawnScript : MonoBehaviour
     public void setSpawnPoints(Transform[] spawnPoints)
     {
         this.spawnPoints = spawnPoints;
+        if (spawnPoints != null)
+        {
+            numOfSpawnPoints = spawnPoints.Length;
+        } else {
+            numOfSpawnPoints = 0;
+        }
     }
 }
