@@ -10,6 +10,10 @@ public class ShootScript : MonoBehaviour
 
     private int score = 0;
 
+    private int level;
+
+    private string color = "";
+
     private void Start()
     {
         score = 0;
@@ -21,14 +25,37 @@ public class ShootScript : MonoBehaviour
 
         if (Physics.Raycast(arCamera.transform.position, arCamera.transform.forward, out hit))
         {
-            if (hit.transform.name == "balloon1(Clone)" || hit.transform.name == "balloon2(Clone)"
-                || hit.transform.name == "balloon3(Clone)")
+            if (hit.transform.name.Contains("balloon"))
             {
-                AddScore(hit.transform.gameObject);
+                switch (level)
+                {
 
-                Destroy(hit.transform.gameObject);
+                    case 3:
+                        if (hit.transform.name.Contains(color))
+                        {
+                            AddScore(hit.transform.gameObject);
 
-                Instantiate(smoke, hit.point, Quaternion.LookRotation(hit.normal));
+                            Destroy(hit.transform.gameObject);
+
+                            Instantiate(smoke, hit.point, Quaternion.LookRotation(hit.normal));
+                        } else {
+                            SubstractScore(hit.transform.gameObject);
+
+                            Destroy(hit.transform.gameObject);
+
+                            Instantiate(smoke, hit.point, Quaternion.LookRotation(hit.normal));
+                        }
+                        break;
+                    case 1:
+                    default:
+                        AddScore(hit.transform.gameObject);
+
+                        Destroy(hit.transform.gameObject);
+
+                        Instantiate(smoke, hit.point, Quaternion.LookRotation(hit.normal));
+                        break;
+
+                }
             }
         }
     }
@@ -36,6 +63,15 @@ public class ShootScript : MonoBehaviour
     public void AddScore(GameObject balloon)
     {
         score += balloon.GetComponent<BalloonScript>().GetScore();
+    }
+
+    public void SubstractScore(GameObject balloon)
+    {
+        score -= balloon.GetComponent<BalloonScript>().GetScore();
+        if (score < 0)
+        {
+            score = 0;
+        }
     }
 
     public void ResetScore()
@@ -51,5 +87,10 @@ public class ShootScript : MonoBehaviour
     public void SetScore(int s)
     {
         score = s;
+    }
+
+    public void SetLevel(int lvl)
+    {
+        level = lvl;
     }
 }

@@ -15,7 +15,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     [Header("Players")]
     public static ARGameManager instance;
 
-    public ARPlayerController[] players;
+    // public ARPlayerController[] players;
 
     private GameObject imageTarget;
 
@@ -59,7 +59,11 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private const string lookAtAnchor = "All players need to point their camera at the anchor object in the room";
 
+    private Color[] colors = { Color.blue, Color.red, Color.yellow, Color.magenta};
+
     private bool startNextRound = true;
+
+    private int colorID = 0;
     private void Awake()
     {
         if (instance == null)
@@ -83,10 +87,14 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             debugText.text += p.NickName + "\n";
             Debug.LogWarning("Buffered Player: " + p.NickName + "\n");
         }
-        players = new ARPlayerController[PhotonNetwork.PlayerList.Length];
+        // players = new ARPlayerController[PhotonNetwork.PlayerList.Length];
         photonView.RPC("ImInARGame", RpcTarget.AllBuffered);
         Debug.LogWarning("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
+
+        colorID = PhotonNetwork.LocalPlayer.ActorNumber; // Sets the color of the player to the color of the player's ID
+        objectiveText.color = colors[colorID];
+
     }
 
     private void Update()
@@ -208,14 +216,19 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     // Starts the game each level
     private void StartBalloonGame()
     {
-        if (!spawnScript.enabled)
+        if (!spawnScript.enabled) {
+            Debug.LogWarning("Game Started. Enabling SpawnScript");
+            // Enable SpawnManager
             spawnScript.enabled = true;
+        }
 
         spawnScript.setSpawnPoints(spawnPoints);
         objectiveText.text = levelObjective + "\nThe first to get to " + roundScoreGoal + " points wins!";
 
         if (shootScript == null)
             shootScript = GameObject.Find("ShootManager").GetComponent<ShootScript>();
+        shootScript.SetLevel(gameLevel);
+
 
         if (playerUI != null)
         {
@@ -355,24 +368,22 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         switch (gameLevel)
         {
             case 1:
-                Debug.LogWarning("Game Started. Enabling SpawnScript");
-                // Enable SpawnManager
                 levelObjective = "Shoot the balloons and earn the most points!";
                 break;
             case 2:
+                InitializeSpawnPoints(PhotonNetwork.PlayerList.Length);
                 levelObjective = "Shoot the balloons in your color and earn the most points!\n Hitting other players balloons will give them points in your stead!";
-                InitializeSpawnPoints(1);
                 break;
             case 3:
-                levelScore = 0;
+                InitializeSpawnPoints(PhotonNetwork.PlayerList.Length);
                 levelObjective = "Shoot the balloons in your color and earn the most points!\n Hitting other players balloons will give them points in your stead and will make you lose points!";
                 break;
             case 4:
-                levelScore = 0;
+                InitializeSpawnPoints(3);
                 levelObjective = "Mini boss round!\n Shoot the big balloon and be the first to pop it!";
                 break;
             case 5:
-                levelScore = 0;
+                InitializeSpawnPoints(4);
                 levelObjective = "Final Round!\n Shoot the mega ultra horsing balloon and be the first to pop it!";
                 break;
             default:
@@ -397,7 +408,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(5);
         if (gameLevel <= 6)
         {
-            objectiveText.text = "Starting the next round (" + gameLevel + ")\n" + lookAtAnchor;
+            objectiveText.text = "Starting the next round (" + (gameLevel  + 1) + ")\n" + lookAtAnchor;
             shootScript.SetScore(0);
             SetCustomProperties(false, 0, totalScore);
             startNextRound = true;

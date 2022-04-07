@@ -23,6 +23,7 @@ public class SpawnScript : MonoBehaviour
         {
             for (int i = 0; i < numOfSpawnPoints; i++)
             {
+                // ballons[i].GetComponent<BalloonScript>().groupId = 
                 Instantiate(ballons[i], spawnPoints[i].position, Quaternion.identity);
             }
         }
