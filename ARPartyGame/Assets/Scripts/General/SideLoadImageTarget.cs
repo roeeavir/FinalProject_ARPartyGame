@@ -92,7 +92,7 @@ public class SideLoadImageTarget : MonoBehaviour
             playersScores.transform.parent = mTarget.transform;
 
             playersScores.transform.position = new Vector3(0f, 0f, 0f);
-            playersScores.transform.localScale = new Vector3(0.01f, 1f, 0.02f);
+            playersScores.transform.localScale = new Vector3(0.03f, 1f, 0.03f);
             playersScores.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 
             Debug.Log("Main AR game anchor has been created");

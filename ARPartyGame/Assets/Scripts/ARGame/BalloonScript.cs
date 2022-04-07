@@ -82,6 +82,9 @@ public class BalloonScript : MonoBehaviour
                 }
                 transform.Translate(direction * Time.deltaTime * randomSpeed);
                 break;
+            default:
+                transform.Translate(Vector3.up * Time.deltaTime * normalSpeed);
+                break;
         }
     }
 
