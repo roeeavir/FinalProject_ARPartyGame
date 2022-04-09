@@ -182,17 +182,21 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         // Create 3 random spawn points
         debugText.text += "SpawnPlayer1\n";
         spawnPoints = new Transform[size];
+        float x = 0, y = 0, z = 0;
         for (int i = 0; i < spawnPoints.Length; i++)
         {
             string spawnPointName = "SpawnPoint" + PhotonNetwork.LocalPlayer.ActorNumber + "-" + i;
             GameObject newObj = new GameObject(spawnPointName);
-            // Randomly position the spawn points
-            float val = Random.Range(0, 2);
-            float x = val < 1 ? -i - 2 : i + 2;
-            val = Random.Range(0, 2);
-            float y = val < 1 ? -i - 2 : i + 2;
-            val = Random.Range(0, 2);
-            float z = val < 1 ? -i - 2 : i + 2;
+            if (i == 0 || gameLevel == 0)
+            {
+                // Randomly position the spawn points
+                float val = Random.Range(0, 2);
+                x = val < 1 ? -i - 2 : i + 2;
+                val = Random.Range(0, 2);
+                y = val < 1 ? -i - 2 : i + 2;
+                val = Random.Range(0, 2);
+                z = val < 1 ? -i - 2 : i + 2;
+            }
 
             newObj.transform.position = new Vector3(x, y, z);
             spawnPoints[i] = GameObject.Find(spawnPointName).transform;
@@ -214,6 +218,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             spawnScript.enabled = true;
         }
 
+        spawnScript.SetNextTimeToSpawn(2.5f);
+        spawnScript.SetGroupId(getDifficultyOfLevel());
         spawnScript.setSpawnPoints(spawnPoints);
         objectiveText.text = levelObjective + "\nThe first to get to " + roundScoreGoal + " points wins!";
 
@@ -481,6 +487,25 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             Debug.LogWarning("Image Target not found");
     }
 
+    private int getDifficultyOfLevel()
+    {
+        switch (gameLevel)
+        {
+            case 1:
+                return 0; // Normal
+            case 2:
+                return 3; // All balloons are fast and random
+            case 3:
+                return 4;
+            case 4:
+                return 4;
+            case 5:
+                return 5;
+            default:
+                Debug.LogWarning("Bad game level: " + gameLevel + " in getDifficultyOfLevel");
+                return 0;
+        }
+    }
 
 
 }

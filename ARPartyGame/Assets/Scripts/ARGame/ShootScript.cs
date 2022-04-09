@@ -143,7 +143,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
     {
         Destroy(hit.transform.gameObject);
         Instantiate(smoke, hit.point, Quaternion.LookRotation(hit.normal));
-        GameObject popup = Instantiate(popupScore, hit.point, Quaternion.LookRotation(hit.normal));
+        GameObject popup = Instantiate(popupScore, hit.point, Quaternion.LookRotation(arCamera.transform.forward));
         popup.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
         popup.transform.forward = popup.transform.forward * -1; // Fixes rotation
         popup.GetComponent<TextMesh>().text = popScore >= 0 ? "+" + popScore : popScore.ToString();
@@ -156,7 +156,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
     {
         shootBtn.SetActive(false);
         GameObject bullet = Instantiate(bulletPrefab, arCamera.transform.position, arCamera.transform.rotation);
-        bullet.GetComponent<Rigidbody>().AddForce(arCamera.transform.forward * 1000);
+        bullet.GetComponent<Rigidbody>().AddForce(arCamera.transform.forward * 1500);
         yield return new WaitForSeconds(0.5f);
         shootBtn.SetActive(true);
         Destroy(bullet, 2.0f);

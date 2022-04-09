@@ -191,7 +191,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public void OnCloseAnchorCanvas()
     {
         Debug.LogWarning("onCloseAnchorCanvas()");
-        anchorCanvas.SetActive(false);
+        mainCamera.GetComponent<PhoneCamera>().enabled = false; // disable the camera
+        photoBtn.SetActive(false);
+        DisableAnchorCanvasView();
     }
 
     public void OnSetAnchorPhotoFromGallery(){
