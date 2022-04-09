@@ -63,6 +63,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private bool startNextRound = true;
 
+    private int gameMode = 0;
+
 
 
     private int colorID = 0;
@@ -80,6 +82,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         debugText = GameObject.Find("DebugText").GetComponent<Text>();
         objectiveText = GameObject.Find("ObjectiveText").GetComponent<Text>();
         spawnScript = spawnManager.GetComponent<SpawnScript>();
+        SetGameMode();
 
         customProperties["isReady"] = false;
         PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
@@ -505,6 +508,20 @@ public class ARGameManager : MonoBehaviourPunCallbacks
                 Debug.LogWarning("Bad game level: " + gameLevel + " in getDifficultyOfLevel");
                 return 0;
         }
+    }
+
+    private void SetGameMode(){
+        gameMode = GameMode.gameMode;
+        if(gameMode == 0){
+            Debug.LogWarning("Game mode set to casual - " + gameMode);
+        } else if (gameMode == 1){
+            Debug.LogWarning("Game mode set to intermediate - " + gameMode);
+        } else if (gameMode == 2){
+            Debug.LogWarning("Game mode set to intense - " + gameMode);
+        } else {
+            Debug.LogWarning("Game mode set to bad value - " + gameMode);
+        }
+        roundScoreGoal *= (gameMode + 1);
     }
 
 

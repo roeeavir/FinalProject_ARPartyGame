@@ -30,7 +30,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public GameObject anchorCanvas;
 
-    WebCamTexture webCamTexture;
+    public GameObject gameMode;
+
+    private WebCamTexture webCamTexture;
 
     public GameObject photoCanvas;
 
@@ -125,10 +127,12 @@ public class MenuManager : MonoBehaviourPunCallbacks
             if (player.IsMasterClient)
             {
                 playerList.text += player.NickName + " (Host)";
+                gameMode.SetActive(true);
             }
             else
             {
                 playerList.text += player.NickName;
+                gameMode.SetActive(false);
             }
             if (player.CustomProperties["isReady"] != null)
             {
@@ -452,6 +456,33 @@ public class MenuManager : MonoBehaviourPunCallbacks
         }
 
         DisableAnchorCanvasView();
+    }
+    
+    public void OnSetGameMode()
+    {
+        float val = gameMode.GetComponent<Slider>().value;
+        photonView.RPC("SetGameMode", RpcTarget.AllBuffered, val);
+    }
+
+    [PunRPC]
+    public void SetGameMode(float val)
+    {
+        switch (val)
+        {
+            case 0:
+                GameObject.Find("CurrentGameMode").GetComponent<Text>().text = "Game Mode: Casual";
+                break;
+            case 1:
+                GameObject.Find("CurrentGameMode").GetComponent<Text>().text = "Game Mode: Intermediate";
+                break;
+            case 2:
+                GameObject.Find("CurrentGameMode").GetComponent<Text>().text = "Game Mode: Intense";
+                break;
+            default:
+                GameObject.Find("CurrentGameMode").GetComponent<Text>().text = "Game Mode: Casual";
+                break;
+        }
+        GameMode.SetGameMode((int)val);
     }
 
     //     private IEnumerator TakeScreenshot()
