@@ -11,6 +11,12 @@ public class ShootScript : MonoBehaviourPunCallbacks
     public GameObject arCamera;
     public GameObject smoke;
 
+    public GameObject bulletPrefab;
+
+    public GameObject shootBtn;
+
+    public GameObject popupScore;
+
     private int score = 0;
 
     private int level;
@@ -28,6 +34,8 @@ public class ShootScript : MonoBehaviourPunCallbacks
     {
         RaycastHit hit;
 
+        StartCoroutine(SpawnBullet());
+
         if (color.Equals(""))
         {
             color = colors[PhotonNetwork.LocalPlayer.ActorNumber - 1];
@@ -38,40 +46,42 @@ public class ShootScript : MonoBehaviourPunCallbacks
         {
             if (hit.transform.name.Contains("balloon"))
             {
+                int popScore = 0;
                 switch (level)
                 {
                     case 2:
                         if (hit.transform.name.Contains(color.ToLower()))
                         {
                             AddScore(hit.transform.gameObject);
+                            popScore = hit.transform.gameObject.GetComponent<BalloonScript>().GetScore();
                         }
                         else
                         {
                             Debug.LogWarning("Wrong color");
                             photonView.RPC("sendScoreToAnotherPlayer", RpcTarget.All, hit.transform.name, hit.transform.gameObject.GetComponent<BalloonScript>().GetScore());
                         }
-                        Destroy(hit.transform.gameObject);
-                        Instantiate(smoke, hit.point, Quaternion.LookRotation(hit.normal));
+                        StartCoroutine(popBalloon(hit, popScore));
                         break;
                     case 3:
                         if (hit.transform.name.Contains(color.ToLower()))
                         {
                             AddScore(hit.transform.gameObject);
+                            popScore = hit.transform.gameObject.GetComponent<BalloonScript>().GetScore();
                         }
                         else
                         {
                             Debug.LogWarning("Wrong color");
                             photonView.RPC("sendScoreToAnotherPlayer", RpcTarget.All, hit.transform.name, hit.transform.gameObject.GetComponent<BalloonScript>().GetScore());
                             SubstractScore(hit.transform.gameObject);
+                            popScore = -hit.transform.gameObject.GetComponent<BalloonScript>().GetScore();
                         }
-                        Destroy(hit.transform.gameObject);
-                        Instantiate(smoke, hit.point, Quaternion.LookRotation(hit.normal));
+                        StartCoroutine(popBalloon(hit, popScore));
                         break;
                     case 1:
                     default:
                         AddScore(hit.transform.gameObject);
-                        Destroy(hit.transform.gameObject);
-                        Instantiate(smoke, hit.point, Quaternion.LookRotation(hit.normal));
+                        popScore = hit.transform.gameObject.GetComponent<BalloonScript>().GetScore();
+                        StartCoroutine(popBalloon(hit, popScore));
                         break;
 
                 }
@@ -128,5 +138,29 @@ public class ShootScript : MonoBehaviourPunCallbacks
             this.score += score;
         }
     }
+
+    private IEnumerator popBalloon(RaycastHit hit, int popScore)
+    {
+        Destroy(hit.transform.gameObject);
+        Instantiate(smoke, hit.point, Quaternion.LookRotation(hit.normal));
+        GameObject popup = Instantiate(popupScore, hit.point, Quaternion.LookRotation(hit.normal));
+        popup.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+        popup.transform.forward = popup.transform.forward * -1; // Fixes rotation
+        popup.GetComponent<TextMesh>().text = popScore >= 0 ? "+" + popScore : popScore.ToString();
+        yield return new WaitForSeconds(1f);
+        Destroy(popup);
+    }
+
+    // Spawns a bullet from camera position
+    private IEnumerator SpawnBullet()
+    {
+        shootBtn.SetActive(false);
+        GameObject bullet = Instantiate(bulletPrefab, arCamera.transform.position, arCamera.transform.rotation);
+        bullet.GetComponent<Rigidbody>().AddForce(arCamera.transform.forward * 1000);
+        yield return new WaitForSeconds(0.5f);
+        shootBtn.SetActive(true);
+        Destroy(bullet, 2.0f);
+    }
+
 
 }

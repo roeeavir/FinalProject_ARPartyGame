@@ -41,4 +41,5 @@ public class SpawnScript : MonoBehaviour
             numOfSpawnPoints = 0;
         }
     }
+
 }

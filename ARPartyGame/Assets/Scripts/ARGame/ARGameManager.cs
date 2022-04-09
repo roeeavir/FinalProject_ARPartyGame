@@ -37,7 +37,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private ExitGames.Client.Photon.Hashtable customProperties = new ExitGames.Client.Photon.Hashtable();
 
-    private bool waitPlayers = false, waitTracking = false;
+    private bool waitPlayers = false;
 
     public Text PlayersScores;
 
@@ -63,7 +63,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private bool startNextRound = true;
 
-    
+
 
     private int colorID = 0;
     private void Awake()
@@ -122,44 +122,38 @@ public class ARGameManager : MonoBehaviourPunCallbacks
                     Debug.LogWarning("shootScript is null");
                 }
 
+            }
+
+            if (DefaultObserverEventHandler.isTracking)
+            {
+
+                if (startNextRound && !gameStarted)
+                {
+                    if (!(bool)PhotonNetwork.LocalPlayer.CustomProperties["isReady"])
+                    {
+                        SetCustomProperties(true, levelScore, totalScore);
+                    }
+
+                    if (ArePlayersReady())
+                    {
+                        StartNextLevel();
+                    }
+                    else
+                    {
+                        if (!waitPlayers)
+                        {
+                            Debug.LogWarning("Not all players are ready");
+                            StartCoroutine(WaitForPlayers());
+                        }
+                    }
+                }
+
                 if (restartTrack)
                 {
                     RestartImageTargetState();
                     restartTrack = false;
                     StartCoroutine(WaitForTrack());
                 }
-
-            }
-
-            if (DefaultObserverEventHandler.isTracking && startNextRound && !gameStarted)
-            {
-                if (!(bool)PhotonNetwork.LocalPlayer.CustomProperties["isReady"])
-                {
-                    SetCustomProperties(true, levelScore, totalScore);
-                }
-
-                if (ArePlayersReady())
-                {
-                    StartNextLevel();
-                }
-                else
-                {
-                    if (!waitPlayers)
-                    {
-                        Debug.LogWarning("Not all players are ready");
-                        StartCoroutine(WaitForPlayers());
-                    }
-                }
-            }
-            else
-            {
-                // if (startNextRound && gameLevel > 0)
-                // {
-                //     if (!waitTracking)
-                //     {
-                //         StartCoroutine(WaitForTracking());
-                //     }
-                // }
             }
         }
         else
@@ -223,7 +217,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         spawnScript.setSpawnPoints(spawnPoints);
         objectiveText.text = levelObjective + "\nThe first to get to " + roundScoreGoal + " points wins!";
 
-        if (shootScript == null){
+        if (shootScript == null)
+        {
             shootScript = GameObject.Find("ShootManager").GetComponent<ShootScript>();
             // shootScript.SetColors(colors);
         }
@@ -274,19 +269,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         waitPlayers = false;
     }
 
-    private IEnumerator WaitForTracking()
-    {
-        waitTracking = true;
-
-        Debug.LogWarning("\nWaiting for tracking to start...");
-
-        yield return new WaitForSeconds(3);
-
-        DefaultObserverEventHandler.isTracking = true;
-
-        waitTracking = false;
-    }
-
     private void SetPlayersScores()
     {
         SetCustomProperties((bool)customProperties["isReady"], levelScore, totalScore);
@@ -321,8 +303,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         totalScore += levelScore;
         SetCustomProperties(false, levelScore, totalScore);
         // SetImageTarget(null);
+        // Reset Vuforia's image tracking
         DefaultObserverEventHandler.isTracking = false;
-        // reset vuforia tracking
         Debug.LogWarning("Game level " + gameLevel + " has been finished!");
         if (gameLevel != 0)
             setLevelWinnerString();
@@ -486,11 +468,12 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         Destroy(gameObject);
     }
 
-    private void SetImageTarget(GameObject newImageTarget){
+    private void SetImageTarget(GameObject newImageTarget)
+    {
         // set imageTarget to from SideLoadImageTarget script
         Debug.LogWarning("Image Target yet to be set");
         imageTarget = newImageTarget;
-        imageTarget.GetComponent<DefaultObserverEventHandler>().StatusFilter = DefaultObserverEventHandler.TrackingStatusFilter.Tracked;;    
+        imageTarget.GetComponent<DefaultObserverEventHandler>().StatusFilter = DefaultObserverEventHandler.TrackingStatusFilter.Tracked; ;
 
         if (imageTarget != null)
             Debug.LogWarning("Image Target found");
