@@ -5,7 +5,7 @@ using UnityEngine;
 public class SpawnScript : MonoBehaviour
 {
     private Transform[] spawnPoints;
-    public GameObject[] ballons;
+    public GameObject[] enemies;
 
     private int numOfSpawnPoints = 3;
 
@@ -30,9 +30,9 @@ public class SpawnScript : MonoBehaviour
             {
                 if (groupId != 0)
                 {
-                    ballons[i].GetComponent<BalloonScript>().groupId = groupId;
+                    enemies[i].GetComponent<EnemyScript>().groupId = groupId;
                 }
-                Instantiate(ballons[i], spawnPoints[i].position, Quaternion.identity);
+                Instantiate(enemies[i], spawnPoints[i].position, Quaternion.identity);
             }
         }
 

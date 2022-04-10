@@ -59,7 +59,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private const string lookAtAnchor = "All players need to point their camera at the anchor object in the room";
 
-    private Color[] colors = { Color.blue, Color.red, Color.yellow, Color.magenta, Color.green };
+    private Color[] colors = { /*Blue*/new Color(26, 125, 196, 255), /*Green*/new Color(46, 203, 104, 255), /*Orange*/new Color(254, 140, 24, 255),
+     /*Purple*/new Color(140, 83, 252, 255), /*Pink*/new Color(196, 39, 204, 255) };
 
     private bool startNextRound = true;
 
@@ -212,7 +213,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     }
 
     // Starts the game each level
-    private void StartBalloonGame()
+    private void StartGame()
     {
         if (!spawnScript.enabled)
         {
@@ -318,7 +319,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         if (gameLevel != 0)
             setLevelWinnerString();
         spawnScript.setSpawnPoints(null);
-        destroyAllBalloons();
+        destroyAllEnemies();
         objectiveText.text = winnerName + winnerInLevel;
         playerUI.SetActive(false);
         StartCoroutine(WaitForNextRound());
@@ -329,15 +330,15 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         Debug.LogWarning("Starting next level (" + gameLevel + ")");
         gameLevel++;
         setLevelObjectiveString();
-        StartBalloonGame();
+        StartGame();
     }
 
-    private void destroyAllBalloons()
+    private void destroyAllEnemies()
     {
-        GameObject[] balloons = GameObject.FindGameObjectsWithTag("balloon");
-        foreach (GameObject balloon in balloons)
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("enemy");
+        foreach (GameObject enemy in enemies)
         {
-            Destroy(balloon);
+            Destroy(enemy);
         }
     }
 
@@ -377,27 +378,27 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         {
             case 1:
                 Debug.LogWarning("Level 1 Objective and Spawn Points");
-                levelObjective = "Shoot the balloons and earn the most points!";
+                levelObjective = "Shoot the enemies and earn the most points!";
                 break;
             case 2:
                 Debug.LogWarning("Level 2 Objective and Spawn Points");
                 InitializeSpawnPoints(PhotonNetwork.PlayerList.Length + 1);
-                levelObjective = "Shoot the balloons in your color and earn the most points!\n Hitting other players balloons will give them points in your stead!";
+                levelObjective = "Shoot the enemies in your color and earn the most points!\n Hitting other players enemies will give them points in your stead!";
                 break;
             case 3:
                 Debug.LogWarning("Level 3 Objective and Spawn Points");
                 InitializeSpawnPoints(PhotonNetwork.PlayerList.Length + 1);
-                levelObjective = "Shoot the balloons in your color and earn the most points!\n Hitting other players balloons will give them points in your stead and will make you lose points!";
+                levelObjective = "Shoot the enemies in your color and earn the most points!\n Hitting other players enemies will give them points in your stead and will make you lose points!";
                 break;
             case 4:
                 Debug.LogWarning("Level 4 Objective and Spawn Points");
                 InitializeSpawnPoints(3);
-                levelObjective = "Mini boss round!\n Shoot the big balloon and be the first to pop it!";
+                levelObjective = "Mini boss round!\n Shoot the big enemies and be the first to destroy it!";
                 break;
             case 5:
                 Debug.LogWarning("Level 5 Objective and Spawn Points");
                 InitializeSpawnPoints(4);
-                levelObjective = "Final Round!\n Shoot the mega ultra horsing balloon and be the first to pop it!";
+                levelObjective = "Final Round!\n Shoot the mega ultra horsing enemies and be the first to destroy it!";
                 break;
             default:
                 Debug.LogWarning("Bad game level: " + gameLevel + " in SetLevelObjectiveString");
@@ -497,9 +498,9 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             case 1:
                 return 0; // Normal
             case 2:
-                return 3; // All balloons are fast and random
+                return 3 + gameMode; // All enemies are fast and random
             case 3:
-                return 4;
+                return 4 + gameMode; // All enemies are faster and randomer
             case 4:
                 return 4;
             case 5:
@@ -510,15 +511,23 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private void SetGameMode(){
+    private void SetGameMode()
+    {
         gameMode = GameMode.gameMode;
-        if(gameMode == 0){
+        if (gameMode == 0)
+        {
             Debug.LogWarning("Game mode set to casual - " + gameMode);
-        } else if (gameMode == 1){
+        }
+        else if (gameMode == 1)
+        {
             Debug.LogWarning("Game mode set to intermediate - " + gameMode);
-        } else if (gameMode == 2){
+        }
+        else if (gameMode == 2)
+        {
             Debug.LogWarning("Game mode set to intense - " + gameMode);
-        } else {
+        }
+        else
+        {
             Debug.LogWarning("Game mode set to bad value - " + gameMode);
         }
         roundScoreGoal *= (gameMode + 1);
