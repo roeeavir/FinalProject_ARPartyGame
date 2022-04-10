@@ -127,12 +127,10 @@ public class MenuManager : MonoBehaviourPunCallbacks
             if (player.IsMasterClient)
             {
                 playerList.text += player.NickName + " (Host)";
-                gameMode.SetActive(true);
             }
             else
             {
                 playerList.text += player.NickName;
-                gameMode.SetActive(false);
             }
             if (player.CustomProperties["isReady"] != null)
             {
@@ -151,10 +149,12 @@ public class MenuManager : MonoBehaviourPunCallbacks
             if (PhotonNetwork.IsMasterClient)
             {
                 setAnchorBtn.interactable = true; // enable set anchor button
+                gameMode.SetActive(true);
             }
             else
             {
                 setAnchorBtn.interactable = false; // disable set anchor button
+                gameMode.SetActive(false);
             }
             startGameBtn.interactable = false; // disable start game button
             startARGameBtn.interactable = false; // disable start AR game button

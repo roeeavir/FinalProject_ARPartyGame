@@ -59,8 +59,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private const string lookAtAnchor = "All players need to point their camera at the anchor object in the room";
 
-    private Color[] colors = { /*Blue*/new Color(0.1f, 0.5f, 0.75f), /*Green*/new Color(0.2f, 0.8f, 0.4f), /*Orange*/new Color(1f, 0.58f, 0.1f),
-     /*Purple*/new Color(0.65f, 0.3f, 0.97f), /*Pink*/new Color(0.75f, 0.15f, 0.8f) };
 
     private bool startNextRound = true;
 
@@ -68,7 +66,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
 
 
-    private int colorID = 0;
     private void Awake()
     {
         if (instance == null)
@@ -97,10 +94,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         photonView.RPC("ImInARGame", RpcTarget.AllBuffered);
         Debug.LogWarning("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
-
-        colorID = PhotonNetwork.LocalPlayer.ActorNumber - 1; // Sets the color of the player to the color of the player's ID
-        objectiveText.color = colors[colorID];
-        Debug.LogWarning("Players Color : " + colors[colorID]);
 
     }
 
@@ -230,7 +223,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         if (shootScript == null)
         {
             shootScript = GameObject.Find("ShootManager").GetComponent<ShootScript>();
-            // shootScript.SetColors(colors);
         }
         shootScript.SetLevel(gameLevel);
 
@@ -301,12 +293,12 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         if (levelScore >= roundScoreGoal)
         {
             Debug.LogWarning("A round winner has been decided!");
-            photonView.RPC("FinishLevel", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.NickName);
+            photonView.RPC("FinishLevel", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.NickName, levelScore);
         }
     }
 
     [PunRPC]
-    private void FinishLevel(string winnerName)
+    private void FinishLevel(string winnerName, int lvlScore)
     {
         gameStarted = false;
         startNextRound = false;
@@ -317,12 +309,13 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         DefaultObserverEventHandler.isTracking = false;
         Debug.LogWarning("Game level " + gameLevel + " has been finished!");
         if (gameLevel != 0)
-            setLevelWinnerString();
+            setLevelWinnerString(lvlScore);
         spawnScript.setSpawnPoints(null);
         destroyAllEnemies();
         objectiveText.text = winnerName + winnerInLevel;
         playerUI.SetActive(false);
-        StartCoroutine(WaitForNextRound());
+        if (gameLevel < 5)
+            StartCoroutine(WaitForNextRound());
     }
 
     private void StartNextLevel()
@@ -342,27 +335,24 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         }
     }
 
-    private void setLevelWinnerString()
+    private void setLevelWinnerString(int lvlScore)
     {
         switch (gameLevel)
         {
             case 1:
-                winnerInLevel = " has won the first round with " + levelScore + " points!";
+                winnerInLevel = " has won the first round with " + lvlScore + " points!";
                 break;
             case 2:
-                winnerInLevel = " has won the second round with " + levelScore + " points!";
+                winnerInLevel = " has won the second round with " + lvlScore + " points!";
                 break;
             case 3:
-                winnerInLevel = " has won the third round with " + levelScore + " points!";
+                winnerInLevel = " has won the third round with " + lvlScore + " points!";
                 break;
             case 4:
-                winnerInLevel = " has won the fourth round with " + levelScore + " points!";
+                winnerInLevel = " has won the fourth round with " + lvlScore + " points!";
                 break;
             case 5:
-                winnerInLevel = " has won the fifth round with " + levelScore + " points!";
-                break;
-            case 6:
-                winnerInLevel = " has won the game with " + levelScore + " points!!!";
+                winnerInLevel = " has won the game with " + lvlScore + " points!!!";
                 photonView.RPC("SetGameEnded", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.NickName);
                 break;
             default:
@@ -383,22 +373,17 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             case 2:
                 Debug.LogWarning("Level 2 Objective and Spawn Points");
                 InitializeSpawnPoints(PhotonNetwork.PlayerList.Length + 1);
-                levelObjective = "Shoot the enemies in your color and earn the most points!\n Hitting other players enemies will give them points in your stead!";
+                levelObjective = "Shoot the enemies in your color and earn the most points!\n Hitting other players enemies will give them points in your stead and will make you lose points!";
                 break;
             case 3:
                 Debug.LogWarning("Level 3 Objective and Spawn Points");
-                InitializeSpawnPoints(PhotonNetwork.PlayerList.Length + 1);
-                levelObjective = "Shoot the enemies in your color and earn the most points!\n Hitting other players enemies will give them points in your stead and will make you lose points!";
+                InitializeSpawnPoints(5);
+                levelObjective = "Shoot the enemies that match the color of your text and earn the most points!\n Hitting other players enemies will give them points in your stead and will make you lose points!";
                 break;
             case 4:
                 Debug.LogWarning("Level 4 Objective and Spawn Points");
                 InitializeSpawnPoints(3);
                 levelObjective = "Mini boss round!\n Shoot the big enemies and be the first to destroy it!";
-                break;
-            case 5:
-                Debug.LogWarning("Level 5 Objective and Spawn Points");
-                InitializeSpawnPoints(4);
-                levelObjective = "Final Round!\n Shoot the mega ultra horsing enemies and be the first to destroy it!";
                 break;
             default:
                 Debug.LogWarning("Bad game level: " + gameLevel + " in SetLevelObjectiveString");
@@ -503,8 +488,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
                 return 4 + gameMode; // All enemies are faster and randomer
             case 4:
                 return 4;
-            case 5:
-                return 5;
             default:
                 Debug.LogWarning("Bad game level: " + gameLevel + " in getDifficultyOfLevel");
                 return 0;
@@ -533,7 +516,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         roundScoreGoal *= (gameMode + 1);
     }
 
-    public void OnResetTargetObjectBtn(){
+    public void OnResetTargetObjectBtn()
+    {
         Debug.LogWarning("Reset Target Object Button Pressed");
         DefaultObserverEventHandler.isTracking = false;
         gameObject.GetComponent<SideLoadImageTarget>().setTargetChildren();

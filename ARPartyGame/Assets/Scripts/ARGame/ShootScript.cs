@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.UI;
 
 
 public class ShootScript : MonoBehaviourPunCallbacks
@@ -21,13 +22,25 @@ public class ShootScript : MonoBehaviourPunCallbacks
 
     private int level;
 
-    private string color = "";
+    private string currentColor = "";
 
-    private string[] colors = { "blue", "green", "orange", "purple", "pink" };
+    private string[] colorsStr = { "blue", "green", "orange", "purple", "pink" };
+
+    private Color[] colors = { /*Blue*/new Color(0.1f, 0.5f, 0.75f), /*Green*/new Color(0.2f, 0.8f, 0.4f), /*Orange*/new Color(1f, 0.58f, 0.1f),
+     /*Purple*/new Color(0.65f, 0.3f, 0.97f), /*Pink*/new Color(0.75f, 0.15f, 0.8f) };
+
+    private int index;
+
+    private Text objectiveText;
 
     private void Start()
     {
         score = 0;
+        objectiveText = GameObject.Find("ObjectiveText").GetComponent<Text>();
+        currentColor = colorsStr[PhotonNetwork.LocalPlayer.ActorNumber - 1];
+        index = PhotonNetwork.LocalPlayer.ActorNumber - 1; 
+        objectiveText.color = colors[index]; // Sets the color of the player to the color of the player's ID
+        Debug.LogWarning("Players Color : " + colors[index]);
     }
 
     public void Shoot()
@@ -36,10 +49,11 @@ public class ShootScript : MonoBehaviourPunCallbacks
 
         StartCoroutine(SpawnBullet());
 
-        if (color.Equals(""))
+        if (currentColor.Equals(""))
         {
-            color = colors[PhotonNetwork.LocalPlayer.ActorNumber - 1];
-            Debug.LogWarning(color);
+            currentColor = colorsStr[PhotonNetwork.LocalPlayer.ActorNumber - 1];
+            index = PhotonNetwork.LocalPlayer.ActorNumber - 1;
+            Debug.LogWarning(currentColor);
         }
 
         if (Physics.Raycast(arCamera.transform.position, arCamera.transform.forward, out hit))
@@ -49,44 +63,54 @@ public class ShootScript : MonoBehaviourPunCallbacks
                 int popScore = 0;
                 switch (level)
                 {
-                    case 2:
-                        if (hit.transform.name.ToLower().Contains(color.ToLower()))
-                        {
-                            AddScore(hit.transform.gameObject);
-                            popScore = hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
-                        }
-                        else
-                        {
-                            Debug.LogWarning("Wrong color");
-                            photonView.RPC("sendScoreToAnotherPlayer", RpcTarget.All, hit.transform.name.ToLower(), hit.transform.gameObject.GetComponent<EnemyScript>().GetScore());
-                        }
-                        StartCoroutine(DestroyEnemy(hit, popScore));
-                        break;
-                    case 3:
-                        if (hit.transform.name.ToLower().Contains(color.ToLower()))
-                        {
-                            AddScore(hit.transform.gameObject);
-                            popScore = hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
-                        }
-                        else
-                        {
-                            Debug.LogWarning("Wrong color");
-                            photonView.RPC("sendScoreToAnotherPlayer", RpcTarget.All, hit.transform.name.ToLower(), hit.transform.gameObject.GetComponent<EnemyScript>().GetScore());
-                            SubstractScore(hit.transform.gameObject);
-                            popScore = -hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
-                        }
-                        StartCoroutine(DestroyEnemy(hit, popScore));
-                        break;
                     case 1:
                     default:
                         AddScore(hit.transform.gameObject);
                         popScore = hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
                         StartCoroutine(DestroyEnemy(hit, popScore));
                         break;
-
+                    case 2:
+                        if (hit.transform.name.ToLower().Contains(currentColor.ToLower()))
+                        {
+                            AddScore(hit.transform.gameObject);
+                            popScore = hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Wrong color");
+                            photonView.RPC("SendScoreToAnotherPlayer", RpcTarget.All, hit.transform.name.ToLower(), hit.transform.gameObject.GetComponent<EnemyScript>().GetScore());
+                            SubstractScore(hit.transform.gameObject);
+                            popScore = -hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
+                        }
+                        StartCoroutine(DestroyEnemy(hit, popScore));
+                        break;
+                    case 3:
+                        if (hit.transform.name.ToLower().Contains(currentColor.ToLower()))
+                        {
+                            AddScore(hit.transform.gameObject);
+                            popScore = hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
+                            index++;
+                            if (index > colorsStr.Length - 1)
+                            {
+                                index = 0;
+                            }
+                            currentColor = colorsStr[index];
+                            objectiveText.color = colors[index];
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Wrong color");
+                            photonView.RPC("SendScoreToAnotherPlayer", RpcTarget.All, hit.transform.name.ToLower(), hit.transform.gameObject.GetComponent<EnemyScript>().GetScore());
+                            SubstractScore(hit.transform.gameObject);
+                            popScore = -hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
+                        }
+                        StartCoroutine(DestroyEnemy(hit, popScore));
+                        break;
                 }
             }
-        } else {
+        }
+        else
+        {
             Debug.LogWarning("No target");
         }
     }
@@ -129,8 +153,8 @@ public class ShootScript : MonoBehaviourPunCallbacks
     [PunRPC]
     private void SendScoreToAnotherPlayer(string name, int score)
     {
-        Debug.LogWarning("Sending to another player. name:" + name + " score: " + score + " my color " + color);
-        if (name.ToLower().Contains(color.ToLower()))
+        Debug.LogWarning("Sending to another player. name:" + name + " score: " + score + " my color " + currentColor);
+        if (name.ToLower().Contains(currentColor.ToLower()))
         {
             this.score += score;
         }
