@@ -59,8 +59,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private const string lookAtAnchor = "All players need to point their camera at the anchor object in the room";
 
-    private Color[] colors = { /*Blue*/new Color(26, 125, 196, 255), /*Green*/new Color(46, 203, 104, 255), /*Orange*/new Color(254, 140, 24, 255),
-     /*Purple*/new Color(140, 83, 252, 255), /*Pink*/new Color(196, 39, 204, 255) };
+    private Color[] colors = { /*Blue*/new Color(0.1f, 0.5f, 0.75f), /*Green*/new Color(0.2f, 0.8f, 0.4f), /*Orange*/new Color(1f, 0.58f, 0.1f),
+     /*Purple*/new Color(0.65f, 0.3f, 0.97f), /*Pink*/new Color(0.75f, 0.15f, 0.8f) };
 
     private bool startNextRound = true;
 
@@ -531,6 +531,14 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             Debug.LogWarning("Game mode set to bad value - " + gameMode);
         }
         roundScoreGoal *= (gameMode + 1);
+    }
+
+    public void OnResetTargetObjectBtn(){
+        Debug.LogWarning("Reset Target Object Button Pressed");
+        DefaultObserverEventHandler.isTracking = false;
+        gameObject.GetComponent<SideLoadImageTarget>().setTargetChildren();
+        SetImageTarget(GameObject.Find("DynamicImageTarget"));
+        Debug.LogWarning("Reset Target Object Complete");
     }
 
 
