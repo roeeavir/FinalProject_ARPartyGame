@@ -69,31 +69,8 @@ public class SideLoadImageTarget : MonoBehaviour
         }
         else if (targetName.Equals("DynamicImageTarget"))
         {
-            GameObject camera = GameObject.Find("ARCamera");
-            if (camera != null)
-            {
-                camera.GetComponent<VuforiaBehaviour>().SetWorldCenter(WorldCenterMode.SPECIFIC_TARGET, mTarget.GetComponent<ImageTargetBehaviour>());
-            }
-            GameObject playersScores = GameObject.Find("Scores Background");
-            if (playersScores != null)
-            {
-                // Debug.Log("Plane Yese set to texture");
-                Debug.Log("Plane Scores Background is not null");
-                // playersScores.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.GetTexture();
-            }
-            else
-            {
-                Debug.Log("Plane Scores Background is null");
-            }
 
-            // playersScores.transform.localScale = new Vector3(-1f, 1f, 1f);
-
-            // Place the plane as mTarget's child
-            playersScores.transform.parent = mTarget.transform;
-
-            playersScores.transform.position = new Vector3(0f, 0f, 0f);
-            playersScores.transform.localScale = new Vector3(0.03f, 1f, 0.03f);
-            playersScores.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            setTargetChildren();
 
             Debug.Log("Main AR game anchor has been created");
         }
@@ -130,11 +107,11 @@ public class SideLoadImageTarget : MonoBehaviour
 
         if (VuforiaBehaviour.Instance == null)
         {
-            Debug.Log("VuforiaBehaviour is not null");
+            Debug.LogWarning("VuforiaBehaviour is not null");
         }
         else
         {
-            Debug.Log("VuforiaBehaviour is null");
+            Debug.LogWarning("VuforiaBehaviour is null");
         }
 
 
@@ -143,7 +120,7 @@ public class SideLoadImageTarget : MonoBehaviour
                    printedTargetSize,
                    targetName);
 
-        Debug.Log("Image Target created");
+        Debug.LogWarning("Image Target created");
 
         // add the Default Observer Event Handler to the newly created game object
         target.gameObject.AddComponent<DefaultObserverEventHandler>();
@@ -178,6 +155,33 @@ public class SideLoadImageTarget : MonoBehaviour
     {
         textureFile = texture;
         targetName = name;
+    }
+
+    public void setTargetChildren()
+    {
+        GameObject camera = GameObject.Find("ARCamera");
+        if (camera != null)
+        {
+            camera.GetComponent<VuforiaBehaviour>().SetWorldCenter(WorldCenterMode.SPECIFIC_TARGET, mTarget.GetComponent<ImageTargetBehaviour>());
+        }
+        GameObject playersScores = GameObject.Find("Scores Background");
+        if (playersScores != null)
+        {
+            Debug.LogWarning("Plane Scores Background is not null");
+            // playersScores.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.GetTexture();
+        }
+        else
+        {
+            Debug.LogWarning("Plane Scores Background is null");
+        }
+
+        // Place the plane as mTarget's child
+        playersScores.transform.parent = mTarget.transform;
+
+        playersScores.transform.position = new Vector3(0f, 0f, 0f);
+        playersScores.transform.localScale = new Vector3(0.03f, 1f, 0.03f);
+        playersScores.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+
     }
 
 }
