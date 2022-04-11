@@ -5,7 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - bullet
-  - enemy
+  - balloon
   layers:
   - Default
   - TransparentFX

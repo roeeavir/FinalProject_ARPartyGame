@@ -38,9 +38,11 @@ public class SpawnScript : MonoBehaviour
                 {
                     spawnPoints[i] = SpawnPointsScript.CreateNewSpawnPoint();
                     changeSpawnPoint = false;
+
                 }
                 else
                 {
+
                     changeSpawnPoint = true;
                 }
             }
