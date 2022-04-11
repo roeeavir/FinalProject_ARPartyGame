@@ -69,11 +69,6 @@ public class SideLoadImageTarget : MonoBehaviour
         }
         else if (targetName.Equals("DynamicImageTarget"))
         {
-            GameObject camera = GameObject.Find("ARCamera");
-            if (camera != null)
-            {
-                camera.GetComponent<VuforiaBehaviour>().SetWorldCenter(WorldCenterMode.SPECIFIC_TARGET, mTarget.GetComponent<ImageTargetBehaviour>());
-            }
 
             setTargetChildren();
 
@@ -164,6 +159,11 @@ public class SideLoadImageTarget : MonoBehaviour
 
     public void setTargetChildren()
     {
+        GameObject camera = GameObject.Find("ARCamera");
+        if (camera != null)
+        {
+            camera.GetComponent<VuforiaBehaviour>().SetWorldCenter(WorldCenterMode.SPECIFIC_TARGET, mTarget.GetComponent<ImageTargetBehaviour>());
+        }
         GameObject playersScores = GameObject.Find("Scores Background");
         if (playersScores != null)
         {

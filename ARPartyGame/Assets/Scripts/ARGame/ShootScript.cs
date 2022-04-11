@@ -31,6 +31,8 @@ public class ShootScript : MonoBehaviourPunCallbacks
 
     private int index;
 
+    private float distance = 2f;
+
     private Text objectiveText;
 
     private void Start()
@@ -160,14 +162,13 @@ public class ShootScript : MonoBehaviourPunCallbacks
         }
     }
 
-    private IEnumerator DestroyEnemy(RaycastHit hit, int popScore)
+    private IEnumerator DestroyEnemy(RaycastHit hit, int enemyScore)
     {
         Destroy(hit.transform.gameObject);
         Instantiate(smoke, hit.point, Quaternion.LookRotation(hit.normal));
-        GameObject popup = Instantiate(popupScore, hit.point, Quaternion.LookRotation(arCamera.transform.forward));
-        popup.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-        popup.transform.forward = popup.transform.forward * -1; // Fixes rotation
-        popup.GetComponent<TextMesh>().text = popScore >= 0 ? "+" + popScore : popScore.ToString();
+        GameObject popup = Instantiate(popupScore, arCamera.transform.position + arCamera.transform.forward * distance, arCamera.transform.rotation * Quaternion.Euler(0, 0, 90));
+        popup.GetComponent<TextMesh>().text = enemyScore >= 0 ? "+" + enemyScore : enemyScore.ToString();
+        popup.GetComponent<TextMesh>().color = colors[index];
         yield return new WaitForSeconds(1f);
         Destroy(popup);
     }
