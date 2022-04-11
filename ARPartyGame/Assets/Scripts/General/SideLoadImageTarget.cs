@@ -107,11 +107,11 @@ public class SideLoadImageTarget : MonoBehaviour
 
         if (VuforiaBehaviour.Instance == null)
         {
-            Debug.Log("VuforiaBehaviour is not null");
+            Debug.LogWarning("VuforiaBehaviour is not null");
         }
         else
         {
-            Debug.Log("VuforiaBehaviour is null");
+            Debug.LogWarning("VuforiaBehaviour is null");
         }
 
 
@@ -120,7 +120,7 @@ public class SideLoadImageTarget : MonoBehaviour
                    printedTargetSize,
                    targetName);
 
-        Debug.Log("Image Target created");
+        Debug.LogWarning("Image Target created");
 
         // add the Default Observer Event Handler to the newly created game object
         target.gameObject.AddComponent<DefaultObserverEventHandler>();
@@ -167,16 +167,13 @@ public class SideLoadImageTarget : MonoBehaviour
         GameObject playersScores = GameObject.Find("Scores Background");
         if (playersScores != null)
         {
-            // Debug.Log("Plane Yese set to texture");
-            Debug.Log("Plane Scores Background is not null");
+            Debug.LogWarning("Plane Scores Background is not null");
             // playersScores.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.GetTexture();
         }
         else
         {
-            Debug.Log("Plane Scores Background is null");
+            Debug.LogWarning("Plane Scores Background is null");
         }
-
-        // playersScores.transform.localScale = new Vector3(-1f, 1f, 1f);
 
         // Place the plane as mTarget's child
         playersScores.transform.parent = mTarget.transform;

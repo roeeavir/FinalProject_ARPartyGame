@@ -33,9 +33,10 @@ public class EnemyScript : MonoBehaviour
 
     private Vector3 position;
 
-    Vector2 direction = new Vector2(0, 0);
+    private Vector2 direction = new Vector2(0, 0);
 
-    EnemyMovementState state = EnemyMovementState.Normal;
+    private EnemyMovementState state = EnemyMovementState.Normal;
+
 
     void Start()
     {

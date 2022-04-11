@@ -179,24 +179,28 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         // Create 3 random spawn points
         debugText.text += "SpawnPlayer1\n";
         spawnPoints = new Transform[size];
-        float x = 0, y = 0, z = 0;
+        // float x = 0, y = 0, z = 0;
         for (int i = 0; i < spawnPoints.Length; i++)
         {
             string spawnPointName = "SpawnPoint" + PhotonNetwork.LocalPlayer.ActorNumber + "-" + i;
-            GameObject newObj = new GameObject(spawnPointName);
-            if (i == 0 || gameLevel == 0)
-            {
-                // Randomly position the spawn points
-                float val = Random.Range(0, 2);
-                x = val < 1 ? -i - 2 : i + 2;
-                val = Random.Range(0, 2);
-                y = val < 1 ? -i - 2 : i + 2;
-                val = Random.Range(0, 2);
-                z = val < 1 ? -i - 2 : i + 2;
-            }
+            // GameObject newObj = new GameObject(spawnPointName);
+            // if (i == 0 || gameLevel == 0)
+            // {
+            //     // Randomly position the spawn points
+            //     float val = Random.Range(0, 2);
+            //     x = val < 1 ? -i - 2 : i + 2;
+            //     val = Random.Range(0, 2);
+            //     y = val < 1 ? -i - 2 : i + 2;
+            //     val = Random.Range(0, 2);
+            //     z = val < 1 ? -i - 2 : i + 2;
+            // }
 
-            newObj.transform.position = new Vector3(x, y, z);
-            spawnPoints[i] = GameObject.Find(spawnPointName).transform;
+
+
+            // newObj.transform.position = new Vector3(x, y, z);
+            // spawnPoints[i] = GameObject.Find(spawnPointName).transform;
+
+            spawnPoints[i] = SpawnPointsScript.CreateNewSpawnPoint();
             Debug.LogWarning(spawnPointName + ": " + spawnPoints[i].position);
             debugText.text += spawnPointName + ": " + spawnPoints[i].position + "\n";
         }
@@ -304,9 +308,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         startNextRound = false;
         totalScore += levelScore;
         SetCustomProperties(false, levelScore, totalScore);
-        // SetImageTarget(null);
-        // Reset Vuforia's image tracking
-        DefaultObserverEventHandler.isTracking = false;
+        DefaultObserverEventHandler.isTracking = false; // Reset Vuforia's image tracking
         Debug.LogWarning("Game level " + gameLevel + " has been finished!");
         if (gameLevel != 0)
             setLevelWinnerString(lvlScore);
@@ -382,7 +384,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
                 break;
             case 4:
                 Debug.LogWarning("Level 4 Objective and Spawn Points");
-                InitializeSpawnPoints(3);
+                InitializeSpawnPoints(1);
                 levelObjective = "Mini boss round!\n Shoot the big enemies and be the first to destroy it!";
                 break;
             default:

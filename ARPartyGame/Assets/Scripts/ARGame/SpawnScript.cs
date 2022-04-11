@@ -13,18 +13,19 @@ public class SpawnScript : MonoBehaviour
 
     private int groupId = 0;
 
+    private bool changeSpawnPoint = false;
     // Start is called before the first frame update
     void Start()
     {
         StartCoroutine(StartSpawning());
-        StartCoroutine(MixSpawnPoints());
+        // StartCoroutine(MixSpawnPoints());
     }
 
     private IEnumerator StartSpawning()
     {
         yield return new WaitForSeconds(nextTimeToSpawn);
 
-        if (spawnPoints != null)
+        if (spawnPoints != null && groupId != 100)
         {
             for (int i = 0; i < numOfSpawnPoints; i++)
             {
@@ -33,33 +34,60 @@ public class SpawnScript : MonoBehaviour
                     enemies[i].GetComponent<EnemyScript>().groupId = groupId;
                 }
                 Instantiate(enemies[i], spawnPoints[i].position, Quaternion.identity);
+                if (changeSpawnPoint)
+                {
+                    spawnPoints[i] = SpawnPointsScript.CreateNewSpawnPoint();
+                    changeSpawnPoint = false;
+                }
+                else
+                {
+                    changeSpawnPoint = true;
+                }
             }
+
         }
 
         StartCoroutine(StartSpawning());
     }
 
-    private IEnumerator MixSpawnPoints(){
-        yield return new WaitForSeconds(nextTimeToSpawn * 4);
+    // private IEnumerator MixSpawnPoints(){
+    //     yield return new WaitForSeconds(nextTimeToSpawn * 2);
 
-        float x = 0, y = 0, z = 0;
-        if (spawnPoints != null)
-        {
-            for (int i = 0; i < numOfSpawnPoints; i++)
-            {
-                float val = Random.Range(0, 2);
-                x = val < 1 ? -spawnPoints[i].position.x : spawnPoints[i].position.x;
-                val = Random.Range(0, 2);
-                y = val < 1 ? -spawnPoints[i].position.y : spawnPoints[i].position.y;
-                val = Random.Range(0, 2);
-                z = val < 1 ? -spawnPoints[i].position.z : spawnPoints[i].position.z;
+    //     float x = 0, y = 0, z = 0;
+    //     if (spawnPoints != null)
+    //     {
+    //         for (int i = 0; i < numOfSpawnPoints; i++)
+    //         {
+    //             float val = Random.Range(0, 2);
+    //             x = val < 1 ? -spawnPoints[i].position.x : spawnPoints[i].position.x;
+    //             val = Random.Range(0, 2);
+    //             y = val < 1 ? -spawnPoints[i].position.y : spawnPoints[i].position.y;
+    //             val = Random.Range(0, 2);
+    //             z = val < 1 ? -spawnPoints[i].position.z : spawnPoints[i].position.z;
 
-                spawnPoints[i].position = new Vector3(x, y, z);
-            }
-        }
+    //             spawnPoints[i].position = new Vector3(x, y, z);
+    //         }
+    //     }
 
-        StartCoroutine(MixSpawnPoints());
-    }
+    //     StartCoroutine(MixSpawnPoints());
+    // }
+
+    // public Transform CreateNewSpawnPoint()
+    // {
+    //     float x = 0, y = 0, z = 0;
+
+    //     float val = Random.Range(0, 2);
+    //     x = val < 1 ? Random.Range(-2, -6) : Random.Range(2, 6);
+    //     val = Random.Range(0, 2);
+    //     y = val < 1 ? Random.Range(-2, -6) : Random.Range(2, 6);
+    //     val = Random.Range(0, 2);
+    //     z = val < 1 ? Random.Range(-2, -6) : Random.Range(2, 6);
+
+    //     Transform newSpawnPoint = new GameObject().transform;
+    //     newSpawnPoint.position = new Vector3(x, y, z);
+    //     newSpawnPoint.parent = transform;
+    //     return newSpawnPoint;
+    // }
 
     public void setSpawnPoints(Transform[] spawnPoints)
     {
