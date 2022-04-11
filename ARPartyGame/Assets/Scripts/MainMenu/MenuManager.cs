@@ -34,7 +34,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public GameObject anchorCanvas;
 
-    WebCamTexture webCamTexture;
+    public GameObject gameMode;
+
+    private WebCamTexture webCamTexture;
 
     public GameObject photoCanvas;
 
@@ -156,10 +158,12 @@ public class MenuManager : MonoBehaviourPunCallbacks
             if (PhotonNetwork.IsMasterClient)
             {
                 setAnchorBtn.interactable = true; // enable set anchor button
+                gameMode.SetActive(true);
             }
             else
             {
                 setAnchorBtn.interactable = false; // disable set anchor button
+                gameMode.SetActive(false);
             }
             startGameBtn.interactable = false; // disable start game button
             startARGameBtn.interactable = false; // disable start AR game button
@@ -200,7 +204,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public void OnCloseAnchorCanvas()
     {
         Debug.LogWarning("onCloseAnchorCanvas()");
-        anchorCanvas.SetActive(false);
+        mainCamera.GetComponent<PhoneCamera>().enabled = false; // disable the camera
+        photoBtn.SetActive(false);
+        DisableAnchorCanvasView();
     }
 
     public void OnSetAnchorPhotoFromGallery(){
@@ -459,6 +465,33 @@ public class MenuManager : MonoBehaviourPunCallbacks
         }
 
         DisableAnchorCanvasView();
+    }
+    
+    public void OnSetGameMode()
+    {
+        float val = gameMode.GetComponent<Slider>().value;
+        photonView.RPC("SetGameMode", RpcTarget.AllBuffered, val);
+    }
+
+    [PunRPC]
+    public void SetGameMode(float val)
+    {
+        switch (val)
+        {
+            case 0:
+                GameObject.Find("CurrentGameMode").GetComponent<Text>().text = "Game Mode: Casual";
+                break;
+            case 1:
+                GameObject.Find("CurrentGameMode").GetComponent<Text>().text = "Game Mode: Intermediate";
+                break;
+            case 2:
+                GameObject.Find("CurrentGameMode").GetComponent<Text>().text = "Game Mode: Intense";
+                break;
+            default:
+                GameObject.Find("CurrentGameMode").GetComponent<Text>().text = "Game Mode: Casual";
+                break;
+        }
+        GameMode.SetGameMode((int)val);
     }
 
     public void onTutorialClick(){

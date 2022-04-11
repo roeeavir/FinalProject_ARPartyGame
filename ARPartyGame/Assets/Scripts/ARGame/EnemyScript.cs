@@ -2,10 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BalloonScript : MonoBehaviour
+public class EnemyScript : MonoBehaviour
 {
-
-    enum BalloonMovementState
+    enum EnemyMovementState
     {
         Normal,
         Fast,
@@ -15,7 +14,11 @@ public class BalloonScript : MonoBehaviour
         RandomFast,
         RandomFaster,
         RandomerFaster,
+        RandomerFastest,
         RandomestFastest,
+        RandomerFasterSize,
+        RandomestFastestSize,
+
     }
 
     public int groupId = 1;
@@ -26,16 +29,20 @@ public class BalloonScript : MonoBehaviour
     private int score = 0;
     private float nextTimeToRandomize = 0f;
 
+    private bool isSmall = false;
+
+    private Vector3 position;
 
     Vector2 direction = new Vector2(0, 0);
 
-    BalloonMovementState state = BalloonMovementState.Normal;
+    EnemyMovementState state = EnemyMovementState.Normal;
 
     void Start()
     {
         // Choose state at random
-        state = (BalloonMovementState)Random.Range(groupId * 2 - 2, groupId * 2);
+        state = (EnemyMovementState)Random.Range(groupId * 2 - 2, groupId * 2);
         score = (int)state + 1;
+        position = transform.position;
     }
 
     // Update is called once per frame
@@ -45,27 +52,27 @@ public class BalloonScript : MonoBehaviour
 
         switch (state)
         {
-            case BalloonMovementState.Normal:
+            case EnemyMovementState.Normal:
                 transform.Translate(Vector3.up * Time.deltaTime * normalSpeed);
                 break;
-            case BalloonMovementState.Fast:
+            case EnemyMovementState.Fast:
                 transform.Translate(Vector3.up * Time.deltaTime * fastSpeed);
                 break;
-            case BalloonMovementState.Smart:
+            case EnemyMovementState.Smart:
                 transform.Translate(Vector3.up * Time.deltaTime * smartSpeed);
                 if ((counter / 800) % 2 == 0)
                     transform.Translate(Vector3.right * Time.deltaTime * sideSpeed);
                 else
                     transform.Translate(Vector3.left * Time.deltaTime * sideSpeed);
                 break;
-            case BalloonMovementState.FastSmart:
+            case EnemyMovementState.FastSmart:
                 transform.Translate(Vector3.up * Time.deltaTime * fastSpeed);
                 if ((counter / 800) % 2 == 0)
                     transform.Translate(Vector3.right * Time.deltaTime * smartSpeed);
                 else
                     transform.Translate(Vector3.left * Time.deltaTime * smartSpeed);
                 break;
-            case BalloonMovementState.Random:
+            case EnemyMovementState.Random:
                 if (Time.time >= nextTimeToRandomize)
                 {
                     nextTimeToRandomize = Time.time + 0.5f;
@@ -75,7 +82,7 @@ public class BalloonScript : MonoBehaviour
                 }
                 transform.Translate(direction * Time.deltaTime * randomSpeed);
                 break;
-            case BalloonMovementState.RandomFast:
+            case EnemyMovementState.RandomFast:
                 if (Time.time >= nextTimeToRandomize)
                 {
                     nextTimeToRandomize = Time.time + 0.5f;
@@ -85,7 +92,7 @@ public class BalloonScript : MonoBehaviour
                 }
                 transform.Translate(direction * Time.deltaTime * randomSpeed);
                 break;
-            case BalloonMovementState.RandomFaster:
+            case EnemyMovementState.RandomFaster:
                 if (Time.time >= nextTimeToRandomize)
                 {
                     nextTimeToRandomize = Time.time + 0.5f;
@@ -95,7 +102,17 @@ public class BalloonScript : MonoBehaviour
                 }
                 transform.Translate(direction * Time.deltaTime * randomSpeed);
                 break;
-            case BalloonMovementState.RandomerFaster:
+            case EnemyMovementState.RandomerFaster:
+                if (Time.time >= nextTimeToRandomize)
+                {
+                    nextTimeToRandomize = Time.time + 0.4f;
+                    transform.Translate(direction * 0f);
+                    direction = Random.insideUnitCircle.normalized;
+                    randomSpeed = Random.Range(sideSpeed * 2, fastSpeed * 10);
+                }
+                transform.Translate(direction * Time.deltaTime * randomSpeed);
+                break;
+            case EnemyMovementState.RandomerFastest:
                 if (Time.time >= nextTimeToRandomize)
                 {
                     nextTimeToRandomize = Time.time + 0.4f;
@@ -105,19 +122,63 @@ public class BalloonScript : MonoBehaviour
                 }
                 transform.Translate(direction * Time.deltaTime * randomSpeed);
                 break;
-            case BalloonMovementState.RandomestFastest:
+            case EnemyMovementState.RandomestFastest:
                 if (Time.time >= nextTimeToRandomize)
                 {
-                    nextTimeToRandomize = Time.time + 0.35f;
+                    nextTimeToRandomize = Time.time + 0.30f;
                     transform.Translate(direction * 0f);
                     direction = Random.insideUnitCircle.normalized;
-                    randomSpeed = Random.Range(sideSpeed * 4, fastSpeed * 16);
+                    randomSpeed = Random.Range(sideSpeed * 4, fastSpeed * 12);
+                }
+                transform.Translate(direction * Time.deltaTime * randomSpeed);
+                break;
+            case EnemyMovementState.RandomerFasterSize:
+                if (Time.time >= nextTimeToRandomize)
+                {
+                    nextTimeToRandomize = Time.time + 0.4f;
+                    transform.Translate(direction * 0f);
+                    direction = Random.insideUnitCircle.normalized;
+                    randomSpeed = Random.Range(sideSpeed * 2, fastSpeed * 10);
+                    if (!isSmall)
+                    {
+                        isSmall = true;
+                        transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                    }
+                    else
+                    {
+                        isSmall = false;
+                        transform.localScale = new Vector3(1f, 1f, 1f);
+                    }
+                }
+                transform.Translate(direction * Time.deltaTime * randomSpeed);
+                break;
+            case EnemyMovementState.RandomestFastestSize:
+                if (Time.time >= nextTimeToRandomize)
+                {
+                    nextTimeToRandomize = Time.time + 0.30f;
+                    transform.Translate(direction * 0f);
+                    direction = Random.insideUnitCircle.normalized;
+                    randomSpeed = Random.Range(sideSpeed * 4, fastSpeed * 12);
+                    if (!isSmall)
+                    {
+                        isSmall = true;
+                        transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
+                    }
+                    else
+                    {
+                        isSmall = false;
+                        transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                    }
                 }
                 transform.Translate(direction * Time.deltaTime * randomSpeed);
                 break;
             default:
                 transform.Translate(Vector3.up * Time.deltaTime * normalSpeed);
                 break;
+        }
+        if (Vector3.Distance(transform.position, position) > 15f)
+        {
+            Destroy(gameObject);
         }
     }
 
