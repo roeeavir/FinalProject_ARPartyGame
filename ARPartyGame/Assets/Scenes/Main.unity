@@ -738,6 +738,7 @@ GameObject:
   m_Layer: 5
   m_Name: Text
 <<<<<<< HEAD
+<<<<<<< HEAD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -830,6 +831,8 @@ GameObject:
 >>>>>>> a23f45cc30d2e71949fb6a1e7892f1916eb5d938
 =======
 >>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
+=======
+>>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -837,10 +840,14 @@ GameObject:
   m_IsActive: 1
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 --- !u!224 &352560345
 =======
 --- !u!224 &345490792
 >>>>>>> a23f45cc30d2e71949fb6a1e7892f1916eb5d938
+=======
+--- !u!224 &313864132
+>>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
 =======
 --- !u!224 &313864132
 >>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
@@ -851,8 +858,13 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   m_GameObject: {fileID: 352560344}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+=======
+  m_GameObject: {fileID: 313864131}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+>>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
 =======
   m_GameObject: {fileID: 313864131}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
@@ -868,6 +880,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+<<<<<<< HEAD
 <<<<<<< HEAD
 --- !u!114 &352560346
 =======
@@ -892,6 +905,9 @@ RectTransform:
 =======
 --- !u!114 &313864133
 >>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
+=======
+--- !u!114 &313864133
+>>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -899,7 +915,11 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   m_GameObject: {fileID: 352560344}
+=======
+  m_GameObject: {fileID: 313864131}
+>>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
 =======
   m_GameObject: {fileID: 313864131}
 >>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
@@ -983,6 +1003,7 @@ CanvasRenderer:
   m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
+<<<<<<< HEAD
       m_Calls:
       - m_Target: {fileID: 1725111792}
         m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
@@ -1053,6 +1074,8 @@ MonoBehaviour:
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
+=======
+>>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
@@ -4530,6 +4553,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+<<<<<<< HEAD
   m_Children: []
   m_Father: {fileID: 672813964}
   m_RootOrder: 6
@@ -4538,6 +4562,18 @@ RectTransform:
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 183}
   m_SizeDelta: {x: 500, y: 80}
+=======
+  m_Children:
+  - {fileID: 1577268034}
+  - {fileID: 914731983}
+  m_Father: {fileID: 2101708111}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -179, y: 0}
+  m_SizeDelta: {x: 250, y: 100}
+>>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1342028037
 MonoBehaviour:
@@ -5290,9 +5326,13 @@ CanvasRenderer:
   m_CullTransparentMesh: 1
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 --- !u!1 &1532056248
 =======
 --- !u!1 &1524335087
+=======
+--- !u!1 &1577268033
+>>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5300,27 +5340,43 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
+<<<<<<< HEAD
   - component: {fileID: 1524335088}
   - component: {fileID: 1524335090}
   - component: {fileID: 1524335089}
+=======
+  - component: {fileID: 1577268034}
+  - component: {fileID: 1577268036}
+  - component: {fileID: 1577268035}
+>>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
   m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
+<<<<<<< HEAD
   m_IsActive: 1
 --- !u!224 &1524335088
+=======
+  m_IsActive: 0
+--- !u!224 &1577268034
+>>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
 RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< HEAD
   m_GameObject: {fileID: 1524335087}
+=======
+  m_GameObject: {fileID: 1577268033}
+>>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
+<<<<<<< HEAD
   m_Father: {fileID: 345490792}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5400,6 +5456,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
+=======
+>>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
   m_Father: {fileID: 1353378908}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5986,6 +6044,7 @@ CanvasRenderer:
   m_CullTransparentMesh: 1
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 --- !u!1 &1873270264
 GameObject:
@@ -6062,6 +6121,8 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1873270264}
   m_CullTransparentMesh: 1
+=======
+>>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
 =======
 >>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
 --- !u!1 &1904535292
@@ -6144,6 +6205,7 @@ CanvasRenderer:
   m_GameObject: {fileID: 1904535292}
   m_CullTransparentMesh: 1
 <<<<<<< HEAD
+<<<<<<< HEAD
 --- !u!1 &1907883536
 GameObject:
   m_ObjectHideFlags: 0
@@ -6181,6 +6243,8 @@ RectTransform:
   m_SizeDelta: {x: -20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 >>>>>>> a23f45cc30d2e71949fb6a1e7892f1916eb5d938
+=======
+>>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
 =======
 >>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
 --- !u!1 &1908043640
