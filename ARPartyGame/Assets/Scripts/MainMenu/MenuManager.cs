@@ -457,7 +457,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         DisableAnchorCanvasView();
     }
-<<<<<<< HEAD
     
     public void OnSetGameMode()
     {
@@ -485,8 +484,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
         }
         GameMode.SetGameMode((int)val);
     }
-=======
->>>>>>> parent of 27d50e6 (Updated UI and added tutorial)
 
     //     private IEnumerator TakeScreenshot()
     //     {
