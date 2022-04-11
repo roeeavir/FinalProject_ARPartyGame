@@ -13,6 +13,9 @@ public class BalloonScript : MonoBehaviour
         FastSmart,
         Random,
         RandomFast,
+        RandomFaster,
+        RandomerFaster,
+        RandomestFastest,
     }
 
     public int groupId = 1;
@@ -79,6 +82,36 @@ public class BalloonScript : MonoBehaviour
                     transform.Translate(direction * 0f);
                     direction = Random.insideUnitCircle.normalized;
                     randomSpeed = Random.Range(sideSpeed, fastSpeed * 4);
+                }
+                transform.Translate(direction * Time.deltaTime * randomSpeed);
+                break;
+            case BalloonMovementState.RandomFaster:
+                if (Time.time >= nextTimeToRandomize)
+                {
+                    nextTimeToRandomize = Time.time + 0.5f;
+                    transform.Translate(direction * 0f);
+                    direction = Random.insideUnitCircle.normalized;
+                    randomSpeed = Random.Range(sideSpeed * 2, fastSpeed * 8);
+                }
+                transform.Translate(direction * Time.deltaTime * randomSpeed);
+                break;
+            case BalloonMovementState.RandomerFaster:
+                if (Time.time >= nextTimeToRandomize)
+                {
+                    nextTimeToRandomize = Time.time + 0.4f;
+                    transform.Translate(direction * 0f);
+                    direction = Random.insideUnitCircle.normalized;
+                    randomSpeed = Random.Range(sideSpeed * 2, fastSpeed * 12);
+                }
+                transform.Translate(direction * Time.deltaTime * randomSpeed);
+                break;
+            case BalloonMovementState.RandomestFastest:
+                if (Time.time >= nextTimeToRandomize)
+                {
+                    nextTimeToRandomize = Time.time + 0.35f;
+                    transform.Translate(direction * 0f);
+                    direction = Random.insideUnitCircle.normalized;
+                    randomSpeed = Random.Range(sideSpeed * 4, fastSpeed * 16);
                 }
                 transform.Translate(direction * Time.deltaTime * randomSpeed);
                 break;

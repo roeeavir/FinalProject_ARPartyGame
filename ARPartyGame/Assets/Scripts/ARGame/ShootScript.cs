@@ -40,7 +40,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
         score = 0;
         objectiveText = GameObject.Find("ObjectiveText").GetComponent<Text>();
         currentColor = colorsStr[PhotonNetwork.LocalPlayer.ActorNumber - 1];
-        index = PhotonNetwork.LocalPlayer.ActorNumber - 1;
+        index = PhotonNetwork.LocalPlayer.ActorNumber - 1; 
         objectiveText.color = colors[index]; // Sets the color of the player to the color of the player's ID
         Debug.LogWarning("Players Color : " + colors[index]);
     }
@@ -107,9 +107,6 @@ public class ShootScript : MonoBehaviourPunCallbacks
                             popScore = -hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
                         }
                         StartCoroutine(DestroyEnemy(hit, popScore));
-                        break;
-                    case 4: // Boss
-                        HandleBossHit(hit);
                         break;
                 }
             }
@@ -185,12 +182,6 @@ public class ShootScript : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(0.5f);
         shootBtn.SetActive(true);
         Destroy(bullet, 2.0f);
-    }
-
-    private void HandleBossHit(RaycastHit hit) {
-        hit.transform.gameObject.transform.localScale = hit.transform.gameObject.transform.localScale * 0.95f;
-        hit.transform.gameObject.transform.position = SpawnPointsScript.CreateNewSpawnPoint().position;
-        // hit.transform.gameObject.GetComponent<EnemyScript>()
     }
 
 
