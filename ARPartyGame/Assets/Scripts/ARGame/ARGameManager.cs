@@ -195,8 +195,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             //     z = val < 1 ? -i - 2 : i + 2;
             // }
 
-            
-
             // newObj.transform.position = new Vector3(x, y, z);
             // spawnPoints[i] = GameObject.Find(spawnPointName).transform;
 

@@ -38,7 +38,11 @@ public class SpawnScript : MonoBehaviour
                 {
                     spawnPoints[i] = SpawnPointsScript.CreateNewSpawnPoint();
                     changeSpawnPoint = false;
-                } else {
+
+                }
+                else
+                {
+
                     changeSpawnPoint = true;
                 }
             }
@@ -73,7 +77,7 @@ public class SpawnScript : MonoBehaviour
     // public Transform CreateNewSpawnPoint()
     // {
     //     float x = 0, y = 0, z = 0;
-        
+
     //     float val = Random.Range(0, 2);
     //     x = val < 1 ? Random.Range(-2, -6) : Random.Range(2, 6);
     //     val = Random.Range(0, 2);
