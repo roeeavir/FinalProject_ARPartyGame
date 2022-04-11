@@ -493,7 +493,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
         }
         GameMode.SetGameMode((int)val);
     }
-<<<<<<< HEAD
 
     public void onTutorialClick(){
         tutorialMenu.SetActive(true);
@@ -504,8 +503,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
         tutorialMenu.SetActive(false);
         mainMenu.SetActive(true);
     }
-=======
->>>>>>> parent of 78dda01 (Update Main.unity)
 
     //     private IEnumerator TakeScreenshot()
     //     {
