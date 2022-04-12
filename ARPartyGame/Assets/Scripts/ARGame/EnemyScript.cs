@@ -18,13 +18,14 @@ public class EnemyScript : MonoBehaviour
         RandomestFastest,
         RandomerFasterSize,
         RandomestFastestSize,
+        Boss
 
     }
 
     public int groupId = 1;
-    public int counter = 0;
+    private int counter = 0;
 
-    private float sideSpeed = 0.3f, normalSpeed = 0.4f, fastSpeed = 0.8f, smartSpeed = 0.5f, randomSpeed = 0.5f;
+    private float sideSpeed = 0.3f, normalSpeed = 0.4f, fastSpeed = 0.8f, smartSpeed = 0.5f, randomSpeed = 0.5f, bossSpeedMultiplier = 2;
 
     private int score = 0;
     private float nextTimeToRandomize = 0f;
@@ -41,8 +42,17 @@ public class EnemyScript : MonoBehaviour
     void Start()
     {
         // Choose state at random
-        state = (EnemyMovementState)Random.Range(groupId * 2 - 2, groupId * 2);
-        score = (int)state + 1;
+        if (groupId >= 100)
+        {
+            state = EnemyMovementState.Boss;
+            score = groupId;
+        }
+        else
+        {
+            state = (EnemyMovementState)Random.Range(groupId * 2 - 2, groupId * 2);
+            score = (int)state + 1;
+        }
+
         position = transform.position;
     }
 
@@ -173,13 +183,42 @@ public class EnemyScript : MonoBehaviour
                 }
                 transform.Translate(direction * Time.deltaTime * randomSpeed);
                 break;
+            case EnemyMovementState.Boss:
+                if (Time.time >= nextTimeToRandomize)
+                {
+                    nextTimeToRandomize = Time.time + 0.30f;
+                    transform.Translate(direction * 0f);
+                    direction = Random.insideUnitCircle.normalized;
+                    randomSpeed = Random.Range(sideSpeed * 4, fastSpeed * bossSpeedMultiplier * (groupId / 100));
+                    if (!isSmall)
+                    {
+                        isSmall = true;
+                        transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
+                    }
+                    else
+                    {
+                        isSmall = false;
+                        transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                    }
+                }
+                transform.Translate(direction * Time.deltaTime * randomSpeed);
+                break;
             default:
                 transform.Translate(Vector3.up * Time.deltaTime * normalSpeed);
                 break;
         }
         if (Vector3.Distance(transform.position, position) > 15f)
         {
-            Destroy(gameObject);
+            if (groupId < 100)
+            {
+                Destroy(gameObject);
+            }
+            else
+            {
+                transform.position = SpawnPointsScript.CreateNewSpawnPoint().position;
+                position = transform.position;
+            }
+
         }
     }
 
@@ -188,5 +227,9 @@ public class EnemyScript : MonoBehaviour
         return score;
     }
 
+    public void AppenedBossSpeedMultiplier()
+    {
+        bossSpeedMultiplier++;
+    }
 
 }

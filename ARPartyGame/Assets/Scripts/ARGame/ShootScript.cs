@@ -35,6 +35,8 @@ public class ShootScript : MonoBehaviourPunCallbacks
 
     private Text objectiveText;
 
+    private string tempObjective = "";
+
     private void Start()
     {
         score = 0;
@@ -107,6 +109,9 @@ public class ShootScript : MonoBehaviourPunCallbacks
                             popScore = -hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
                         }
                         StartCoroutine(DestroyEnemy(hit, popScore));
+                        break;
+                    case 4: // Boss
+                        HandleBossHit(hit);
                         break;
                 }
             }
@@ -182,6 +187,25 @@ public class ShootScript : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(0.5f);
         shootBtn.SetActive(true);
         Destroy(bullet, 2.0f);
+    }
+
+    private void HandleBossHit(RaycastHit hit)
+    {
+        if (hit.transform.gameObject.GetComponent<ARTarget>().OnHit()){ // Is boss dead
+            Debug.LogWarning("Boss Dead");
+            // GameObject.Find("Boss").GetComponent<BossScript>().TakeDamage(1);
+            AddScore(hit.transform.gameObject);
+            Destroy(hit.transform.gameObject);
+            return;
+        }
+        // hit.transform.gameObject.transform.localScale = hit.transform.gameObject.transform.localScale / 2;
+        hit.transform.gameObject.transform.position = SpawnPointsScript.CreateNewSpawnPoint().position;
+        hit.transform.gameObject.GetComponent<EnemyScript>().AppenedBossSpeedMultiplier(); // Speeds boss up
+        if (tempObjective.Equals("")){
+            tempObjective = objectiveText.text;
+        }
+        
+        objectiveText.text = tempObjective + "\nBoss HP: " + hit.transform.gameObject.GetComponent<ARTarget>().GetHealth();
     }
 
 

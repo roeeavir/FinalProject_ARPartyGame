@@ -1143,6 +1143,7 @@ MonoBehaviour:
   - {fileID: 100000, guid: 24bcbeeb678ef6a478ac1942c6169e3b, type: 3}
   - {fileID: 100000, guid: a986ad541b5e0dc44b96e16bec949a5a, type: 3}
   - {fileID: 100000, guid: f5e1aae1f75066141a4f15732e622566, type: 3}
+  boss: {fileID: 1713781036754730, guid: 0f8a471e5537f864ebdb454fe82308eb, type: 3}
 --- !u!4 &1549900124
 Transform:
   m_ObjectHideFlags: 0

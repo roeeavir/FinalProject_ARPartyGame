@@ -162,7 +162,9 @@ public class SideLoadImageTarget : MonoBehaviour
         GameObject camera = GameObject.Find("ARCamera");
         if (camera != null)
         {
-            camera.GetComponent<VuforiaBehaviour>().SetWorldCenter(WorldCenterMode.SPECIFIC_TARGET, mTarget.GetComponent<ImageTargetBehaviour>());
+            camera.GetComponent<VuforiaBehaviour>().SetWorldCenter(WorldCenterMode.FIRST_TARGET, mTarget.GetComponent<ImageTargetBehaviour>());
+        } else {
+            Debug.LogWarning("Camera is null");
         }
         GameObject playersScores = GameObject.Find("Scores Background");
         if (playersScores != null)

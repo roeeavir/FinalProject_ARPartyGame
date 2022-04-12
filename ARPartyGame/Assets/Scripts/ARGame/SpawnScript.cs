@@ -7,6 +7,8 @@ public class SpawnScript : MonoBehaviour
     private Transform[] spawnPoints;
     public GameObject[] enemies;
 
+    public GameObject boss;
+
     private int numOfSpawnPoints = 3;
 
     private float nextTimeToSpawn = 2.5f;
@@ -14,6 +16,9 @@ public class SpawnScript : MonoBehaviour
     private int groupId = 0;
 
     private bool changeSpawnPoint = false;
+
+    private bool bossSpawned = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,10 +30,17 @@ public class SpawnScript : MonoBehaviour
     {
         yield return new WaitForSeconds(nextTimeToSpawn);
 
-        if (spawnPoints != null && groupId != 100)
+        if (spawnPoints != null && !bossSpawned)
         {
             for (int i = 0; i < numOfSpawnPoints; i++)
             {
+                if (groupId >= 100)
+                {
+                    Instantiate(boss, spawnPoints[i].position, Quaternion.identity);
+                    // boss.transform.localScale = new Vector3(2f, 2f, 2f);
+                    bossSpawned = true;
+                    break;
+                }
                 if (groupId != 0)
                 {
                     enemies[i].GetComponent<EnemyScript>().groupId = groupId;
@@ -47,7 +59,11 @@ public class SpawnScript : MonoBehaviour
 
         }
 
-        StartCoroutine(StartSpawning());
+        if (!bossSpawned)
+        {
+            StartCoroutine(StartSpawning());
+        }
+
     }
 
     // private IEnumerator MixSpawnPoints(){

@@ -229,6 +229,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             shootScript = GameObject.Find("ShootManager").GetComponent<ShootScript>();
         }
         shootScript.SetLevel(gameLevel);
+        // shootScript.SetLevel(4);
 
 
         if (playerUI != null)
@@ -385,7 +386,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             case 4:
                 Debug.LogWarning("Level 4 Objective and Spawn Points");
                 InitializeSpawnPoints(1);
-                levelObjective = "Mini boss round!\n Shoot the big enemies and be the first to destroy it!";
+                levelObjective = "Boss round!\n Shoot the boss and be the first to destroy it!";
                 break;
             default:
                 Debug.LogWarning("Bad game level: " + gameLevel + " in SetLevelObjectiveString");
@@ -488,8 +489,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
                 return 3 + gameMode; // All enemies are fast and random
             case 3:
                 return 4 + gameMode; // All enemies are faster and randomer
-            case 4:
-                return 4;
+            case 4: // Boss
+                return 100 * (gameMode + 1);
             default:
                 Debug.LogWarning("Bad game level: " + gameLevel + " in getDifficultyOfLevel");
                 return 0;
