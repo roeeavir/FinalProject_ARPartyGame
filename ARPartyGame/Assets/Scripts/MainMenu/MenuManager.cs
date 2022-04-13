@@ -13,6 +13,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public GameObject mainMenu;
     public GameObject lobbyMenu;
     public GameObject testMenu;
+    public GameObject tutorialMenu;
     [Header(" — -Main Menu — -")]
     public Button createRoomBtn;
     public Button joinRoomBtn;
@@ -57,6 +58,11 @@ public class MenuManager : MonoBehaviourPunCallbacks
     GameObject testTarget = null;
 
     int testCounter = 0;
+
+    [Header(" — -Tutorial Menu — -")]
+    public Button tutorialBtn;
+    
+    public Button exitTutorialBtn;
 
 
     private void Start()
@@ -483,6 +489,16 @@ public class MenuManager : MonoBehaviourPunCallbacks
                 break;
         }
         GameMode.SetGameMode((int)val);
+    }
+
+    public void onTutorialClick(){
+        tutorialMenu.SetActive(true);
+        mainMenu.SetActive(false);
+    }
+
+    public void onTutorialBackClick(){
+        tutorialMenu.SetActive(false);
+        mainMenu.SetActive(true);
     }
 
     //     private IEnumerator TakeScreenshot()
