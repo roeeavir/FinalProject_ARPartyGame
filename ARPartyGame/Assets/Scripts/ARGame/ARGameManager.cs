@@ -51,7 +51,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private int gameLevel = 0;
 
-    private int roundScoreGoal = 20;
+    private int levelScoreGoal = 10;
 
     private string winnerInLevel = "";
 
@@ -60,7 +60,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     private const string lookAtAnchor = "All players need to point their camera at the anchor object in the room";
 
 
-    private bool startNextRound = true;
+    private bool startNextLevel = true;
 
     private int gameMode = 0;
 
@@ -124,7 +124,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             if (DefaultObserverEventHandler.isTracking)
             {
 
-                if (startNextRound && !gameStarted)
+                if (startNextLevel && !gameStarted)
                 {
                     if (!(bool)PhotonNetwork.LocalPlayer.CustomProperties["isReady"])
                     {
@@ -222,7 +222,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         spawnScript.SetNextTimeToSpawn(2.5f);
         spawnScript.SetGroupId(getDifficultyOfLevel());
         spawnScript.setSpawnPoints(spawnPoints);
-        objectiveText.text = levelObjective + "\nThe first to get to " + roundScoreGoal + " points wins!";
+        objectiveText.text = levelObjective + "\nThe first to get to " + levelScoreGoal + " points wins!";
 
         if (shootScript == null)
         {
@@ -280,7 +280,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     {
         SetCustomProperties((bool)customProperties["isReady"], levelScore, totalScore);
 
-        PlayersScores.text = "Round " + gameLevel + PLAYERS_SCORES;
+        PlayersScores.text = "Level " + gameLevel + PLAYERS_SCORES;
         foreach (Player player in PhotonNetwork.PlayerList)
         {
             PlayersScores.text += player.NickName + "'s Score: " + (int)player.CustomProperties["score"] + "\n";
@@ -295,9 +295,9 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private void CheckGameStatus()
     {
-        if (levelScore >= roundScoreGoal)
+        if (levelScore >= levelScoreGoal)
         {
-            Debug.LogWarning("A round winner has been decided!");
+            Debug.LogWarning("A level winner has been decided!");
             photonView.RPC("FinishLevel", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.NickName, levelScore);
         }
     }
@@ -306,9 +306,10 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     private void FinishLevel(string winnerName, int lvlScore)
     {
         gameStarted = false;
-        startNextRound = false;
+        startNextLevel = false;
         totalScore += levelScore;
         SetCustomProperties(false, levelScore, totalScore);
+        SetPlayersScores();
         DefaultObserverEventHandler.isTracking = false; // Reset Vuforia's image tracking
         Debug.LogWarning("Game level " + gameLevel + " has been finished!");
         if (gameLevel != 0)
@@ -317,8 +318,12 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         destroyAllEnemies();
         objectiveText.text = winnerName + winnerInLevel;
         playerUI.SetActive(false);
-        if (gameLevel < 5)
-            StartCoroutine(WaitForNextRound());
+        if (gameLevel < 4){
+            StartCoroutine(WaitForNextLevel());
+        }
+        else {
+
+        }
     }
 
     private void StartNextLevel()
@@ -343,16 +348,16 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         switch (gameLevel)
         {
             case 1:
-                winnerInLevel = " has won the first round with " + lvlScore + " points!";
+                winnerInLevel = " has won the first level with " + lvlScore + " points!";
                 break;
             case 2:
-                winnerInLevel = " has won the second round with " + lvlScore + " points!";
+                winnerInLevel = " has won the second level with " + lvlScore + " points!";
                 break;
             case 3:
-                winnerInLevel = " has won the third round with " + lvlScore + " points!";
+                winnerInLevel = " has won the third level with " + lvlScore + " points!";
                 break;
             case 4:
-                winnerInLevel = " has won the fourth round with " + lvlScore + " points!";
+                winnerInLevel = " has won the fourth (and final) level with " + lvlScore + " points!";
                 break;
             case 5:
                 winnerInLevel = " has won the game with " + lvlScore + " points!!!";
@@ -386,7 +391,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             case 4:
                 Debug.LogWarning("Level 4 Objective and Spawn Points");
                 InitializeSpawnPoints(1);
-                levelObjective = "Boss round!\n Shoot the boss and be the first to destroy it!";
+                levelObjective = "Boss level!\n Shoot the boss and be the first to destroy it!";
                 break;
             default:
                 Debug.LogWarning("Bad game level: " + gameLevel + " in SetLevelObjectiveString");
@@ -397,15 +402,15 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     }
 
-    private IEnumerator WaitForNextRound()
+    private IEnumerator WaitForNextLevel()
     {
         yield return new WaitForSeconds(5);
-        if (gameLevel <= 6)
+        if (gameLevel <= 4)
         {
             objectiveText.text = "Starting the next game level (" + (gameLevel + 1) + ")\n" + lookAtAnchor;
             shootScript.ResetScore();
             SetCustomProperties(false, 0, totalScore);
-            startNextRound = true;
+            startNextLevel = true;
         }
     }
 
@@ -490,6 +495,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             case 3:
                 return 4 + gameMode; // All enemies are faster and randomer
             case 4: // Boss
+                levelScoreGoal = 100 * (gameMode + 1);
                 return 100 * (gameMode + 1);
             default:
                 Debug.LogWarning("Bad game level: " + gameLevel + " in getDifficultyOfLevel");
@@ -516,7 +522,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         {
             Debug.LogWarning("Game mode set to bad value - " + gameMode);
         }
-        roundScoreGoal *= (gameMode + 1);
+        levelScoreGoal *= (gameMode + 1);
     }
 
     public void OnResetTargetObjectBtn()

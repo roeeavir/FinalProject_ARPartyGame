@@ -175,6 +175,18 @@ public class MenuManager : MonoBehaviourPunCallbacks
             Destroy(quad);
         }
         SetMenu(mainMenu);
+        // reset all variables
+        firstConnect = true;
+        customProperties["isReady"] = false;
+        PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
+        roomName.text = "Room Name: ";
+        playerList.text = "PlayerList size: ";
+        startGameBtn.interactable = false;
+        startARGameBtn.interactable = false;
+        setAnchorBtn.interactable = false;
+        gameMode.SetActive(false);
+        
+
     }
     public void OnStartGameBtn(string sceneName)
     {
@@ -310,6 +322,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
             customProperties["isReady"] = false; // set player as not ready
             player.SetCustomProperties(customProperties);
         }
+        photonView.RPC("UpdateLobbyUI", RpcTarget.All); // update the lobby UI
     }
 
     [PunRPC]
@@ -401,14 +414,11 @@ public class MenuManager : MonoBehaviourPunCallbacks
         {
             // Debug.Log("Plane Yese set to texture");
             Debug.Log("Plane Scores Background is not null");
-            // playersScores.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.GetTexture();
         }
         else
         {
             Debug.Log("Plane Scores Background is null");
         }
-
-        // playersScores.transform.localScale = new Vector3(-1f, 1f, 1f);
 
         // Place the plane as mTarget's child
         testBoard.transform.parent = testTarget.transform;
@@ -416,13 +426,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
         testBoard.transform.position = new Vector3(0f, 0f, 0f);
         testBoard.transform.localScale = new Vector3(0.01f, 1f, 0.02f);
         testBoard.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-
-        // cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        // cube.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
-
-        // // Place the cube as testTarget's child
-        // cube.transform.parent = testTarget.transform;
-        // cube.transform.localPosition = new Vector3(0, 0, 0);
 
         Debug.Log("TestBoard created inside TestImageTarget" + testCounter);
     }

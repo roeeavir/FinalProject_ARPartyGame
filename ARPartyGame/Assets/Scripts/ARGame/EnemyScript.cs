@@ -25,7 +25,7 @@ public class EnemyScript : MonoBehaviour
     public int groupId = 1;
     private int counter = 0;
 
-    private float sideSpeed = 0.3f, normalSpeed = 0.4f, fastSpeed = 0.8f, smartSpeed = 0.5f, randomSpeed = 0.5f, bossSpeedMultiplier = 2;
+    private float sideSpeed = 0.3f, normalSpeed = 0.4f, fastSpeed = 0.8f, smartSpeed = 0.5f, randomSpeed = 0.5f, bossSpeedMultiplier = 1;
 
     private int score = 0;
     private float nextTimeToRandomize = 0f;
@@ -38,6 +38,8 @@ public class EnemyScript : MonoBehaviour
 
     private EnemyMovementState state = EnemyMovementState.Normal;
 
+    private bool freeze = false;
+
 
     void Start()
     {
@@ -45,7 +47,7 @@ public class EnemyScript : MonoBehaviour
         if (groupId >= 100)
         {
             state = EnemyMovementState.Boss;
-            score = groupId;
+            score = groupId / 10;
         }
         else
         {
@@ -59,6 +61,11 @@ public class EnemyScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (freeze)
+        {
+            return;
+        }
+
         counter++;
 
         switch (state)
@@ -109,7 +116,7 @@ public class EnemyScript : MonoBehaviour
                     nextTimeToRandomize = Time.time + 0.5f;
                     transform.Translate(direction * 0f);
                     direction = Random.insideUnitCircle.normalized;
-                    randomSpeed = Random.Range(sideSpeed * 2, fastSpeed * 8);
+                    randomSpeed = Random.Range(sideSpeed * 2, fastSpeed * 5);
                 }
                 transform.Translate(direction * Time.deltaTime * randomSpeed);
                 break;
@@ -119,7 +126,7 @@ public class EnemyScript : MonoBehaviour
                     nextTimeToRandomize = Time.time + 0.4f;
                     transform.Translate(direction * 0f);
                     direction = Random.insideUnitCircle.normalized;
-                    randomSpeed = Random.Range(sideSpeed * 2, fastSpeed * 10);
+                    randomSpeed = Random.Range(sideSpeed * 2, fastSpeed * 6);
                 }
                 transform.Translate(direction * Time.deltaTime * randomSpeed);
                 break;
@@ -129,7 +136,7 @@ public class EnemyScript : MonoBehaviour
                     nextTimeToRandomize = Time.time + 0.4f;
                     transform.Translate(direction * 0f);
                     direction = Random.insideUnitCircle.normalized;
-                    randomSpeed = Random.Range(sideSpeed * 2, fastSpeed * 12);
+                    randomSpeed = Random.Range(sideSpeed * 2, fastSpeed * 8);
                 }
                 transform.Translate(direction * Time.deltaTime * randomSpeed);
                 break;
@@ -139,7 +146,7 @@ public class EnemyScript : MonoBehaviour
                     nextTimeToRandomize = Time.time + 0.30f;
                     transform.Translate(direction * 0f);
                     direction = Random.insideUnitCircle.normalized;
-                    randomSpeed = Random.Range(sideSpeed * 4, fastSpeed * 12);
+                    randomSpeed = Random.Range(sideSpeed * 3, fastSpeed * 8);
                 }
                 transform.Translate(direction * Time.deltaTime * randomSpeed);
                 break;
@@ -149,7 +156,7 @@ public class EnemyScript : MonoBehaviour
                     nextTimeToRandomize = Time.time + 0.4f;
                     transform.Translate(direction * 0f);
                     direction = Random.insideUnitCircle.normalized;
-                    randomSpeed = Random.Range(sideSpeed * 2, fastSpeed * 10);
+                    randomSpeed = Random.Range(sideSpeed * 2, fastSpeed * 6);
                     if (!isSmall)
                     {
                         isSmall = true;
@@ -169,7 +176,7 @@ public class EnemyScript : MonoBehaviour
                     nextTimeToRandomize = Time.time + 0.30f;
                     transform.Translate(direction * 0f);
                     direction = Random.insideUnitCircle.normalized;
-                    randomSpeed = Random.Range(sideSpeed * 4, fastSpeed * 12);
+                    randomSpeed = Random.Range(sideSpeed * 3, fastSpeed * 8);
                     if (!isSmall)
                     {
                         isSmall = true;
@@ -189,7 +196,7 @@ public class EnemyScript : MonoBehaviour
                     nextTimeToRandomize = Time.time + 0.30f;
                     transform.Translate(direction * 0f);
                     direction = Random.insideUnitCircle.normalized;
-                    randomSpeed = Random.Range(sideSpeed * 4, fastSpeed * bossSpeedMultiplier * (groupId / 100));
+                    randomSpeed = Random.Range(sideSpeed * 3, fastSpeed * bossSpeedMultiplier * (groupId / 100));
                     if (!isSmall)
                     {
                         isSmall = true;
@@ -227,9 +234,19 @@ public class EnemyScript : MonoBehaviour
         return score;
     }
 
+    public void SetScore(int score)
+    {
+        this.score = score;
+    }
+
     public void AppenedBossSpeedMultiplier()
     {
         bossSpeedMultiplier++;
+    }
+
+    public void SetFreeze(bool freeze)
+    {
+        this.freeze = freeze;
     }
 
 }

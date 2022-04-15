@@ -42,7 +42,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
         score = 0;
         objectiveText = GameObject.Find("ObjectiveText").GetComponent<Text>();
         currentColor = colorsStr[PhotonNetwork.LocalPlayer.ActorNumber - 1];
-        index = PhotonNetwork.LocalPlayer.ActorNumber - 1; 
+        index = PhotonNetwork.LocalPlayer.ActorNumber - 1;
         objectiveText.color = colors[index]; // Sets the color of the player to the color of the player's ID
         Debug.LogWarning("Players Color : " + colors[index]);
     }
@@ -71,7 +71,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
                     default:
                         AddScore(hit.transform.gameObject);
                         popScore = hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
-                        StartCoroutine(DestroyEnemy(hit, popScore));
+                        DestroyEnemy(hit, popScore);
                         break;
                     case 2:
                         if (hit.transform.name.ToLower().Contains(currentColor.ToLower()))
@@ -86,7 +86,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
                             SubstractScore(hit.transform.gameObject);
                             popScore = -hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
                         }
-                        StartCoroutine(DestroyEnemy(hit, popScore));
+                        DestroyEnemy(hit, popScore);
                         break;
                     case 3:
                         if (hit.transform.name.ToLower().Contains(currentColor.ToLower()))
@@ -108,7 +108,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
                             SubstractScore(hit.transform.gameObject);
                             popScore = -hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
                         }
-                        StartCoroutine(DestroyEnemy(hit, popScore));
+                        DestroyEnemy(hit, popScore);
                         break;
                     case 4: // Boss
                         HandleBossHit(hit);
@@ -122,11 +122,13 @@ public class ShootScript : MonoBehaviourPunCallbacks
         }
     }
 
+    // Adds score
     public void AddScore(GameObject enemy)
     {
         score += enemy.GetComponent<EnemyScript>().GetScore();
     }
 
+    // Substracts the score of the enemy from the player's score
     public void SubstractScore(GameObject enemy)
     {
         score -= enemy.GetComponent<EnemyScript>().GetScore();
@@ -136,11 +138,13 @@ public class ShootScript : MonoBehaviourPunCallbacks
         }
     }
 
+    // Resets the score to 0
     public void ResetScore()
     {
         score = 0;
     }
 
+    // Returns the current score
     public int GetScore()
     {
         return score;
@@ -167,15 +171,12 @@ public class ShootScript : MonoBehaviourPunCallbacks
         }
     }
 
-    private IEnumerator DestroyEnemy(RaycastHit hit, int enemyScore)
+    // Destroys the enemy and shows a pop up score
+    private void DestroyEnemy(RaycastHit hit, int enemyScore)
     {
         Destroy(hit.transform.gameObject);
         Instantiate(smoke, hit.point, Quaternion.LookRotation(hit.normal));
-        GameObject popup = Instantiate(popupScore, arCamera.transform.position + arCamera.transform.forward * distance, arCamera.transform.rotation * Quaternion.Euler(0, 0, 90));
-        popup.GetComponent<TextMesh>().text = enemyScore >= 0 ? "+" + enemyScore : enemyScore.ToString();
-        popup.GetComponent<TextMesh>().color = colors[index];
-        yield return new WaitForSeconds(1f);
-        Destroy(popup);
+        ShowPopupScore(enemyScore);
     }
 
     // Spawns a bullet from camera position
@@ -183,30 +184,79 @@ public class ShootScript : MonoBehaviourPunCallbacks
     {
         shootBtn.SetActive(false);
         GameObject bullet = Instantiate(bulletPrefab, arCamera.transform.position, arCamera.transform.rotation);
-        bullet.GetComponent<Rigidbody>().AddForce(arCamera.transform.forward * 1500);
+        bullet.GetComponent<Rigidbody>().AddForce(arCamera.transform.forward * 2000);
         yield return new WaitForSeconds(0.5f);
         shootBtn.SetActive(true);
         Destroy(bullet, 2.0f);
     }
 
+    // Handles the boss hit
     private void HandleBossHit(RaycastHit hit)
     {
-        if (hit.transform.gameObject.GetComponent<ARTarget>().OnHit()){ // Is boss dead
-            Debug.LogWarning("Boss Dead");
-            // GameObject.Find("Boss").GetComponent<BossScript>().TakeDamage(1);
-            AddScore(hit.transform.gameObject);
-            Destroy(hit.transform.gameObject);
+
+        hit.transform.gameObject.GetComponent<EnemyScript>().SetFreeze(true);
+
+        if (hit.transform.gameObject.GetComponent<ARTarget>().OnHit())
+        { // Is boss dead
+            StartCoroutine(handleBossDeadAnimation(hit));
+
             return;
         }
-        // hit.transform.gameObject.transform.localScale = hit.transform.gameObject.transform.localScale / 2;
-        hit.transform.gameObject.transform.position = SpawnPointsScript.CreateNewSpawnPoint().position;
-        hit.transform.gameObject.GetComponent<EnemyScript>().AppenedBossSpeedMultiplier(); // Speeds boss up
-        if (tempObjective.Equals("")){
-            tempObjective = objectiveText.text;
-        }
-        
-        objectiveText.text = tempObjective + "\nBoss HP: " + hit.transform.gameObject.GetComponent<ARTarget>().GetHealth();
+
+        StartCoroutine(handleBossDamagedAnimation(hit));
+
     }
 
+    // Shows a popup score when the enemy is hit
+    private void ShowPopupScore(int score)
+    {
+        GameObject popup = Instantiate(popupScore, arCamera.transform.position + arCamera.transform.forward * distance, arCamera.transform.rotation * Quaternion.Euler(0, 0, 90));
+        popup.GetComponent<TextMesh>().text = score >= 0 ? "+" + score : score.ToString();
+        popup.GetComponent<TextMesh>().color = colors[index];
+        Destroy(popup, 1.0f);
+    }
+
+    // Handles the boss dead animation
+    private IEnumerator handleBossDeadAnimation(RaycastHit hit)
+    {
+        hit.transform.gameObject.GetComponent<BoxCollider>().enabled = false;
+        hit.transform.gameObject.GetComponent<Animation_Test>().DeathAni();
+
+        yield return new WaitForSeconds(2f);
+
+
+        Debug.LogWarning("Boss Dead");
+        hit.transform.gameObject.GetComponent<EnemyScript>().SetScore(hit.transform.gameObject.GetComponent<EnemyScript>().GetScore() * 2);
+        ShowPopupScore(hit.transform.gameObject.GetComponent<EnemyScript>().GetScore());
+        AddScore(hit.transform.gameObject);
+        DestroyEnemy(hit, hit.transform.gameObject.GetComponent<EnemyScript>().GetScore());
+        hit.transform.gameObject.GetComponent<BoxCollider>().enabled = true;
+    }
+
+    // Handles the boss damaged animation
+    private IEnumerator handleBossDamagedAnimation(RaycastHit hit)
+    {
+        hit.transform.gameObject.GetComponent<BoxCollider>().enabled = false;
+        hit.transform.gameObject.GetComponent<Animation_Test>().DamageAni();
+
+        yield return new WaitForSeconds(1f);
+
+        hit.transform.gameObject.GetComponent<Animation_Test>().IdleAni();
+        hit.transform.gameObject.GetComponent<EnemyScript>().SetFreeze(false);
+
+        ShowPopupScore(hit.transform.gameObject.GetComponent<EnemyScript>().GetScore());
+        AddScore(hit.transform.gameObject);
+        hit.transform.gameObject.transform.position = SpawnPointsScript.CreateNewSpawnPoint().position;
+        hit.transform.gameObject.GetComponent<EnemyScript>().AppenedBossSpeedMultiplier(); // Speeds boss up
+
+        hit.transform.gameObject.GetComponent<BoxCollider>().enabled = true;
+
+        if (tempObjective.Equals(""))
+        {
+            tempObjective = objectiveText.text;
+        }
+
+        objectiveText.text = tempObjective + "\nBoss HP: " + hit.transform.gameObject.GetComponent<ARTarget>().GetHealth();
+    }
 
 }
