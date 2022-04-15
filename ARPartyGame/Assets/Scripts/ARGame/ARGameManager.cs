@@ -39,9 +39,9 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private bool waitPlayers = false;
 
-    public Text PlayersScores;
+    public Text PlayersScores, PlayersTotalScores;
 
-    private const string PLAYERS_SCORES = " Players Scores:";
+    private const string PLAYERS_SCORES = " Players Scores";
 
     private bool restartTrack = true;
 
@@ -280,16 +280,18 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     {
         SetCustomProperties((bool)customProperties["isReady"], levelScore, totalScore);
 
-        PlayersScores.text = "Level " + gameLevel + PLAYERS_SCORES;
+        // PlayersScores.text = "Level " + gameLevel + PLAYERS_SCORES + ":\n";
+        PlayersScores.text = "";
         foreach (Player player in PhotonNetwork.PlayerList)
         {
             PlayersScores.text += player.NickName + "'s Score: " + (int)player.CustomProperties["score"] + "\n";
         }
 
-        PlayersScores.text += "\nTotal " + PLAYERS_SCORES + " This Far\n";
+        // PlayersTotalScores.text = "\nTotal " + PLAYERS_SCORES + " This Far:\n";
+        PlayersTotalScores.text = "";
         foreach (Player player in PhotonNetwork.PlayerList)
         {
-            PlayersScores.text += player.NickName + "'s Total Score: " + (int)player.CustomProperties["totalScore"] + "\n";
+            PlayersTotalScores.text += player.NickName + "'s Total Score: " + (int)player.CustomProperties["totalScore"] + "\n";
         }
     }
 

@@ -35,16 +35,20 @@ public class ShootScript : MonoBehaviourPunCallbacks
 
     private Text objectiveText;
 
+    private Text colorText;
+
     private string tempObjective = "";
 
     private void Start()
     {
         score = 0;
         objectiveText = GameObject.Find("ObjectiveText").GetComponent<Text>();
+        colorText = GameObject.Find("ColorText").GetComponent<Text>();
         currentColor = colorsStr[PhotonNetwork.LocalPlayer.ActorNumber - 1];
         index = PhotonNetwork.LocalPlayer.ActorNumber - 1;
-        objectiveText.color = colors[index]; // Sets the color of the player to the color of the player's ID
+        colorText.color = colors[index]; // Sets the color of the player to the color of the player's ID
         Debug.LogWarning("Players Color : " + colors[index]);
+        colorText.text = "YOUR COLOR IS:\n" + currentColor; // Sets the color of the player to the color of the player's ID
     }
 
     public void Shoot()
@@ -99,7 +103,8 @@ public class ShootScript : MonoBehaviourPunCallbacks
                                 index = 0;
                             }
                             currentColor = colorsStr[index];
-                            objectiveText.color = colors[index];
+                            colorText.color = colors[index];
+                            colorText.text = "YOUR COLOR IS:\n" + currentColor;
                         }
                         else
                         {
