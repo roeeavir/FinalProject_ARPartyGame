@@ -17,15 +17,11 @@ public class MenuManager : MonoBehaviourPunCallbacks
     [Header(" — -Main Menu — -")]
     public Button createRoomBtn;
     public Button joinRoomBtn;
+    public Text badInputText;
     [Header(" — -Lobby Menu — -")]
-    public Text roomName;
-    public Text playerList;
-    public Button startGameBtn;
-
-    public Button startARGameBtn;
-
+    public Text roomName, playerList;
+    public Button startGameBtn, startARGameBtn;
     public Button setAnchorBtn;
-
 
     public GameObject textureDelivery;
 
@@ -41,9 +37,12 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public GameObject testARCamera;
 
-    public GameObject photoBtn;
+    public GameObject photoBtn, takePhotoBtn, fromGalleryBtn;
 
     public RawImage photo;
+
+    public Text lobbyObjectiveText;
+
 
     private ExitGames.Client.Photon.Hashtable customProperties = new ExitGames.Client.Photon.Hashtable();
 
@@ -61,8 +60,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     [Header(" — -Tutorial Menu — -")]
     public Button tutorialBtn;
-    
+
     public Button exitTutorialBtn;
+
 
 
     private void Start()
@@ -99,12 +99,21 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public void OnCreateRoomBtn(Text roomNameInput)
     {
         Debug.LogWarning("Creating Room" + roomNameInput.text);
+        // Check name
+        if (!CheckValidPlayerName() || !CheckValidRoomName(roomNameInput.text))
+        {
+            return;
+        }
         NetworkManager.instance.CreateRoom(roomNameInput.text); // create room
         roomName.text = "Room Name: " + roomNameInput.text;
     }
     public void OnJoinRoomBtn(Text roomNameInput)
     {
         Debug.LogWarning("Joining room: " + roomNameInput.text);
+        if (!CheckValidPlayerName() || !CheckValidRoomName(roomNameInput.text))
+        {
+            return;
+        }
         NetworkManager.instance.JoinRoom(roomNameInput.text);
         roomName.text = roomNameInput.text;
     }
@@ -142,11 +151,11 @@ public class MenuManager : MonoBehaviourPunCallbacks
             {
                 if ((bool)player.CustomProperties["isReady"])
                 {
-                    playerList.text += " R\n"; // Ready
+                    playerList.text += " Ready!\n"; // Ready
                 }
                 else
                 {
-                    playerList.text += " NR\n"; // Not Ready
+                    playerList.text += " X\n"; // Not Ready
                 }
             }
         }
@@ -156,11 +165,13 @@ public class MenuManager : MonoBehaviourPunCallbacks
             {
                 setAnchorBtn.interactable = true; // enable set anchor button
                 gameMode.SetActive(true);
+                lobbyObjectiveText.text = "Set the anchor image";
             }
             else
             {
                 setAnchorBtn.interactable = false; // disable set anchor button
                 gameMode.SetActive(false);
+                lobbyObjectiveText.text = "Waiting for host to set anchor image and start the game...";
             }
             startGameBtn.interactable = false; // disable start game button
             startARGameBtn.interactable = false; // disable start AR game button
@@ -185,7 +196,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
         startARGameBtn.interactable = false;
         setAnchorBtn.interactable = false;
         gameMode.SetActive(false);
-        
+
 
     }
     public void OnStartGameBtn(string sceneName)
@@ -208,6 +219,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
     {
         Debug.LogWarning("onOpenAnchorCanvas()");
         anchorCanvas.SetActive(true);
+        takePhotoBtn.SetActive(true);
+        fromGalleryBtn.SetActive(true);
+        // lobbyMenu.SetActive(false);
     }
 
     public void OnCloseAnchorCanvas()
@@ -218,9 +232,10 @@ public class MenuManager : MonoBehaviourPunCallbacks
         DisableAnchorCanvasView();
     }
 
-    public void OnSetAnchorPhotoFromGallery(){
+    public void OnSetAnchorPhotoFromGallery()
+    {
         ResetPlayersReady();
-         
+
         NativeGallery.Permission permission = NativeGallery.GetImageFromGallery((path) =>
        {
            texture = GetComponent<AnchorManager>().SetAnchorPhotoFromGallery(path);
@@ -247,7 +262,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
         StartCoroutine(OnPhotoBtnClicked());
     }
 
-    private IEnumerator OnPhotoBtnClicked(){
+    private IEnumerator OnPhotoBtnClicked()
+    {
         ResetPlayersReady();
 
         yield return new WaitForEndOfFrame(); // wait for screen to be rendered
@@ -271,7 +287,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
         Debug.LogWarning("OnSetAnchorPhotoFromCamera()");
         photoCanvas.SetActive(true);
         photoBtn.SetActive(true);
-        // photo.GetComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+        takePhotoBtn.SetActive(false);
+        fromGalleryBtn.SetActive(false);
         mainCamera.GetComponent<PhoneCamera>().enabled = true;
     }
 
@@ -282,6 +299,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
             photoCanvas.SetActive(false);
 
             anchorCanvas.SetActive(false);
+
+            // lobbyMenu.SetActive(true);
         }
     }
 
@@ -289,14 +308,17 @@ public class MenuManager : MonoBehaviourPunCallbacks
     private IEnumerator WaitForPlayersReady()
     {
         Debug.Log("Waiting for players to be ready");
+        lobbyObjectiveText.text = "Waiting for target image to be sent to all players...";
         // yield return new WaitForSeconds(2);
         while (!ArePlayersReady())
         {
             Debug.Log("Not all players are ready, waiting...");
             yield return new WaitForSeconds(1);
         }
+        yield return new WaitForSeconds(1);
         startGameBtn.interactable = true;
         startARGameBtn.interactable = true;
+        lobbyObjectiveText.text = "All players are ready, start the game!";
     }
 
     // Check if all players are ready
@@ -333,7 +355,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
         {
             Destroy(quad); // destroy quad
         }
-        
+
         texture = GetComponent<AnchorManager>().SetAnchorPhoto(receivedByte); // set anchor photo
 
         // Assign texture to a temporary quad and destroy it after 5 seconds
@@ -466,7 +488,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         DisableAnchorCanvasView();
     }
-    
+
     public void OnSetGameMode()
     {
         float val = gameMode.GetComponent<Slider>().value;
@@ -494,12 +516,14 @@ public class MenuManager : MonoBehaviourPunCallbacks
         GameMode.SetGameMode((int)val);
     }
 
-    public void onTutorialClick(){
+    public void onTutorialClick()
+    {
         tutorialMenu.SetActive(true);
         mainMenu.SetActive(false);
     }
 
-    public void onTutorialBackClick(){
+    public void onTutorialBackClick()
+    {
         tutorialMenu.SetActive(false);
         mainMenu.SetActive(true);
     }
@@ -545,4 +569,42 @@ public class MenuManager : MonoBehaviourPunCallbacks
     //         mainCamera.GetComponent<PhoneCamera>().enabled = false;
     //     }
 
+    private bool CheckValidRoomName(string roomName)
+    {
+        if (roomName.Length > 8)
+        {
+            Debug.Log("Room name is too long");
+            StartCoroutine(ShowErrorMessage("Invalid Room Name!\nRoom name must be 1 to 8 characters long!"));
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    private bool CheckValidPlayerName()
+    {
+        if (PhotonNetwork.NickName.Length > 8)
+        {
+            Debug.Log("Player name is too long");
+            StartCoroutine(ShowErrorMessage("Invalid Player Name!\nPlayer name must be 2 to 8 characters long!"));
+            return false;
+        }
+        else
+        {
+            if (!PhotonNetwork.IsMasterClient)
+            {
+                // Check if player name is already taken
+            }
+            return true;
+        }
+    }
+
+    private IEnumerator ShowErrorMessage(string message)
+    {
+        badInputText.text = message;
+        yield return new WaitForSeconds(3);
+        badInputText.text = "";
+    }
 }

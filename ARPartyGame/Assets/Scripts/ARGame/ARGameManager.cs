@@ -29,7 +29,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     public GameObject playerUI = null;
 
-    private Text debugText, objectiveText, scoreText;
+    private Text debugText, objectiveText;
 
     private SpawnScript spawnScript = null;
 
@@ -110,7 +110,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
                 if (shootScript != null)
                 {
                     levelScore = shootScript.GetScore();
-                    scoreText.text = levelScore.ToString();
                     SetPlayersScores();
                     CheckGameStatus();
                 }
@@ -236,7 +235,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         {
             playerUI.SetActive(true);
             Debug.LogWarning("PlayerUI enabled");
-            scoreText = playerUI.GetComponentInChildren<Text>();
         }
         else
         {

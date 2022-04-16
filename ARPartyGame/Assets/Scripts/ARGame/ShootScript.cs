@@ -24,9 +24,9 @@ public class ShootScript : MonoBehaviourPunCallbacks
 
     private string currentColor = "";
 
-    private string[] colorsStr = { "blue", "green", "orange", "purple", "pink" };
+    private string[] colorsStr = { "BLUE", "GREEN", "ORANGE", "PURPLE", "PINK" };
 
-    private Color[] colors = { /*Blue*/new Color(0.1f, 0.5f, 0.75f), /*Green*/new Color(0.2f, 0.8f, 0.4f), /*Orange*/new Color(1f, 0.58f, 0.1f),
+    private Color[] colors = { /*Blue*/new Color(0f, 0f, 1f), /*Green*/new Color(0f, 1f, 0f), /*Orange*/new Color(1f, 0.58f, 0.1f),
      /*Purple*/new Color(0.65f, 0.3f, 0.97f), /*Pink*/new Color(0.75f, 0.15f, 0.8f) };
 
     private int index;
@@ -201,7 +201,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
 
         hit.transform.gameObject.GetComponent<EnemyScript>().SetFreeze(true);
 
-        if (hit.transform.gameObject.GetComponent<ARTarget>().OnHit())
+        if (hit.transform.gameObject.GetComponent<ARTarget>().OnHit(hit.transform.gameObject.GetComponent<EnemyScript>().GetScore()))
         { // Is boss dead
             StartCoroutine(handleBossDeadAnimation(hit));
 

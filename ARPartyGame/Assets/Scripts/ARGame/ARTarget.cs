@@ -11,9 +11,9 @@ public class ARTarget : MonoBehaviour
         
     }
 
-    public bool OnHit()
+    public bool OnHit(int damage)
     {
-        health -= 10;
+        health -= damage;
         return health <= 0;
     }
 
