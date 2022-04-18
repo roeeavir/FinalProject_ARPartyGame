@@ -43,6 +43,11 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public Text lobbyObjectiveText;
 
+    private Timer timer;
+
+    private string nextScene = "";
+
+
 
     private ExitGames.Client.Photon.Hashtable customProperties = new ExitGames.Client.Photon.Hashtable();
 
@@ -65,10 +70,12 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
 
 
+
     private void Start()
     {
         createRoomBtn.interactable = false; // disable create room button
         joinRoomBtn.interactable = false; // disable join room button
+        timer = GetComponent<Timer>();
         Debug.LogWarning("MenuManager Start Address: " + PhotonNetwork.NetworkingClient.GameServerAddress);
 
         customProperties["isReady"] = false;
@@ -201,13 +208,18 @@ public class MenuManager : MonoBehaviourPunCallbacks
     }
     public void OnStartGameBtn(string sceneName)
     {
+        nextScene = sceneName;
+        timer.StartTimer(StartGame);
+    }
+
+    private void StartGame(){
         if (PhotonNetwork.IsMasterClient)
         {
-            Debug.LogWarning("Starting " + sceneName);
+            Debug.LogWarning("Starting " + nextScene);
             GetComponent<SideLoadImageTarget>().enabled = false;
             // PhotonNetwork.CurrentRoom.IsOpen = false;
             // PhotonNetwork.CurrentRoom.IsVisible = false;
-            NetworkManager.instance.photonView.RPC("ChangeScene", RpcTarget.All, sceneName);
+            NetworkManager.instance.photonView.RPC("ChangeScene", RpcTarget.All, nextScene);
         }
         else
         {

@@ -64,6 +64,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private int gameMode = 0;
 
+    private Timer timer;
+
 
 
     private void Awake()
@@ -80,6 +82,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         debugText = GameObject.Find("DebugText").GetComponent<Text>();
         objectiveText = GameObject.Find("ObjectiveText").GetComponent<Text>();
         spawnScript = spawnManager.GetComponent<SpawnScript>();
+        timer = GetComponent<Timer>();
         SetGameMode();
 
         customProperties["isReady"] = false;
@@ -132,7 +135,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
                     if (ArePlayersReady())
                     {
-                        StartNextLevel();
+                        timer.StartTimer(StartNextLevel); // Start the timer for the next level
                     }
                     else
                     {
