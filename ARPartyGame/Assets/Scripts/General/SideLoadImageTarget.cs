@@ -8,6 +8,8 @@ public class SideLoadImageTarget : MonoBehaviour
     public float printedTargetSize = 0.32f;
     public string targetName = "DynamicImageTarget";
 
+    public GameObject scoresBoard;
+
     private ImageTargetBehaviour mTarget = null;
 
 
@@ -162,28 +164,34 @@ public class SideLoadImageTarget : MonoBehaviour
         GameObject camera = GameObject.Find("ARCamera");
         if (camera != null)
         {
+            camera.SetActive(false);
             camera.GetComponent<VuforiaBehaviour>().SetWorldCenter(WorldCenterMode.FIRST_TARGET, mTarget.GetComponent<ImageTargetBehaviour>());
+            camera.SetActive(true);
         } else {
             Debug.LogWarning("Camera is null");
         }
-        GameObject playersScores = GameObject.Find("Scores Background");
-        if (playersScores != null)
-        {
-            Debug.LogWarning("Plane Scores Background is not null");
-            // playersScores.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.GetTexture();
+
+        GameObject tmpPlayersScores = GameObject.FindGameObjectWithTag("board"); // Destroy the existing scores background
+        if (tmpPlayersScores == null){
+            // Destroy(tmpPlayersScores);
+            GameObject playersScores = Instantiate(scoresBoard, mTarget.transform) as GameObject;
+            if (playersScores != null)
+            {
+                Debug.LogWarning("Plane Scores Background is not null");
+                // playersScores.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.GetTexture();
+            }
+            else
+            {
+                Debug.LogWarning("Plane Scores Background is null");
+            }
+
+            // Place the plane as mTarget's child
+            playersScores.transform.parent = mTarget.transform;
+
+            playersScores.transform.position = new Vector3(0f, 0f, 0f);
+            playersScores.transform.localScale = new Vector3(0.03f, 1f, 0.03f);
+            playersScores.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
         }
-        else
-        {
-            Debug.LogWarning("Plane Scores Background is null");
-        }
-
-        // Place the plane as mTarget's child
-        playersScores.transform.parent = mTarget.transform;
-
-        playersScores.transform.position = new Vector3(0f, 0f, 0f);
-        playersScores.transform.localScale = new Vector3(0.03f, 1f, 0.03f);
-        playersScores.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-
     }
 
 }

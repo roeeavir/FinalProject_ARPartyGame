@@ -35,5 +35,10 @@ public class Timer : MonoBehaviour
         callback?.Invoke();
     }
 
+    public void SetTime(int t)
+    {
+        time = t;
+    }
+
 
 }

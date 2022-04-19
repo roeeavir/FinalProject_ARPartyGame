@@ -76,6 +76,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
         createRoomBtn.interactable = false; // disable create room button
         joinRoomBtn.interactable = false; // disable join room button
         timer = GetComponent<Timer>();
+        timer.SetTime(3);
         Debug.LogWarning("MenuManager Start Address: " + PhotonNetwork.NetworkingClient.GameServerAddress);
 
         customProperties["isReady"] = false;
@@ -90,6 +91,11 @@ public class MenuManager : MonoBehaviourPunCallbacks
             Destroy(GameManager.instance.gameObject);
         }
 
+        try {
+            PhotonNetwork.LeaveRoom();
+        } catch (System.Exception e) {
+            Debug.LogWarning("MenuManager Start Exception: " + e.Message);
+        }
 
     }
     public override void OnConnectedToMaster()

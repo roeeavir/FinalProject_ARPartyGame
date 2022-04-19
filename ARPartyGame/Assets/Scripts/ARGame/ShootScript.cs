@@ -9,10 +9,13 @@ using UnityEngine.UI;
 public class ShootScript : MonoBehaviourPunCallbacks
 {
 
+    [Header("Must Hvae Game Objects")]
     public GameObject arCamera;
     public GameObject smoke;
 
     public GameObject bulletPrefab;
+
+    [Header("UI")]
 
     public GameObject shootBtn;
 
@@ -57,63 +60,24 @@ public class ShootScript : MonoBehaviourPunCallbacks
 
         StartCoroutine(SpawnBullet());
 
-        if (currentColor.Equals(""))
-        {
-            currentColor = colorsStr[PhotonNetwork.LocalPlayer.ActorNumber - 1];
-            index = PhotonNetwork.LocalPlayer.ActorNumber - 1;
-            Debug.LogWarning(currentColor);
-        }
-
         if (Physics.Raycast(arCamera.transform.position, arCamera.transform.forward, out hit))
         {
             if (hit.transform.name.ToLower().Contains("jelly"))
             {
-                int popScore = 0;
                 switch (level)
                 {
                     case 1:
                     default:
                         AddScore(hit.transform.gameObject);
-                        popScore = hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
+                        int popScore = hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
                         DestroyEnemy(hit, popScore);
                         break;
                     case 2:
-                        if (hit.transform.name.ToLower().Contains(currentColor.ToLower()))
-                        {
-                            AddScore(hit.transform.gameObject);
-                            popScore = hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
-                        }
-                        else
-                        {
-                            Debug.LogWarning("Wrong color");
-                            photonView.RPC("SendScoreToAnotherPlayer", RpcTarget.All, hit.transform.name.ToLower(), hit.transform.gameObject.GetComponent<EnemyScript>().GetScore());
-                            SubstractScore(hit.transform.gameObject);
-                            popScore = -hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
-                        }
-                        DestroyEnemy(hit, popScore);
+                        HitByColor(hit);
                         break;
                     case 3:
-                        if (hit.transform.name.ToLower().Contains(currentColor.ToLower()))
-                        {
-                            AddScore(hit.transform.gameObject);
-                            popScore = hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
-                            index++;
-                            if (index > colorsStr.Length - 1)
-                            {
-                                index = 0;
-                            }
-                            currentColor = colorsStr[index];
-                            colorText.color = colors[index];
-                            colorText.text = "YOUR COLOR IS:\n" + currentColor;
-                        }
-                        else
-                        {
-                            Debug.LogWarning("Wrong color");
-                            photonView.RPC("SendScoreToAnotherPlayer", RpcTarget.All, hit.transform.name.ToLower(), hit.transform.gameObject.GetComponent<EnemyScript>().GetScore());
-                            SubstractScore(hit.transform.gameObject);
-                            popScore = -hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
-                        }
-                        DestroyEnemy(hit, popScore);
+                        HitByColor(hit);
+                        SetColorIndex();
                         break;
                     case 4: // Boss
                         HandleBossHit(hit);
@@ -227,10 +191,9 @@ public class ShootScript : MonoBehaviourPunCallbacks
         hit.transform.gameObject.GetComponent<BoxCollider>().enabled = false;
         hit.transform.gameObject.GetComponent<Animation_Test>().DeathAni();
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.2f);
 
-
-        Debug.LogWarning("Boss Dead");
+        Debug.LogWarning("Boss Killed");
         hit.transform.gameObject.GetComponent<EnemyScript>().SetScore(hit.transform.gameObject.GetComponent<EnemyScript>().GetScore() * 2);
         ShowPopupScore(hit.transform.gameObject.GetComponent<EnemyScript>().GetScore());
         AddScore(hit.transform.gameObject);
@@ -244,7 +207,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
         hit.transform.gameObject.GetComponent<BoxCollider>().enabled = false;
         hit.transform.gameObject.GetComponent<Animation_Test>().DamageAni();
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.8f);
 
         hit.transform.gameObject.GetComponent<Animation_Test>().IdleAni();
         hit.transform.gameObject.GetComponent<EnemyScript>().SetFreeze(false);
@@ -264,4 +227,38 @@ public class ShootScript : MonoBehaviourPunCallbacks
         objectiveText.text = tempObjective + "\nBoss HP: " + hit.transform.gameObject.GetComponent<ARTarget>().GetHealth();
     }
 
+    private void SetColorIndex()
+    {
+        index++;
+        if (index > colorsStr.Length - 1)
+        {
+            index = 0;
+        }
+        currentColor = colorsStr[index];
+        colorText.color = colors[index];
+        colorText.text = "YOUR COLOR IS:\n" + currentColor;
+    }
+
+    private void HitByColor(RaycastHit hit)
+    {
+        int popScore = 0;
+        if (hit.transform.name.ToLower().Contains(currentColor.ToLower()))
+        {
+            AddScore(hit.transform.gameObject);
+            popScore = hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
+        }
+        else
+        {
+            popScore = HitWrongTarget(hit);
+        }
+        DestroyEnemy(hit, popScore);
+    }
+
+    private int HitWrongTarget(RaycastHit hit)
+    {
+        Debug.LogWarning("Wrong color");
+        photonView.RPC("SendScoreToAnotherPlayer", RpcTarget.All, hit.transform.name.ToLower(), hit.transform.gameObject.GetComponent<EnemyScript>().GetScore());
+        SubstractScore(hit.transform.gameObject);
+        return -hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
+    }
 }

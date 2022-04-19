@@ -10,12 +10,18 @@ using UnityEngine.SceneManagement;
 
 public class ARGameManager : MonoBehaviourPunCallbacks
 {
-    [Header("Status")]
-    public bool gameEnded = false;
-    [Header("Players")]
     public static ARGameManager instance;
 
-    // public ARPlayerController[] players;
+    [Header("Status")]
+    public bool gameEnded = false;
+    [Header("Game Manager Helpers")]
+    public GameObject spawnManager = null;
+    [Header("UI")]
+    public GameObject playerUI = null;
+
+    // [Header("Texts")]
+    private Text PlayersScores, PlayersTotalScores;
+
 
     private GameObject imageTarget;
 
@@ -24,10 +30,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     private bool gameStarted = false;
 
     private Transform[] spawnPoints = null;
-
-    public GameObject spawnManager = null;
-
-    public GameObject playerUI = null;
 
     private Text debugText, objectiveText;
 
@@ -39,7 +41,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private bool waitPlayers = false;
 
-    public Text PlayersScores, PlayersTotalScores;
 
     private const string PLAYERS_SCORES = " Players Scores";
 
@@ -51,7 +52,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private int gameLevel = 0;
 
-    private int levelScoreGoal = 10;
+    private int levelScoreGoal = 5;
 
     private string winnerInLevel = "";
 
@@ -158,6 +159,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         else
         {
             SetImageTarget(GameObject.Find("DynamicImageTarget"));
+            SetScoreTexts();
         }
 
     }
@@ -262,21 +264,28 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private void SetPlayersScores()
     {
-        SetCustomProperties((bool)customProperties["isReady"], levelScore, totalScore);
+        try {
+            SetCustomProperties((bool)customProperties["isReady"], levelScore, totalScore);
 
-        // PlayersScores.text = "Level " + gameLevel + PLAYERS_SCORES + ":\n";
-        PlayersScores.text = "";
-        foreach (Player player in PhotonNetwork.PlayerList)
+            // PlayersScores.text = "Level " + gameLevel + PLAYERS_SCORES + ":\n";
+            PlayersScores.text = "";
+            foreach (Player player in PhotonNetwork.PlayerList)
+            {
+                PlayersScores.text += player.NickName + "'s Score: " + (int)player.CustomProperties["score"] + "\n";
+            }
+
+            // PlayersTotalScores.text = "\nTotal " + PLAYERS_SCORES + " This Far:\n";
+            PlayersTotalScores.text = "";
+            foreach (Player player in PhotonNetwork.PlayerList)
+            {
+                PlayersTotalScores.text += player.NickName + "'s Total Score: " + (int)player.CustomProperties["totalScore"] + "\n";
+            }
+        } catch (System.Exception e)
         {
-            PlayersScores.text += player.NickName + "'s Score: " + (int)player.CustomProperties["score"] + "\n";
+            Debug.LogWarning("Error: " + e.Message);
+            gameEnded = true;
         }
 
-        // PlayersTotalScores.text = "\nTotal " + PLAYERS_SCORES + " This Far:\n";
-        PlayersTotalScores.text = "";
-        foreach (Player player in PhotonNetwork.PlayerList)
-        {
-            PlayersTotalScores.text += player.NickName + "'s Total Score: " + (int)player.CustomProperties["totalScore"] + "\n";
-        }
     }
 
     private void CheckGameStatus()
@@ -304,20 +313,19 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         destroyAllEnemies();
         objectiveText.text = winnerName + winnerInLevel;
         playerUI.SetActive(false);
-        if (gameLevel < 4){
-            StartCoroutine(WaitForNextLevel());
-        }
-        else {
-
-        }
+        gameEnded = gameLevel >= 4;
+        StartCoroutine(WaitForNextLevel());
     }
 
     private void StartNextLevel()
     {
-        Debug.LogWarning("Starting next level (" + gameLevel + ")");
         gameLevel++;
         setLevelObjectiveString();
-        StartGame();
+        if (gameLevel < 5)
+        {
+            Debug.LogWarning("Starting next level (" + gameLevel + ")");
+            StartGame();
+        }
     }
 
     private void destroyAllEnemies()
@@ -343,12 +351,12 @@ public class ARGameManager : MonoBehaviourPunCallbacks
                 winnerInLevel = " has won the third level with " + lvlScore + " points!";
                 break;
             case 4:
-                winnerInLevel = " has won the fourth (and final) level with " + lvlScore + " points!";
+                winnerInLevel = " has won the final level with " + lvlScore + " points!";
                 break;
-            case 5:
-                winnerInLevel = " has won the game with " + lvlScore + " points!!!";
-                photonView.RPC("SetGameEnded", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.NickName);
-                break;
+            // case 5:
+            //     winnerInLevel = " has won the game with " + lvlScore + " points!!!";
+            // photonView.RPC("SetGameEnded", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.NickName);
+            // break;
             default:
                 Debug.LogWarning("Bad game level: " + gameLevel + " in setLevelWinnerString");
                 break;
@@ -367,12 +375,12 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             case 2:
                 Debug.LogWarning("Level 2 Objective and Spawn Points");
                 InitializeSpawnPoints(PhotonNetwork.PlayerList.Length + 1);
-                levelObjective = "Shoot the enemies in your color and earn the most points!\n Hitting other players enemies will give them points in your stead and will make you lose points!";
+                levelObjective = "Shoot the enemies that match your color and earn the most points!";
                 break;
             case 3:
                 Debug.LogWarning("Level 3 Objective and Spawn Points");
                 InitializeSpawnPoints(5);
-                levelObjective = "Shoot the enemies that match the color of your text and earn the most points!\n Hitting other players enemies will give them points in your stead and will make you lose points!";
+                levelObjective = "Shoot the enemies that match your color and earn the most points! Your color will change for each enemy killed!";
                 break;
             case 4:
                 Debug.LogWarning("Level 4 Objective and Spawn Points");
@@ -390,13 +398,16 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private IEnumerator WaitForNextLevel()
     {
+        Debug.LogWarning("Waiting for next level");
         yield return new WaitForSeconds(5);
-        if (gameLevel <= 4)
+        shootScript.ResetScore();
+        SetCustomProperties(false, 0, totalScore);
+        if (!gameEnded)
         {
             objectiveText.text = "Starting the next game level (" + (gameLevel + 1) + ")\n" + lookAtAnchor;
-            shootScript.ResetScore();
-            SetCustomProperties(false, 0, totalScore);
             startNextLevel = true;
+        } else {
+            StartCoroutine(WaitForGameEnd());
         }
     }
 
@@ -415,8 +426,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         for (int i = 0; i < imageTarget.transform.childCount; i++)
         {
             imageTarget.transform.GetChild(i).gameObject.SetActive(false);
-            // if (!gameStarted)
-            //     imageTarget.transform.GetChild(i).gameObject.transform.LookAt(Camera.main.transform);
         }
         restartTrack = true;
     }
@@ -431,31 +440,14 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         }
     }
 
-    [PunRPC]
-    private void SetGameEnded(string winnerName)
-    {
-        gameEnded = true;
-        Destroy(NetworkManager.instance.gameObject);
-        StartCoroutine(WaitForGameEnd());
-    }
+    // [PunRPC]
+    // private void SetGameEnded(string winnerName)
+    // {
+    //     gameEnded = true;
+    //     Destroy(NetworkManager.instance.gameObject);
+    //     StartCoroutine(WaitForGameEnd());
+    // }
 
-
-
-    private IEnumerator WaitForGameEnd()
-    {
-        Debug.LogWarning("Waiting for game end");
-        yield return new WaitForSeconds(5);
-        Debug.LogWarning("Game ended");
-        PhotonNetwork.LeaveRoom();
-        while (PhotonNetwork.InRoom)
-        {
-            yield return new WaitForSeconds(1);
-        }
-        customProperties["score"] = 0;
-        PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
-        SceneManager.LoadScene("Main", LoadSceneMode.Single);
-        Destroy(gameObject);
-    }
 
     private void SetImageTarget(GameObject newImageTarget)
     {
@@ -520,5 +512,49 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         Debug.LogWarning("Reset Target Object Complete");
     }
 
+    private void SetScoreTexts()
+    {
+        PlayersScores = GameObject.Find("Players Level Scores").GetComponent<Text>();
+        PlayersTotalScores = GameObject.Find("Players Total Scores").GetComponent<Text>();
+        if (PlayersScores == null || PlayersTotalScores == null){
+            gameEnded = true;
+            Debug.LogWarning("Players Scores or Total Scores not found");
+        }
+    }
 
+    private Player GetWinner(){
+        Player winner = null;
+        int maxScore = 0;
+        foreach (Player p in PhotonNetwork.PlayerList)
+        {
+            if (p.CustomProperties["totalScore"] != null)
+            {
+                if ((int)p.CustomProperties["totalScore"] > maxScore)
+                {
+                    maxScore = (int)p.CustomProperties["totalScore"];
+                    winner = p;
+                }
+            }
+        }
+        return winner;
+    }
+
+    private IEnumerator WaitForGameEnd()
+    {
+        Debug.LogWarning("Waiting for game end");
+        Player winner = GetWinner();
+        objectiveText.text = "Game has ended!\n" + "The winner is player " + winner.NickName + " with " + (int)winner.CustomProperties["totalScore"] + " points!";
+        yield return new WaitForSeconds(5);
+        Debug.LogWarning("Game ended");
+        Destroy(NetworkManager.instance.gameObject);
+        PhotonNetwork.LeaveRoom();
+        while (PhotonNetwork.InRoom)
+        {
+            yield return new WaitForSeconds(1);
+        }
+        // customProperties["score"] = 0;
+        // PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
+        SceneManager.LoadScene("Main", LoadSceneMode.Single);
+        Destroy(gameObject);
+    }
 }
