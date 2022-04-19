@@ -300,6 +300,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void FinishLevel(string winnerName, int lvlScore)
     {
+        FindObjectOfType<AudioManager>().Play("Win");
         gameStarted = false;
         startNextLevel = false;
         totalScore += levelScore;
@@ -544,6 +545,14 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         Debug.LogWarning("Waiting for game end");
         Player winner = GetWinner();
         objectiveText.text = "Game has ended!\n" + "The winner is player " + winner.NickName + " with " + (int)winner.CustomProperties["totalScore"] + " points!";
+        if(winner.NickName == PhotonNetwork.LocalPlayer.NickName)
+        {
+            FindObjectOfType<AudioManager>().Play("Win");
+        }
+        else
+        {
+            FindObjectOfType<AudioManager>().Play("Lose");
+        }
         yield return new WaitForSeconds(5);
         Debug.LogWarning("Game ended");
         Destroy(NetworkManager.instance.gameObject);

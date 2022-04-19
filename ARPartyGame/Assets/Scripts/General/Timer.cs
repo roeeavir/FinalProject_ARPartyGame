@@ -25,6 +25,7 @@ public class Timer : MonoBehaviour
         for (int i = 0; i < time; i++)
         {
             timeText.text = (time - i).ToString();
+            FindObjectOfType<AudioManager>().Play("Timer");
             yield return new WaitForSeconds(1);
         }
         timerIsRunning = false;

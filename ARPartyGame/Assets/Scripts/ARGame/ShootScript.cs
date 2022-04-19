@@ -58,6 +58,8 @@ public class ShootScript : MonoBehaviourPunCallbacks
     {
         RaycastHit hit;
 
+        FindObjectOfType<AudioManager>().Play("Fire");
+
         StartCoroutine(SpawnBullet());
 
         if (Physics.Raycast(arCamera.transform.position, arCamera.transform.forward, out hit))

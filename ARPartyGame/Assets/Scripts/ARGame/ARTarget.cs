@@ -8,6 +8,7 @@ public class ARTarget : MonoBehaviour
 
     public bool OnHit(int damage)
     {
+        FindObjectOfType<AudioManager>().Play("FireHit");
         health -= damage;
         return health <= 0;
     }
