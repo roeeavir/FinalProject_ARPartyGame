@@ -744,7 +744,7 @@ MonoBehaviour:
     loop: 0
   - name: Fire
     clip: {fileID: 8300000, guid: 75adfe9a619833445a701305b983e548, type: 3}
-    volume: 1
+    volume: 0.226
     pitch: 1.31
     source: {fileID: 0}
     spatialBlend: 0.403
@@ -758,7 +758,7 @@ MonoBehaviour:
     loop: 0
   - name: Timer
     clip: {fileID: 8300000, guid: 25675f8572f8c4fc7aa53b3b4416f986, type: 3}
-    volume: 1
+    volume: 0.66
     pitch: 1.31
     source: {fileID: 0}
     spatialBlend: 0.403

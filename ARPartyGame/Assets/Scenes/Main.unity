@@ -6290,6 +6290,13 @@ MonoBehaviour:
     source: {fileID: 0}
     spatialBlend: 0.403
     loop: 0
+  - name: Timer
+    clip: {fileID: 8300000, guid: 5ed9970e17bfee943a6dff056dc3a9d0, type: 3}
+    volume: 1
+    pitch: 1.31
+    source: {fileID: 0}
+    spatialBlend: 0.403
+    loop: 0
 --- !u!1 &1709919430
 GameObject:
   m_ObjectHideFlags: 0
@@ -6451,6 +6458,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   printedTargetSize: 0.32
   targetName: DynamicImageTarget
+  scoresBoard: {fileID: 0}
 --- !u!114 &1725111796
 MonoBehaviour:
   m_ObjectHideFlags: 0
