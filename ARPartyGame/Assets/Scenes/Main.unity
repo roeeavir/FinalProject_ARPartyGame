@@ -6290,8 +6290,36 @@ MonoBehaviour:
     source: {fileID: 0}
     spatialBlend: 0.403
     loop: 0
+  - name: Fire
+    clip: {fileID: 8300000, guid: 75adfe9a619833445a701305b983e548, type: 3}
+    volume: 0.226
+    pitch: 1.31
+    source: {fileID: 0}
+    spatialBlend: 0.403
+    loop: 0
+  - name: FireHit
+    clip: {fileID: 8300000, guid: a37f44cbf8c2a7443a3c361efa2f233a, type: 3}
+    volume: 1
+    pitch: 1.31
+    source: {fileID: 0}
+    spatialBlend: 0.403
+    loop: 0
   - name: Timer
-    clip: {fileID: 8300000, guid: 5ed9970e17bfee943a6dff056dc3a9d0, type: 3}
+    clip: {fileID: 8300000, guid: 25675f8572f8c4fc7aa53b3b4416f986, type: 3}
+    volume: 0.66
+    pitch: 1.31
+    source: {fileID: 0}
+    spatialBlend: 0.403
+    loop: 0
+  - name: Win
+    clip: {fileID: 8300000, guid: 8a343cb2e5bf24d129408aa2696dd0ce, type: 3}
+    volume: 1
+    pitch: 1.31
+    source: {fileID: 0}
+    spatialBlend: 0.403
+    loop: 0
+  - name: Lose
+    clip: {fileID: 8300000, guid: a5e03bdf68a774d7bbdd11fe48caaf4c, type: 3}
     volume: 1
     pitch: 1.31
     source: {fileID: 0}
