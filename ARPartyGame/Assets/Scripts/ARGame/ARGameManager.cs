@@ -43,7 +43,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private bool waitPlayers = false;
 
-
     private const string PLAYERS_SCORES = " Players Scores";
 
     private bool restartTrack = true;
@@ -61,7 +60,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     private string levelObjective = "";
 
     private const string lookAtAnchor = "All players need to point their camera at the anchor object in the room";
-
 
     private bool startNextLevel = true;
 
@@ -448,15 +446,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             //     imageTarget.transform.GetChild(i).gameObject.transform.LookAt(Camera.main.transform);
         }
     }
-
-    // [PunRPC]
-    // private void SetGameEnded(string winnerName)
-    // {
-    //     gameEnded = true;
-    //     Destroy(NetworkManager.instance.gameObject);
-    //     StartCoroutine(WaitForGameEnd());
-    // }
-
 
     private void SetImageTarget(GameObject newImageTarget)
     {

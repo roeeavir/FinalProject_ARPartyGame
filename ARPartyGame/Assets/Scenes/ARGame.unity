@@ -858,6 +858,12 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 126675178}
+    - target: {fileID: 6064748646421423871, guid: eee927e4315f3544f8e16ac1c24837bb, type: 3}
+      propertyPath: m_Text
+      value: 'Console:
+
+        Hagai and Tom''s Pelephone'
+      objectReference: {fileID: 0}
     - target: {fileID: 6064748646480543034, guid: eee927e4315f3544f8e16ac1c24837bb, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
