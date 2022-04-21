@@ -19,6 +19,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     [Header("UI")]
     public GameObject playerUI = null;
 
+    public GameObject bossUI;
+
     // [Header("Texts")]
     private Text PlayersScores, PlayersTotalScores;
 
@@ -52,7 +54,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private int gameLevel = 0;
 
-    private int levelScoreGoal = 5;
+    private int levelScoreGoal = 20;
 
     private string winnerInLevel = "";
 
@@ -300,6 +302,9 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void FinishLevel(string winnerName, int lvlScore)
     {
+        if (gameLevel == 4){
+            bossUI.SetActive(false);
+        }
         FindObjectOfType<AudioManager>().Play("Win");
         gameStarted = false;
         startNextLevel = false;
@@ -325,6 +330,9 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         if (gameLevel < 5)
         {
             Debug.LogWarning("Starting next level (" + gameLevel + ")");
+            if (gameLevel == 4){
+                bossUI.SetActive(true);
+            }
             StartGame();
         }
     }
