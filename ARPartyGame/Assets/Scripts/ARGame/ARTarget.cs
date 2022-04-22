@@ -24,7 +24,7 @@ public class ARTarget : MonoBehaviour
     {
         FindObjectOfType<AudioManager>().Play("FireHit");
         health -= damage;
-        healthBar.GetComponent<Image>().fillAmount = health / MAX_HEALTH;
+        healthBar.GetComponent<Image>().fillAmount = (float) health / MAX_HEALTH;
         return health <= 0;
     }
 

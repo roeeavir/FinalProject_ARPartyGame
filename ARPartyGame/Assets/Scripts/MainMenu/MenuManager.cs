@@ -625,4 +625,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(3);
         badInputText.text = "";
     }
+
+    // Special thanks to:
+    // Hagai and Tom pelephone for this QA
 }
