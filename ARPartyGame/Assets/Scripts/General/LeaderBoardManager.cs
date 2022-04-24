@@ -33,9 +33,9 @@ public class LeaderBoardManager : MonoBehaviour
         else
         {
             SortPlayerDataList();
-            for (int i = 0; i < playerDataList.Count; i++)
+            for (int i = 1; i <= playerDataList.Count; i++)
             {
-                highScoresTextString += playerDataList[i].ToString() + "\n";
+                highScoresTextString += i +". "+playerDataList[i-1].ToString() + "\n";
             }
         }
         if (highScoresText == null)

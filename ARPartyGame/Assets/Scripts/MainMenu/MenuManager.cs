@@ -137,7 +137,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
             return;
         }
         NetworkManager.instance.JoinRoom(roomNameInput.text);
-        roomName.text = roomNameInput.text;
+        roomName.text = "Room Name: " + roomNameInput.text;
     }
     public void OnPlayerNameUpdate(Text playerNameInput)
     {
