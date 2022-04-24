@@ -231,11 +231,12 @@ public class ShootScript : MonoBehaviourPunCallbacks
 
     private void SetColorIndex()
     {
-        index++;
-        if (index > colorsStr.Length - 1)
-        {
-            index = 0;
-        }
+        int temp = index;
+        do {
+            temp = Random.Range(0, colors.Length);
+        } while (index == temp);
+
+        index = temp;
         currentColor = colorsStr[index];
         colorText.color = colors[index];
         colorText.text = "YOUR COLOR IS:\n" + currentColor;

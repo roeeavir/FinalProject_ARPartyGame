@@ -14,6 +14,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public GameObject lobbyMenu;
     public GameObject testMenu;
     public GameObject tutorialMenu;
+
+    public GameObject scoreBoardMenu;
     [Header(" — -Main Menu — -")]
     public Button createRoomBtn;
     public Button joinRoomBtn;
@@ -68,6 +70,10 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public Button exitTutorialBtn;
 
+    [Header(" — -Score Board Menu — -")]
+
+    public Text scoreBoardText;
+
 
 
 
@@ -91,9 +97,12 @@ public class MenuManager : MonoBehaviourPunCallbacks
             Destroy(GameManager.instance.gameObject);
         }
 
-        try {
+        try
+        {
             PhotonNetwork.LeaveRoom();
-        } catch (System.Exception e) {
+        }
+        catch (System.Exception e)
+        {
             Debug.LogWarning("MenuManager Start Exception: " + e.Message);
         }
 
@@ -218,7 +227,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
         timer.StartTimer(StartGame);
     }
 
-    private void StartGame(){
+    private void StartGame()
+    {
         if (PhotonNetwork.IsMasterClient)
         {
             Debug.LogWarning("Starting " + nextScene);
@@ -546,6 +556,19 @@ public class MenuManager : MonoBehaviourPunCallbacks
         mainMenu.SetActive(true);
     }
 
+    public void onScoreBoardClick()
+    {
+        FindObjectOfType<LeaderBoardManager>().WritePlayerData(scoreBoardText.GetComponent<Text>());
+        scoreBoardMenu.SetActive(true);
+        mainMenu.SetActive(false);
+    }
+
+    public void onScoreBoardBackClick()
+    {
+        scoreBoardMenu.SetActive(false);
+        mainMenu.SetActive(true);
+    }
+
     //     private IEnumerator TakeScreenshot()
     //     {
     //         // photo.GetComponent<AspectRatioFitter>().aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
@@ -589,7 +612,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     private bool CheckValidRoomName(string roomName)
     {
-        if (roomName.Length > 8)
+        if (roomName.Length > 8 || roomName.Length < 1)
         {
             Debug.Log("Room name is too long");
             StartCoroutine(ShowErrorMessage("Invalid Room Name!\nRoom name must be 1 to 8 characters long!"));
@@ -603,7 +626,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     private bool CheckValidPlayerName()
     {
-        if (PhotonNetwork.NickName.Length > 8)
+        if (PhotonNetwork.NickName.Length > 8 || PhotonNetwork.NickName.Length < 2)
         {
             Debug.Log("Player name is too long");
             StartCoroutine(ShowErrorMessage("Invalid Player Name!\nPlayer name must be 2 to 8 characters long!"));

@@ -47,7 +47,7 @@ public class EnemyScript : MonoBehaviour
         if (groupId >= 100)
         {
             state = EnemyMovementState.Boss;
-            score = groupId / 5;
+            score = groupId / 1;
         }
         else
         {
