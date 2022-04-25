@@ -34,7 +34,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private Transform[] spawnPoints = null;
 
-    private Text debugText, objectiveText;
+    private Text objectiveText;
 
     private SpawnScript spawnScript = null;
 
@@ -54,7 +54,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private int gameLevel = 0;
 
-    private int levelScoreGoal = 5;
+    private int levelScoreGoal = 15;
 
     private string winnerInLevel = "";
 
@@ -80,8 +80,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     private void Start()
     {
-        // Set debugText from the canvas
-        debugText = GameObject.Find("DebugText").GetComponent<Text>();
         objectiveText = GameObject.Find("ObjectiveText").GetComponent<Text>();
         spawnScript = spawnManager.GetComponent<SpawnScript>();
         timer = GetComponent<Timer>();
@@ -92,7 +90,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         // Print every player buffered in Photon
         foreach (Player p in PhotonNetwork.PlayerList)
         {
-            debugText.text += p.NickName + "\n";
             Debug.LogWarning("Buffered Player: " + p.NickName + "\n");
         }
         // players = new ARPlayerController[PhotonNetwork.PlayerList.Length];
@@ -173,7 +170,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             return;
         }
 
-        debugText.text += "ImInARGame\n";
         InitializeSpawnPoints(3);
         hasBeenInitialized = true;
 
@@ -182,7 +178,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     void InitializeSpawnPoints(int size)
     {
         // Create 3 random spawn points
-        debugText.text += "SpawnPlayer1\n";
         spawnPoints = new Transform[size];
         for (int i = 0; i < spawnPoints.Length; i++)
         {
@@ -190,10 +185,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
             spawnPoints[i] = SpawnPointsScript.CreateNewSpawnPoint();
             Debug.LogWarning(spawnPointName + ": " + spawnPoints[i].position);
-            debugText.text += spawnPointName + ": " + spawnPoints[i].position + "\n";
         }
         // Spawn the player
-        debugText.text += "SpawnPlayer2\n";
 
     }
 
@@ -512,6 +505,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     {
         Debug.LogWarning("Reset Target Object Button Pressed");
         DefaultObserverEventHandler.isTracking = false;
+        SetCustomProperties(false, levelScore, totalScore);// Reset ready status
         gameObject.GetComponent<SideLoadImageTarget>().setTargetChildren();
         SetImageTarget(GameObject.Find("DynamicImageTarget"));
         Debug.LogWarning("Reset Target Object Complete");

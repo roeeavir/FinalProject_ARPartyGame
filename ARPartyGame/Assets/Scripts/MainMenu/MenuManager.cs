@@ -146,6 +146,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         SetMenu(lobbyMenu);
+        ResetPlayersReady();
+        startGameBtn.interactable = false; // disable start game button
+        startARGameBtn.interactable = false; // disable start AR game button
         photonView.RPC("UpdateLobbyUI", RpcTarget.All);
     }
     public override void OnPlayerLeftRoom(Player otherPlayer)
@@ -651,4 +654,5 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     // Special thanks to:
     // Hagai and Tom pelephone for this QA
+    // Extra special thanks to Elironi Pepperoni
 }
