@@ -17,7 +17,7 @@ public class Tutorial : MonoBehaviour
         "Now take a photo of the anchor and make sure its a stable object\n ",
         "After Selecting the anchor, you need to chec if the anchor is good enough\n If the anchor is good enough, you will see an AR board that will confirm the anchor\n ",
         "Now make sure every player is ready and click on \"Start AR Game\"\n ",
-        "After every player is pointing their camera to the anchor, the game will start in 3 seconds\n ",
+        "After every player is pointing their camera to the anchor, the game will start in 5 seconds\n ",
         "The goal is to pop the baloons in the environment\n ",
         "Every stage has it's own objective",
         "In the final stage you will meet the boss\n "
