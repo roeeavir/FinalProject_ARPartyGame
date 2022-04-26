@@ -227,7 +227,20 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public void OnStartGameBtn(string sceneName)
     {
         nextScene = sceneName;
-        timer.StartTimer(StartGame);
+        NetworkManager.instance.photonView.RPC("StartGameCountDown", RpcTarget.All);
+    }
+
+    [PunRPC]
+    private void StartGameCountDown()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            timer.StartTimer(StartGame);
+        }
+        else
+        {
+            timer.StartTimer(null);
+        }
     }
 
     private void StartGame()

@@ -33,7 +33,10 @@ public class Timer : MonoBehaviour
 
         timeText.text = "";
 
-        callback?.Invoke();
+        if (callback != null)
+        {
+            callback?.Invoke();
+        }
     }
 
     public void SetTime(int t)

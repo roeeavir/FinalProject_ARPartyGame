@@ -68,6 +68,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private Timer timer;
 
+    private bool allPlayersConnected = false;
+
 
 
     private void Awake()
@@ -85,8 +87,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         timer = GetComponent<Timer>();
         SetGameMode();
 
-        customProperties["isReady"] = false;
-        PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
+        SetCustomProperties(false, 0, 0);
         // Print every player buffered in Photon
         foreach (Player p in PhotonNetwork.PlayerList)
         {
@@ -101,6 +102,10 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private void Update()
     {
+        if (!allPlayersConnected){
+            allPlayersConnected = AreAllPlayersConnected();
+            return;
+        }
         if (imageTarget != null)
         {
             if (gameEnded)
@@ -210,7 +215,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             shootScript = GameObject.Find("ShootManager").GetComponent<ShootScript>();
         }
         shootScript.SetLevel(gameLevel);
-        // shootScript.SetLevel(4);
 
 
         if (playerUI != null)
@@ -222,9 +226,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         {
             Debug.LogWarning("PlayerUI not found");
         }
-
-        // gameLevel = 1;
-
 
         gameStarted = true;
 
@@ -375,7 +376,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         {
             case 1:
                 Debug.LogWarning("Level 1 Objective and Spawn Points");
-                levelObjective = "Shoot the enemies regardless of color and earn the most points!\n";
+                levelObjective = "Shoot the enemies regardless of color and earn the most points!";
                 break;
             case 2:
                 Debug.LogWarning("Level 2 Objective and Spawn Points");
@@ -578,5 +579,17 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             }
         }
         FindObjectOfType<LeaderBoardManager>().SaveScoreBoard();
+    }
+
+    private bool AreAllPlayersConnected()
+    {
+        foreach (Player p in PhotonNetwork.PlayerList)
+        {
+            if (!p.CustomProperties.ContainsKey("score"))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }

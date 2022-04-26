@@ -18,7 +18,6 @@ public class SpawnPointsScript : MonoBehaviour
 
         Transform newSpawnPoint = new GameObject().transform;
         newSpawnPoint.position = new Vector3(x, y, z);
-        // newSpawnPoint.parent = transform;
         return newSpawnPoint;
     }
 }

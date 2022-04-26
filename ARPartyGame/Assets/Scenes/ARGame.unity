@@ -790,7 +790,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8386768abdc38ac45bc4cbf93f3be919, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  highScoresText: {fileID: 0}
 --- !u!1001 &6064748645663243749
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -805,6 +804,26 @@ PrefabInstance:
     - target: {fileID: 3623919093713223952, guid: eee927e4315f3544f8e16ac1c24837bb, type: 3}
       propertyPath: m_FillAmount
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064748644916119596, guid: eee927e4315f3544f8e16ac1c24837bb, type: 3}
+      propertyPath: m_FontData.m_MaxSize
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064748644916119596, guid: eee927e4315f3544f8e16ac1c24837bb, type: 3}
+      propertyPath: m_FontData.m_FontSize
+      value: 39
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064748644916119596, guid: eee927e4315f3544f8e16ac1c24837bb, type: 3}
+      propertyPath: m_FontData.m_LineSpacing
+      value: 1.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064748644916119597, guid: eee927e4315f3544f8e16ac1c24837bb, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: -249
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064748644916119597, guid: eee927e4315f3544f8e16ac1c24837bb, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 19.5
       objectReference: {fileID: 0}
     - target: {fileID: 6064748645036057861, guid: eee927e4315f3544f8e16ac1c24837bb, type: 3}
       propertyPath: m_IsActive
