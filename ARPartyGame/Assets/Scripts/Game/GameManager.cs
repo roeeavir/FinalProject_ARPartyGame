@@ -4,8 +4,8 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 using System.Linq;
-using Vuforia;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviourPunCallbacks
 {
     [Header("Status")]
@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     private bool hasBeenSpawned = false;
 
 
-    public Text listOfPlayers, debugText, health;
+    public Text health;
     private void Awake()
     {
         if (instance == null)
@@ -37,13 +37,11 @@ public class GameManager : MonoBehaviourPunCallbacks
         // Print every player buffered in Photon
         foreach (Player p in PhotonNetwork.PlayerList)
         {
-            debugText.text += p.NickName + "\n";
             Debug.LogWarning("Buffered Player: " + p.NickName + "\n");
         }
         pickedSpawnIndex = new List<int>();
         players = new PlayerController[PhotonNetwork.PlayerList.Length];
         photonView.RPC("ImInGame", RpcTarget.AllBuffered);
-        debugText.text += "Number of Players: " + PhotonNetwork.PlayerList.Length + "\n";
         Debug.LogWarning("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
 
@@ -87,7 +85,6 @@ public class GameManager : MonoBehaviourPunCallbacks
             return;
         }
 
-        debugText.text += "ImInGame\n";
         SpawnPlayer();
         hasBeenSpawned = true;
 
@@ -100,17 +97,12 @@ public class GameManager : MonoBehaviourPunCallbacks
             rand = Random.Range(0, spawnPoints.Length); // random spawn point
         }
         pickedSpawnIndex.Add(rand); // add the random spawn point to the list
-        debugText.text += spawnPoints[rand].position + "\n";
-        debugText.text += Quaternion.identity + "\n";
         GameObject playerObject = null;
-        debugText.text += "SpawnPlayer1\n";
         playerObject = (GameObject)PhotonNetwork.Instantiate(playerPrefabLocation, spawnPoints[rand].position, Quaternion.identity); // spawn player
         // playerObject.gameObject.SetActive(DefaultObserverEventHandler.isTracking);
         //intialize the player
         PlayerController playerScript = playerObject.GetComponent<PlayerController>();
-        debugText.text += "SpawnPlayer2\n";
         playerScript.photonView.RPC("Initialize", RpcTarget.All, PhotonNetwork.LocalPlayer);
-        debugText.text += "SpawnPlayer3\n";
         Debug.LogWarning(playerScript);
         players[PhotonNetwork.LocalPlayer.ActorNumber - 1] = playerScript;
         if (players[PhotonNetwork.LocalPlayer.ActorNumber - 1] == null)
@@ -122,7 +114,6 @@ public class GameManager : MonoBehaviourPunCallbacks
             Debug.LogWarning("Player is not null");
         }
 
-        debugText.text += "SpawnPlayer4\n";
     }
     public PlayerController GetPlayer(int playerID)
     {
@@ -133,6 +124,15 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         Debug.LogWarning("GetPlayer with object: " + playerObj.GetComponent<PlayerController>().id);
         return players.First(x => x.gameObject == playerObj);
+    }
+
+    public void OnReturnToMainMenu(){
+        Destroy(NetworkManager.instance.gameObject); // Destroy network manager
+        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.LeaveLobby();
+        PhotonNetwork.Disconnect();
+        SceneManager.LoadScene("Main", LoadSceneMode.Single); // Load main menu scene
+        Destroy(gameObject); // Destroy game manager
     }
 
 }

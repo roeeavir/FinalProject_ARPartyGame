@@ -190,7 +190,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
     // Handles the boss dead animation
     private IEnumerator handleBossDeadAnimation(RaycastHit hit)
     {
-        hit.transform.gameObject.GetComponent<BoxCollider>().enabled = false;
+        hit.transform.gameObject.GetComponent<BoxCollider>().enabled = false; // Prevents the boss from being hit anymore by disabling the collider
         hit.transform.gameObject.GetComponent<Animation_Test>().DeathAni();
 
         yield return new WaitForSeconds(1.2f);
@@ -206,7 +206,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
     // Handles the boss damaged animation
     private IEnumerator handleBossDamagedAnimation(RaycastHit hit)
     {
-        hit.transform.gameObject.GetComponent<BoxCollider>().enabled = false;
+        hit.transform.gameObject.GetComponent<BoxCollider>().enabled = false; // Prevents the boss from being hit anymore by disabling the collider
         hit.transform.gameObject.GetComponent<Animation_Test>().DamageAni();
 
         yield return new WaitForSeconds(0.8f);
@@ -219,7 +219,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
         hit.transform.gameObject.transform.position = SpawnPointsScript.CreateNewSpawnPoint().position;
         hit.transform.gameObject.GetComponent<EnemyScript>().AppenedBossSpeedMultiplier(); // Speeds boss up
 
-        hit.transform.gameObject.GetComponent<BoxCollider>().enabled = true;
+        hit.transform.gameObject.GetComponent<BoxCollider>().enabled = true; // Re-enables the boss collider
 
         if (tempObjective.Equals(""))
         {
@@ -233,8 +233,8 @@ public class ShootScript : MonoBehaviourPunCallbacks
     {
         int temp = index;
         do {
-            temp = Random.Range(0, colors.Length);
-        } while (index == temp);
+            temp = Random.Range(0, colors.Length); // Randomizes the color index 
+        } while (index == temp); // Makes sure the color index is different from the current color index
 
         index = temp;
         currentColor = colorsStr[index];
@@ -245,12 +245,12 @@ public class ShootScript : MonoBehaviourPunCallbacks
     private void HitByColor(RaycastHit hit)
     {
         int popScore = 0;
-        if (hit.transform.name.ToLower().Contains(currentColor.ToLower()))
+        if (hit.transform.name.ToLower().Contains(currentColor.ToLower())) // If the enemy has the same color as the player
         {
             AddScore(hit.transform.gameObject);
             popScore = hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
         }
-        else
+        else // If the enemy has a different color than the player
         {
             popScore = HitWrongTarget(hit);
         }

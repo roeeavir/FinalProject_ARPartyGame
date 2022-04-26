@@ -9,6 +9,7 @@ public class PlayerData
     public int score;
     public string date;
 
+    // Constructor
     public PlayerData(string playerName, int score, string date)
     {
         this.playerName = playerName;
@@ -19,6 +20,6 @@ public class PlayerData
     // toString method
     public override string ToString()
     {
-        return string.Format("Player {0} with {1} point at {2}", playerName, score, date);
+        return string.Format("Player {0} with {1} points at {2}", playerName, score, date);
     }
 }

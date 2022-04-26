@@ -626,6 +626,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
     //         mainCamera.GetComponent<PhoneCamera>().enabled = false;
     //     }
 
+    // Check if the room name is valid
     private bool CheckValidRoomName(string roomName)
     {
         if (roomName.Length > 8 || roomName.Length < 1)
@@ -640,6 +641,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
         }
     }
 
+    // Check if the player name is valid
     private bool CheckValidPlayerName()
     {
         if (PhotonNetwork.NickName.Length > 8 || PhotonNetwork.NickName.Length < 2)
@@ -653,6 +655,15 @@ public class MenuManager : MonoBehaviourPunCallbacks
             if (!PhotonNetwork.IsMasterClient)
             {
                 // Check if player name is already taken
+                for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++) // Prevents duplicate player names
+                {
+                    if (PhotonNetwork.PlayerList[i].NickName == PhotonNetwork.NickName)
+                    {
+                        Debug.Log("Player name is already taken");
+                        StartCoroutine(ShowErrorMessage("Invalid Player Name!\nPlayer name is already taken!"));
+                        return false;
+                    }
+                }
             }
             return true;
         }

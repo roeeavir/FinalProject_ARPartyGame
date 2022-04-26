@@ -102,7 +102,8 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private void Update()
     {
-        if (!allPlayersConnected){
+        if (!allPlayersConnected)
+        {
             allPlayersConnected = AreAllPlayersConnected();
             return;
         }
@@ -205,16 +206,16 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             spawnScript.enabled = true;
         }
 
-        spawnScript.SetNextTimeToSpawn(2.5f);
-        spawnScript.SetGroupId(getDifficultyOfLevel());
-        spawnScript.setSpawnPoints(spawnPoints);
+        spawnScript.SetNextTimeToSpawn(2.5f); // Set the time to spawn the next enemy
+        spawnScript.SetGroupId(getDifficultyOfLevel()); // Set the spawn script's group id to the difficulty of the level
+        spawnScript.setSpawnPoints(spawnPoints); // Set the spawn script's spawn points to the spawn points created in InitializeSpawnPoints
         objectiveText.text = levelObjective + "\nThe first to get to " + levelScoreGoal + " points wins!";
 
         if (shootScript == null)
         {
             shootScript = GameObject.Find("ShootManager").GetComponent<ShootScript>();
         }
-        shootScript.SetLevel(gameLevel);
+        shootScript.SetLevel(gameLevel); // Set the level of the game to the current level for the shoot script
 
 
         if (playerUI != null)
@@ -312,28 +313,31 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         if (gameLevel != 0)
             setLevelWinnerString(lvlScore);
         spawnScript.setSpawnPoints(null);
-        destroyAllEnemies();
+        destroyAllEnemies(); // Destroy all enemies in the scene
         objectiveText.text = winnerName + winnerInLevel;
         playerUI.SetActive(false);
-        gameEnded = gameLevel >= 4;
+        gameEnded = gameLevel >= 4; // If the game is over (4 levels)
+        levelScoreGoal += gameLevel * 2; // Increase the level score goal for the next level by a little
         StartCoroutine(WaitForNextLevel());
     }
 
+    // Starts the next level
     private void StartNextLevel()
     {
         gameLevel++;
         setLevelObjectiveString();
-        if (gameLevel < 5)
+        if (gameLevel < 5) // If the game is not over
         {
             Debug.LogWarning("Starting next level (" + gameLevel + ")");
             if (gameLevel == 4)
             {
-                bossUI.SetActive(true);
+                bossUI.SetActive(true); // Activate the boss UI if the game reaches level 4 (last level)
             }
             StartGame();
         }
     }
 
+    // Destroys all enemies in the scene
     private void destroyAllEnemies()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("enemy");
@@ -461,6 +465,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             Debug.LogWarning("Image Target not found");
     }
 
+    // Returns the difficulty level of the level
     private int getDifficultyOfLevel()
     {
         switch (gameLevel)
@@ -472,46 +477,43 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             case 3:
                 return 4 + gameMode; // All enemies are faster and randomer
             case 4: // Boss
-                levelScoreGoal = 100 * (gameMode + 1);
-                return 100 * (gameMode + 1);
+                levelScoreGoal = 100 * (gameMode + 1); 
+                return 100 * (gameMode + 1); // Boss
             default:
                 Debug.LogWarning("Bad game level: " + gameLevel + " in getDifficultyOfLevel");
                 return 0;
         }
     }
 
+    // Sets the game mode to the given value
     private void SetGameMode()
     {
         gameMode = GameMode.gameMode;
+
         if (gameMode == 0)
-        {
             Debug.LogWarning("Game mode set to casual - " + gameMode);
-        }
         else if (gameMode == 1)
-        {
             Debug.LogWarning("Game mode set to intermediate - " + gameMode);
-        }
         else if (gameMode == 2)
-        {
             Debug.LogWarning("Game mode set to intense - " + gameMode);
-        }
         else
-        {
             Debug.LogWarning("Game mode set to bad value - " + gameMode);
-        }
+
         levelScoreGoal *= (gameMode + 1);
     }
 
+    // Resets the anchor image tracking and the AR camera (fixes the anchor image tracking position)
     public void OnResetTargetObjectBtn()
     {
         Debug.LogWarning("Reset Target Object Button Pressed");
         DefaultObserverEventHandler.isTracking = false;
-        SetCustomProperties(false, levelScore, totalScore);// Reset ready status
+        SetCustomProperties(false, levelScore, totalScore); // Reset ready status
         gameObject.GetComponent<SideLoadImageTarget>().setTargetChildren();
         SetImageTarget(GameObject.Find("DynamicImageTarget"));
         Debug.LogWarning("Reset Target Object Complete");
     }
 
+    // Sets the score texts objects to the correct text variable
     private void SetScoreTexts()
     {
         PlayersScores = GameObject.Find("Players Level Scores").GetComponent<Text>();
@@ -523,6 +525,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    // Returns the player with the highest score (if there is a tie, it returns the first player)
     private Player GetWinner()
     {
         Player winner = null;
@@ -541,51 +544,52 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         return winner;
     }
 
+    // Wait for game to end
     private IEnumerator WaitForGameEnd()
     {
         Debug.LogWarning("Waiting for game end");
-        Player winner = GetWinner();
+        Player winner = GetWinner(); // Returns the player that won the game
         objectiveText.text = "Game has ended!\n" + "The winner is player " + winner.NickName + " with " + (int)winner.CustomProperties["totalScore"] + " points!";
+
         if (winner.NickName == PhotonNetwork.LocalPlayer.NickName)
-        {
             FindObjectOfType<AudioManager>().Play("Win");
-        }
         else
-        {
             FindObjectOfType<AudioManager>().Play("Lose");
-        }
-        AddPlayersDataToScoreboard();
+
+        AddPlayersDataToScoreboard(); // Add player data to scoreboard
         yield return new WaitForSeconds(5);
+
         Debug.LogWarning("Game ended");
-        Destroy(NetworkManager.instance.gameObject);
-        PhotonNetwork.LeaveRoom();
+        Destroy(NetworkManager.instance.gameObject); // Destroy network manager
+        PhotonNetwork.LeaveRoom(); // Disconnect from room
         while (PhotonNetwork.InRoom)
         {
             yield return new WaitForSeconds(1);
         }
-        // customProperties["score"] = 0;
-        // PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
-        SceneManager.LoadScene("Main", LoadSceneMode.Single);
-        Destroy(gameObject);
+        SceneManager.LoadScene("Main", LoadSceneMode.Single); // Load main menu scene
+        Destroy(gameObject); // Destroy game manager
     }
 
+
+    // Add player(s) data to local scoreboard
     private void AddPlayersDataToScoreboard()
     {
         foreach (Player p in PhotonNetwork.PlayerList)
         {
-            if (p.CustomProperties["totalScore"] != null)
+            if (p.CustomProperties["totalScore"] != null) // Checks if the player has a total score property
             {
-                FindObjectOfType<LeaderBoardManager>().AddPlayerData(p.NickName, (int)p.CustomProperties["totalScore"], DateTime.Now.ToString("dd-mm-yyyy"));
+                FindObjectOfType<LeaderBoardManager>().AddPlayerData(p.NickName, (int)p.CustomProperties["totalScore"], DateTime.Now.ToString("dd-MM-yyyy"));
             }
         }
         FindObjectOfType<LeaderBoardManager>().SaveScoreBoard();
     }
 
+    // Check if all players are connected to the new scene
     private bool AreAllPlayersConnected()
     {
         foreach (Player p in PhotonNetwork.PlayerList)
         {
-            if (!p.CustomProperties.ContainsKey("score"))
+            if (!p.CustomProperties.ContainsKey("score")) // Checks if the player has a score property (if not, they are not connected yet)
             {
                 return false;
             }
