@@ -19,7 +19,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
     [Header(" — -Main Menu — -")]
     public Button createRoomBtn;
     public Button joinRoomBtn;
-    public Text badInputText;
     [Header(" — -Lobby Menu — -")]
     public Text roomName, playerList;
     public Button startGameBtn, startARGameBtn;
@@ -632,7 +631,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
         if (roomName.Length > 8 || roomName.Length < 1)
         {
             Debug.Log("Room name is too long");
-            StartCoroutine(ShowErrorMessage("Invalid Room Name!\nRoom name must be 1 to 8 characters long!"));
+            StartCoroutine(NetworkManager.instance.ShowErrorMessage("Invalid Room Name!\nRoom name must be 1 to 8 characters long!"));
             return false;
         }
         else
@@ -647,7 +646,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
         if (PhotonNetwork.NickName.Length > 8 || PhotonNetwork.NickName.Length < 2)
         {
             Debug.Log("Player name is too long");
-            StartCoroutine(ShowErrorMessage("Invalid Player Name!\nPlayer name must be 2 to 8 characters long!"));
+            StartCoroutine(NetworkManager.instance.ShowErrorMessage("Invalid Player Name!\nPlayer name must be 2 to 8 characters long!"));
             return false;
         }
         else
@@ -660,20 +659,13 @@ public class MenuManager : MonoBehaviourPunCallbacks
                     if (PhotonNetwork.PlayerList[i].NickName == PhotonNetwork.NickName)
                     {
                         Debug.Log("Player name is already taken");
-                        StartCoroutine(ShowErrorMessage("Invalid Player Name!\nPlayer name is already taken!"));
+                        StartCoroutine(NetworkManager.instance.ShowErrorMessage("Invalid Player Name!\nPlayer name is already taken!"));
                         return false;
                     }
                 }
             }
             return true;
         }
-    }
-
-    private IEnumerator ShowErrorMessage(string message)
-    {
-        badInputText.text = message;
-        yield return new WaitForSeconds(3);
-        badInputText.text = "";
     }
 
     // Special thanks to:

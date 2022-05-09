@@ -164,7 +164,7 @@ public class SideLoadImageTarget : MonoBehaviour
         GameObject camera = GameObject.Find("ARCamera");
         if (camera != null)
         {
-            camera.SetActive(false);
+            camera.SetActive(false); // Reset Camera and world center by the anchor
             camera.GetComponent<VuforiaBehaviour>().SetWorldCenter(WorldCenterMode.FIRST_TARGET, mTarget.GetComponent<ImageTargetBehaviour>());
             camera.SetActive(true);
         } else {
@@ -173,12 +173,10 @@ public class SideLoadImageTarget : MonoBehaviour
 
         GameObject tmpPlayersScores = GameObject.FindGameObjectWithTag("board"); // Destroy the existing scores background
         if (tmpPlayersScores == null){
-            // Destroy(tmpPlayersScores);
             GameObject playersScores = Instantiate(scoresBoard, mTarget.transform) as GameObject;
             if (playersScores != null)
             {
                 Debug.LogWarning("Plane Scores Background is not null");
-                // playersScores.GetComponent<Renderer>().material.mainTexture = TexturesFunctions.GetTexture();
             }
             else
             {

@@ -8,7 +8,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 {
     public static NetworkManager instance;
 
-    public Text connectionText;
+    public Text connectionText, badInputText;
 
 
     private void Awake()
@@ -33,6 +33,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     }
     public void JoinRoom(string roomName)
     {
+        Debug.LogWarning("Joining room: " + roomName);
         if (PhotonNetwork.PlayerList.Length <= 4)
         {
             PhotonNetwork.JoinRoom(roomName);
@@ -113,6 +114,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         connectionText.enabled = true;
         connectionText.text = "Joined room";
         StartCoroutine(DisableConnectionText());
+    }
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        Debug.LogWarning("Join room failed");
+        StartCoroutine(ShowErrorMessage("Room doesn't exist"));
+        base.OnJoinRoomFailed(returnCode, message);
+    }
+
+    public IEnumerator ShowErrorMessage(string message)
+    {
+        badInputText.text = message;
+        yield return new WaitForSeconds(3);
+        badInputText.text = "";
     }
 
 

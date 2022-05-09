@@ -7314,7 +7314,6 @@ MonoBehaviour:
   scoreBoardMenu: {fileID: 60323963}
   createRoomBtn: {fileID: 1353378909}
   joinRoomBtn: {fileID: 664751963}
-  badInputText: {fileID: 1753254722}
   roomName: {fileID: 1091539290}
   playerList: {fileID: 1496188795}
   startGameBtn: {fileID: 1107609354}
@@ -7347,6 +7346,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connectionText: {fileID: 285382528}
+  badInputText: {fileID: 1753254722}
 --- !u!114 &1725111794
 MonoBehaviour:
   m_ObjectHideFlags: 0
