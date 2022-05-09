@@ -172,6 +172,12 @@ public class SideLoadImageTarget : MonoBehaviour
         }
 
         GameObject tmpPlayersScores = GameObject.FindGameObjectWithTag("board"); // Destroy the existing scores background
+        if (tmpPlayersScores != null)
+        {
+            Destroy(tmpPlayersScores);
+            tmpPlayersScores = null;
+        }
+        
         if (tmpPlayersScores == null){
             GameObject playersScores = Instantiate(scoresBoard, mTarget.transform) as GameObject;
             if (playersScores != null)
