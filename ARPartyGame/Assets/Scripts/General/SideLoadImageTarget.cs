@@ -20,8 +20,6 @@ public class SideLoadImageTarget : MonoBehaviour
         textureFile = TexturesFunctions.GetTexture();
         // Use Vuforia Application to invoke the function after Vuforia Engine is initialized
         VuforiaApplication.Instance.OnVuforiaStarted += CreateImageTargetFromSideloadedTexture;
-        // VuforiaApplication.Instance.OnVuforiaPaused += RepeatCreateImageTargetFromSideloadedTexture;
-
     }
 
     void OnEnable()
@@ -36,8 +34,6 @@ public class SideLoadImageTarget : MonoBehaviour
         Debug.Log("OnDisable");
         VuforiaApplication.Instance.OnVuforiaStarted -= CreateImageTargetFromSideloadedTexture;
         Debug.Log("CreateImageTargetFromSideloadedTexture is done");
-        // VuforiaApplication.Instance.OnVuforiaPaused -= RepeatCreateImageTargetFromSideloadedTexture;
-        // Debug.Log("RepeatCreateImageTargetFromSideloadedTexture is done");
     }
 
 
@@ -58,18 +54,17 @@ public class SideLoadImageTarget : MonoBehaviour
 
         CreateImageTargetFromTexture();
 
-        if (targetName.Equals("DemoDynamicImageTarget"))
+        if (targetName.Equals("DemoDynamicImageTarget")) // For Bonus Game
         {
             // Create plane at the origin
             GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
             plane.transform.localScale = new Vector3(0.4f, 1f, 0.4f);
             // Add plane to the newly created game object
-            // Instantiate(GameObject.CreatePrimitive(PrimitiveType.Plane), mTarget.transform);
 
             // Place the plane as mTarget's child
             plane.transform.parent = mTarget.transform;
         }
-        else if (targetName.Equals("DynamicImageTarget"))
+        else if (targetName.Equals("DynamicImageTarget")) // For Main Game
         {
 
             setTargetChildren();
@@ -88,17 +83,6 @@ public class SideLoadImageTarget : MonoBehaviour
         Debug.Log("Instant Image Target created " + mTarget.TargetName);
 
     }
-
-    // void RepeatCreateImageTargetFromSideloadedTexture(bool b){
-    //     if (b)
-    //     {
-    //         Debug.Log("Vuforia is paused");
-    //     } else {
-    //         mTarget = null;
-    //         CreateImageTargetFromSideloadedTexture();
-    //         Debug.Log("RepeatCreateImageTargetFromSideloadedTexture is done");
-    //     }
-    // }
 
     void CreateImageTargetFromTexture()
     {

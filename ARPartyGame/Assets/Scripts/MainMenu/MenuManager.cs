@@ -320,8 +320,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
         yield return new WaitForSeconds(1f);
 
-        // checkImageTargetFunctionality();
-
         checkImageTargetFunctionality();
     }
 
@@ -441,14 +439,14 @@ public class MenuManager : MonoBehaviourPunCallbacks
             return;
         }
 
-        testCounter++;
+        testCounter++; // Increment test counter
 
         GetComponent<SideLoadImageTarget>().SetTexture(texture, "TestImageTarget" + testCounter); // set texture to SideLoadImageTarget
 
-        if (testTarget != null)
+        if (testTarget != null) // If testTarget exists
         {
             GetComponent<SideLoadImageTarget>().enabled = false;
-            Destroy(GameObject.Find("TestImageTarget" + (testCounter - 1)));
+            Destroy(GameObject.Find("TestImageTarget" + (testCounter - 1))); // Festroy previous test target
             Debug.Log("TestImageTarget destroyed");
             GetComponent<SideLoadImageTarget>().enabled = true;
         }
@@ -486,7 +484,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
         }
 
         // Place the plane as mTarget's child
-        testBoard.transform.parent = testTarget.transform;
+        testBoard.transform.parent = testTarget.transform; // Set testBoard as testTarget's child
 
         testBoard.transform.position = new Vector3(0f, 0f, 0f);
         testBoard.transform.localScale = new Vector3(0.01f, 1f, 0.02f);
@@ -671,4 +669,5 @@ public class MenuManager : MonoBehaviourPunCallbacks
     // Special thanks to:
     // Hagai and Tom pelephone for this QA
     // Extra special thanks to Elironi Pepperoni
+    // Mega thanks to Noya D adosh
 }
