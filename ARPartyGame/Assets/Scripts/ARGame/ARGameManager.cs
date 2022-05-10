@@ -19,8 +19,11 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     public GameObject spawnManager = null;
     [Header("UI")]
     public GameObject playerUI = null;
-
     public GameObject bossUI;
+
+    [Header("AR Camera")]
+    public GameObject arCamera;
+
 
     // [Header("Texts")]
     private Text PlayersScores, PlayersTotalScores;
@@ -72,6 +75,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
 
 
+
     private void Awake()
     {
         if (instance == null)
@@ -97,6 +101,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         photonView.RPC("ImInARGame", RpcTarget.AllBuffered);
         Debug.LogWarning("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
+        arCamera.SetActive(true);
 
     }
 
@@ -477,7 +482,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             case 3:
                 return 4 + gameMode; // All enemies are faster and randomer
             case 4: // Boss
-                levelScoreGoal = 100 * (gameMode + 1); 
+                levelScoreGoal = 100 * (gameMode + 1);
                 return 100 * (gameMode + 1); // Boss
             default:
                 Debug.LogWarning("Bad game level: " + gameLevel + " in getDifficultyOfLevel");

@@ -196,6 +196,7 @@ MonoBehaviour:
   spawnManager: {fileID: 1549900122}
   playerUI: {fileID: 518307534}
   bossUI: {fileID: 1538136288}
+  arCamera: {fileID: 136388033}
 --- !u!4 &126675179
 Transform:
   m_ObjectHideFlags: 0
@@ -242,7 +243,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &136388034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -267,7 +268,7 @@ MonoBehaviour:
   m_Script: {fileID: -1826476478, guid: 1e108ae5f2133934f948edded555f03e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mWorldCenterMode: 1
+  mWorldCenterMode: 2
   mWorldCenter: {fileID: 0}
 --- !u!81 &136388036
 AudioListener:
