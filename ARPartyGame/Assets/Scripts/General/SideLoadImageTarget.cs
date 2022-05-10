@@ -8,7 +8,7 @@ public class SideLoadImageTarget : MonoBehaviour
     public float printedTargetSize = 0.32f;
     public string targetName = "DynamicImageTarget";
 
-    public GameObject scoresBoard;
+    public GameObject targetBoard;
 
     private ImageTargetBehaviour mTarget = null;
 
@@ -57,8 +57,8 @@ public class SideLoadImageTarget : MonoBehaviour
         if (targetName.Equals("DemoDynamicImageTarget")) // For Bonus Game
         {
             // Create plane at the origin
-            GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
-            plane.transform.localScale = new Vector3(0.4f, 1f, 0.4f);
+            GameObject plane = Instantiate(targetBoard, mTarget.transform) as GameObject;
+            plane.transform.localScale = new Vector3(0.4f, 0.8f, 0.4f);
             // Add plane to the newly created game object
 
             // Place the plane as mTarget's child
@@ -155,7 +155,7 @@ public class SideLoadImageTarget : MonoBehaviour
             Debug.LogWarning("Camera is null");
         }
 
-        GameObject tmpPlayersScores = GameObject.FindGameObjectWithTag("board"); // Destroy the existing scores background
+        GameObject tmpPlayersScores = GameObject.FindGameObjectWithTag("board"); 
         // if (tmpPlayersScores != null)
         // {
         //     Destroy(tmpPlayersScores);
@@ -164,7 +164,7 @@ public class SideLoadImageTarget : MonoBehaviour
         // }
 
         if (tmpPlayersScores == null){
-            GameObject playersScores = Instantiate(scoresBoard, mTarget.transform) as GameObject;
+            GameObject playersScores = Instantiate(targetBoard, mTarget.transform) as GameObject;
             if (playersScores != null)
             {
                 Debug.LogWarning("Plane Scores Background is not null");

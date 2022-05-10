@@ -21,6 +21,8 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
 
     private Target target = null;
 
+    private bool canLeft = true, canRight = true, canUp = true, canDown = true;
+
     private Color[] colors = { Color.cyan, Color.grey, Color.magenta, Color.blue, Color.red, Color.black };
 
     [PunRPC]
@@ -84,42 +86,42 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
             {
                 speed = 0;
             }
-            if ((horizontal > 0 && vertical > 0) || (hori > 0 && verti > 0))
+            if ((canRight && canUp && (horizontal > 0 && vertical > 0) || (hori > 0 && verti > 0))) // Diagonal
             {
                 transform.localEulerAngles = new Vector3(0, 45, 0);
                 transform.Translate(Vector3.forward * speed * Time.deltaTime);
             }
-            else if ((horizontal > 0 && vertical < 0) || (hori > 0 && verti < 0))
+            else if (canRight && canDown && ((horizontal > 0 && vertical < 0) || (hori > 0 && verti < 0))) // Diagonal
             {
                 transform.localEulerAngles = new Vector3(0, 135, 0);
                 transform.Translate(Vector3.forward * speed * Time.deltaTime);
             }
-            else if ((horizontal < 0 && vertical < 0) || (hori < 0 && verti < 0))
+            else if (canLeft && canDown && ((horizontal < 0 && vertical < 0) || (hori < 0 && verti < 0))) // Diagonal
             {
                 transform.localEulerAngles = new Vector3(0, -135, 0);
                 transform.Translate(Vector3.forward * speed * Time.deltaTime);
             }
-            else if ((horizontal < 0 && vertical > 0) || (hori < 0 && verti > 0))
+            else if (canLeft && canUp && ((horizontal < 0 && vertical > 0) || (hori < 0 && verti > 0))) // Diagonal
             {
                 transform.localEulerAngles = new Vector3(0, -45, 0);
                 transform.Translate(Vector3.forward * speed * Time.deltaTime);
             }
-            else if ((horizontal > 0 && vertical == 0) || (hori > 0 && verti == 0))
+            else if (canRight && ((horizontal > 0 && vertical == 0) || (hori > 0 && verti == 0))) // Horizontal
             {
                 transform.localEulerAngles = new Vector3(0, 90, 0);
                 transform.Translate(Vector3.forward * speed * Time.deltaTime);
             }
-            else if ((horizontal < 0 && vertical == 0) || (hori < 0 && verti == 0))
+            else if (canLeft && ((horizontal < 0 && vertical == 0) || (hori < 0 && verti == 0))) // Horizontal
             {
                 transform.localEulerAngles = new Vector3(0, -90, 0);
                 transform.Translate(Vector3.forward * speed * Time.deltaTime);
             }
-            else if ((vertical > 0 && horizontal == 0) || (verti > 0 && hori == 0))
+            else if (canUp && ((vertical > 0 && horizontal == 0) || (verti > 0 && hori == 0))) // Vertical
             {
-                transform.localEulerAngles = new Vector3(0, 0, 0);
+                transform.localEulerAngles = new Vector3(0, 0, 0); // up
                 transform.Translate(Vector3.forward * speed * Time.deltaTime);
             }
-            else if ((vertical < 0 && horizontal == 0) || (verti < 0 && hori == 0))
+            else if (canDown && ((vertical < 0 && horizontal == 0) || (verti < 0 && hori == 0))) // Vertical
             {
                 transform.localEulerAngles = new Vector3(0, 180, 0);
                 transform.Translate(Vector3.forward * speed * Time.deltaTime);
@@ -174,6 +176,51 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
                     StartCoroutine(PlayerColorChange(5)); // change color to black
                 }
             }
+        } else if (other.tag.Equals("wall"))
+        {
+            Debug.LogWarning("wall enter");
+            if (other.transform.name.Equals("UpWall"))
+            {
+                canUp = false;
+            }
+            else if (other.transform.name.Equals("DownWall"))
+            {
+                canDown = false;
+            }
+            else if (other.transform.name.Equals("LeftWall"))
+            {
+                canLeft = false;
+            }
+            else if (other.transform.name.Equals("RightWall"))
+            {
+                canRight = false;
+            }
+              
+        }
+    }
+
+    // On collision exit
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.tag == "wall")
+        {
+            if (other.transform.name.Equals("UpWall"))
+            {
+                canUp = true;
+            }
+            else if (other.transform.name.Equals("DownWall"))
+            {
+                canDown = true;
+            }
+            else if (other.transform.name.Equals("LeftWall"))
+            {
+                canLeft = true;
+            }
+            else if (other.transform.name.Equals("RightWall"))
+            {
+                canRight = true;
+            }
+            Debug.LogWarning("wall exit");
         }
     }
     private IEnumerator PlayerColorChange(int colorID)

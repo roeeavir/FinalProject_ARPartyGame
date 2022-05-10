@@ -8,6 +8,7 @@ TagManager:
   - enemy
   - board
   - HealthBar
+  - wall
   layers:
   - Default
   - TransparentFX

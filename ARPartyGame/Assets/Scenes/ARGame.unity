@@ -157,7 +157,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   printedTargetSize: 0.32
   targetName: DynamicImageTarget
-  scoresBoard: {fileID: 5498623118877914942, guid: a0f04c4d298546b48b53c4586465d0de, type: 3}
+  targetBoard: {fileID: 5498623118877914942, guid: a0f04c4d298546b48b53c4586465d0de, type: 3}
 --- !u!114 &126675177
 MonoBehaviour:
   m_ObjectHideFlags: 0
