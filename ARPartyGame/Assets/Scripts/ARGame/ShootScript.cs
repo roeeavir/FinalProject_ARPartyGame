@@ -15,6 +15,8 @@ public class ShootScript : MonoBehaviourPunCallbacks
 
     public GameObject bulletPrefab;
 
+    public GameObject arrow;
+
     [Header("UI")]
 
     public GameObject shootBtn;
@@ -216,7 +218,9 @@ public class ShootScript : MonoBehaviourPunCallbacks
 
         ShowPopupScore(hit.transform.gameObject.GetComponent<EnemyScript>().GetScore());
         AddScore(hit.transform.gameObject);
-        hit.transform.gameObject.transform.position = SpawnPointsScript.CreateNewSpawnPoint().position;
+        Vector3 position = SpawnPointsScript.CreateNewSpawnPoint().position;
+        StartCoroutine(ShowNextLocation(hit.transform.gameObject.transform.position, position));
+        hit.transform.gameObject.transform.position = position;
         hit.transform.gameObject.GetComponent<EnemyScript>().AppenedBossSpeedMultiplier(); // Speeds boss up
 
         hit.transform.gameObject.GetComponent<BoxCollider>().enabled = true; // Re-enables the boss collider
@@ -263,5 +267,13 @@ public class ShootScript : MonoBehaviourPunCallbacks
         photonView.RPC("SendScoreToAnotherPlayer", RpcTarget.All, hit.transform.name.ToLower(), hit.transform.gameObject.GetComponent<EnemyScript>().GetScore());
         SubstractScore(hit.transform.gameObject);
         return -hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
+    }
+
+    private IEnumerator ShowNextLocation(Vector3 originalPosition, Vector3 newPosition){
+        GameObject tempArrow = Instantiate(arrow, originalPosition, Quaternion.LookRotation(newPosition - originalPosition));
+        // Make tempArrow look at newPosition
+        tempArrow.transform.LookAt(newPosition);
+        yield return new WaitForSeconds(1.0f);
+        Destroy(tempArrow);
     }
 }

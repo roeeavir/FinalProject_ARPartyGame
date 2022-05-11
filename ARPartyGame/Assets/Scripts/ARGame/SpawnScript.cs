@@ -15,7 +15,6 @@ public class SpawnScript : MonoBehaviour
 
     private int groupId = 0;
 
-    private bool changeSpawnPoint = false;
 
     private bool bossSpawned = false;
 
@@ -47,15 +46,7 @@ public class SpawnScript : MonoBehaviour
                     enemies[i].GetComponent<EnemyScript>().groupId = groupId;
                 }
                 Instantiate(enemies[i], spawnPoints[i].position, Quaternion.identity);
-                if (changeSpawnPoint)
-                {
-                    spawnPoints[i] = SpawnPointsScript.CreateNewSpawnPoint();
-                    changeSpawnPoint = false;
-                }
-                else
-                {
-                    changeSpawnPoint = true;
-                }
+                spawnPoints[i] = SpawnPointsScript.CreateNewSpawnPoint();
             }
 
         }

@@ -578,6 +578,7 @@ MonoBehaviour:
   arCamera: {fileID: 136388033}
   smoke: {fileID: 1975141522878942813, guid: 1b9f4316433b24e92be0a740990a1e4d, type: 3}
   bulletPrefab: {fileID: 1274452733272845526, guid: df826b9edfca3a640b308791c26dc2db, type: 3}
+  arrow: {fileID: 7878906349905878966, guid: 98eec4b41f2450d44a624331d6eb29e5, type: 3}
   shootBtn: {fileID: 826867933}
   popupScore: {fileID: 3056183278332301726, guid: 60b9c90651451f944bdea6af2ead23bf, type: 3}
 --- !u!4 &991376063
@@ -932,5 +933,13 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 991376062}
+    - target: {fileID: 6064748646480543035, guid: eee927e4315f3544f8e16ac1c24837bb, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 300
+      objectReference: {fileID: 0}
+    - target: {fileID: 6064748646480543035, guid: eee927e4315f3544f8e16ac1c24837bb, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 300
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eee927e4315f3544f8e16ac1c24837bb, type: 3}

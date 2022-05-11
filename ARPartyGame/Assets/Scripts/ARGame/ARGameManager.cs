@@ -97,7 +97,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         {
             Debug.LogWarning("Buffered Player: " + p.NickName + "\n");
         }
-        // players = new ARPlayerController[PhotonNetwork.PlayerList.Length];
         photonView.RPC("ImInARGame", RpcTarget.AllBuffered);
         Debug.LogWarning("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
