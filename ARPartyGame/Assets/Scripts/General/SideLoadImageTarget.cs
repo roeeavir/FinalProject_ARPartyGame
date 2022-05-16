@@ -149,7 +149,7 @@ public class SideLoadImageTarget : MonoBehaviour
         if (camera != null)
         {
             camera.SetActive(false); // Reset Camera and world center by the anchor
-            camera.GetComponent<VuforiaBehaviour>().SetWorldCenter(WorldCenterMode.DEVICE, mTarget.GetComponent<ImageTargetBehaviour>());
+            camera.GetComponent<VuforiaBehaviour>().SetWorldCenter(WorldCenterMode.FIRST_TARGET, mTarget.GetComponent<ImageTargetBehaviour>());
             camera.SetActive(true);
         } else {
             Debug.LogWarning("Camera is null");
