@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// This class is used to store the player's data locally and show it in the leaderboard
 public class LeaderBoardManager : MonoBehaviour
 {
 
@@ -24,7 +25,7 @@ public class LeaderBoardManager : MonoBehaviour
     {
         string highScoresTextString = "";
 
-        LoadScoreBoard();
+        LoadScoreBoard(); // Load the score board
 
         if (playerDataList == null || playerDataList.Count == 0)
         {
@@ -45,7 +46,7 @@ public class LeaderBoardManager : MonoBehaviour
         }
         highScoresText.text = highScoresTextString;
     }
-
+    // Add a new player to the score board
     public void AddPlayerData(string playerName, int score, string date)
     {
         if (playerDataList == null)
@@ -57,17 +58,18 @@ public class LeaderBoardManager : MonoBehaviour
         playerDataList.Add(playerData);
         Debug.LogWarning("Player data added: " + playerData.ToString());
 
-        if (playerDataList.Count > 10)
+        if (playerDataList.Count > 15) // Only keep the top 15 players
         {
-            playerDataList.RemoveAt(10);
+            playerDataList.RemoveAt(playerDataList.Count - 1);
         }
     }
-
+    // Sorts the player data list by score
     private void SortPlayerDataList()
     {
         playerDataList.Sort((x, y) => y.score.CompareTo(x.score));
     }
 
+    // Save the player data to the player prefs
     public void SaveScoreBoard()
     {
         string dataToSave = "";
@@ -81,6 +83,7 @@ public class LeaderBoardManager : MonoBehaviour
         Debug.LogWarning("ScoreBoard saved: " + dataToSave);
     }
 
+    // Load the score board from the player prefs by splitting the string into lines and then splitting each line into a PlayerData object
     private void LoadScoreBoard()
     {
         string dataToLoad = PlayerPrefs.GetString("ScoreBoard");

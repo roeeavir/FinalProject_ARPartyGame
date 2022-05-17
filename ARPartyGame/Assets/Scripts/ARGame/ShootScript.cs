@@ -5,7 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
 
-
+// This class is used to handle the player's shooting at the enemies and the changes being made by it
 public class ShootScript : MonoBehaviourPunCallbacks
 {
 
@@ -68,6 +68,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
         {
             if (hit.transform.name.ToLower().Contains("jelly"))
             {
+                // Decides what happens when the player hits an enemy by the game level
                 switch (level)
                 {
                     case 1:
@@ -233,6 +234,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
         objectiveText.text = tempObjective + "\nBoss HP: " + hit.transform.gameObject.GetComponent<ARTarget>().GetHealth();
     }
 
+    // Sets the color index randomly
     private void SetColorIndex()
     {
         int temp = index;
@@ -246,6 +248,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
         colorText.text = "YOUR COLOR IS:\n" + currentColor;
     }
 
+    // Handles the enemy being hit when it is color dependent
     private void HitByColor(RaycastHit hit)
     {
         int popScore = 0;
@@ -261,6 +264,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
         DestroyEnemy(hit, popScore);
     }
 
+    // Handles the consquence of the player hitting the wrong color target
     private int HitWrongTarget(RaycastHit hit)
     {
         Debug.LogWarning("Wrong color");
@@ -269,6 +273,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
         return -hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
     }
 
+    // Shows the direction of the next location of the boss
     private IEnumerator ShowNextLocation(Vector3 originalPosition, Vector3 newPosition){
         GameObject tempArrow = Instantiate(arrow, originalPosition, Quaternion.LookRotation(newPosition - originalPosition));
         // Make tempArrow look at newPosition

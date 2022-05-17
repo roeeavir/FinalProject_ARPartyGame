@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// This class is used to handle a player being hit by a another player
 public class Target : MonoBehaviour
 {
     public float health = 100f;
@@ -16,9 +17,9 @@ public class Target : MonoBehaviour
         playerUI = GameObject.FindObjectOfType<PlayerUI>();
     }
 
+    // Subtract health from the target and check if it is dead
     public void TakeDamage(float amount)
     {
-        // FindObjectOfType<SoundController>().Play("Hit");
         health -= amount;
         if (playerUI != null)
         {

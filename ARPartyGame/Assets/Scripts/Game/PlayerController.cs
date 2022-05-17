@@ -138,13 +138,13 @@ public class PlayerController : MonoBehaviourPunCallbacks, IPunObservable
     void Fire()
     {
         GameObject bullet = Instantiate(Resources.Load("bullet", typeof(GameObject))) as GameObject;
-        FindObjectOfType<SoundController>().Play("shoot"); // play sound
-        bullet.name = photonPlayer.NickName; // set name
-        Rigidbody rb = bullet.GetComponent<Rigidbody>(); // get rigidbody
-        bullet.transform.localPosition = transform.position; // set position
-        bullet.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f); // set scale
-        rb.AddForce(this.transform.forward * 200f); // add force
-        Destroy(bullet, 1); // destroy after 1 second
+        FindObjectOfType<AudioManager>().Play("shoot"); // Play sound
+        bullet.name = photonPlayer.NickName; // Set name
+        Rigidbody rb = bullet.GetComponent<Rigidbody>(); // Get rigidbody
+        bullet.transform.localPosition = transform.position; // Set position
+        bullet.transform.localScale = new Vector3(0.03f, 0.03f, 0.03f); // Set scale
+        rb.AddForce(this.transform.forward * 200f); // Add force
+        Destroy(bullet, 1); // Destroy after 1 second
     }
 
     private void OnTriggerEnter(Collider other)

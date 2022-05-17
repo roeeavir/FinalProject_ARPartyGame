@@ -78,7 +78,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
-        if (instance == null)
+        if (instance == null) // Singleton
         {
             instance = this;
         }
@@ -89,7 +89,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         objectiveText = GameObject.Find("ObjectiveText").GetComponent<Text>();
         spawnScript = spawnManager.GetComponent<SpawnScript>();
         timer = GetComponent<Timer>();
-        SetGameMode();
+        SetGameMode(); // Set the game mode
 
         SetCustomProperties(false, 0, 0);
         // Print every player buffered in Photon
@@ -97,10 +97,10 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         {
             Debug.LogWarning("Buffered Player: " + p.NickName + "\n");
         }
-        photonView.RPC("ImInARGame", RpcTarget.AllBuffered);
+        photonView.RPC("ImInARGame", RpcTarget.AllBuffered); // Tell everyone that we are in the game
         Debug.LogWarning("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
-        arCamera.SetActive(true);
+        arCamera.SetActive(true); // Activate AR camera (Tries to prevent a bug where the camera counts as the center of the AR world)
 
     }
 
@@ -108,12 +108,12 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     {
         if (!allPlayersConnected)
         {
-            allPlayersConnected = AreAllPlayersConnected();
+            allPlayersConnected = AreAllPlayersConnected(); // Check if all players are connected
             return;
         }
         if (imageTarget != null)
         {
-            if (gameEnded)
+            if (gameEnded) // If the game has ended, prevent the Update function from doing anything
             {
                 return;
             }
@@ -137,9 +137,9 @@ public class ARGameManager : MonoBehaviourPunCallbacks
 
                 if (startNextLevel && !gameStarted)
                 {
-                    if (!(bool)PhotonNetwork.LocalPlayer.CustomProperties["isReady"])
+                    if (!(bool)PhotonNetwork.LocalPlayer.CustomProperties["isReady"]) // If the player is not ready, update the player's properties to ready
                     {
-                        SetCustomProperties(true, levelScore, totalScore);
+                        SetCustomProperties(true, levelScore, totalScore); // Set the custom properties
                     }
 
                     if (ArePlayersReady())
@@ -156,7 +156,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
                     }
                 }
 
-                if (restartTrack)
+                if (restartTrack) // Restarts the image target tracking every 3 seconds
                 {
                     RestartImageTargetState();
                     restartTrack = false;
@@ -166,11 +166,12 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            SetImageTarget(GameObject.Find("DynamicImageTarget"));
-            SetScoreTexts();
+            SetImageTarget(GameObject.Find("DynamicImageTarget")); // Sets the image target from the existing game object in the scene
+            SetScoreTexts(); // Set the score texts
         }
 
     }
+    // Initialize the first game level spawn points
     [PunRPC]
     void ImInARGame()
     {
@@ -184,7 +185,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         hasBeenInitialized = true;
 
     }
-
+    // Initialize the spawn points by the number given
     void InitializeSpawnPoints(int size)
     {
         // Create 3 random spawn points
@@ -196,8 +197,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
             spawnPoints[i] = SpawnPointsScript.CreateNewSpawnPoint();
             Debug.LogWarning(spawnPointName + ": " + spawnPoints[i].position);
         }
-        // Spawn the player
-
     }
 
     // Starts the game each level
@@ -237,6 +236,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         Debug.LogWarning("Game started (Level " + gameLevel + ")");
     }
 
+    // Checks if all players are ready
     public bool ArePlayersReady()
     {
         foreach (Player player in PhotonNetwork.PlayerList)
@@ -249,6 +249,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         return true;
     }
 
+    // Notifies the players that the other players are not ready yet
     private IEnumerator WaitForPlayers()
     {
         waitPlayers = true;
@@ -262,20 +263,21 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         waitPlayers = false;
     }
 
+    // Sets all the players scores to the scores board
     private void SetPlayersScores()
     {
         try
         {
-            SetCustomProperties((bool)customProperties["isReady"], levelScore, totalScore);
+            SetCustomProperties((bool)customProperties["isReady"], levelScore, totalScore); // Set the custom properties
 
-            // PlayersScores.text = "Level " + gameLevel + PLAYERS_SCORES + ":\n";
+            // Sets the normal scores (for the current level)
             PlayersScores.text = "";
             foreach (Player player in PhotonNetwork.PlayerList)
             {
                 PlayersScores.text += player.NickName + "'s Score: " + (int)player.CustomProperties["score"] + "\n";
             }
 
-            // PlayersTotalScores.text = "\nTotal " + PLAYERS_SCORES + " This Far:\n";
+            // Sets the total scores
             PlayersTotalScores.text = "";
             foreach (Player player in PhotonNetwork.PlayerList)
             {
@@ -289,7 +291,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         }
 
     }
-
+    // Checks if the player has reached the level's score objective and if so, end the level for all players
     private void CheckGameStatus()
     {
         if (levelScore >= levelScoreGoal)
@@ -299,6 +301,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    // End the level. Reset variables. Update objectives and scores.
     [PunRPC]
     private void FinishLevel(string winnerName, int lvlScore)
     {
@@ -315,14 +318,16 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         DefaultObserverEventHandler.isTracking = false; // Reset Vuforia's image tracking
         Debug.LogWarning("Game level " + gameLevel + " has been finished!");
         if (gameLevel != 0)
-            setLevelWinnerString(lvlScore);
+        {
+            setLevelWinnerString(lvlScore); // Set the level winner string
+        }
         spawnScript.setSpawnPoints(null);
         destroyAllEnemies(); // Destroy all enemies in the scene
         objectiveText.text = winnerName + winnerInLevel;
-        playerUI.SetActive(false);
+        playerUI.SetActive(false); // Disable the player UI (Shoot button and crosshair)
         gameEnded = gameLevel >= 4; // If the game is over (4 levels)
         levelScoreGoal += gameLevel * 2; // Increase the level score goal for the next level by a little
-        StartCoroutine(WaitForNextLevel());
+        StartCoroutine(WaitForNextLevel()); // Wait for the next level
     }
 
     // Starts the next level
@@ -344,40 +349,41 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     // Destroys all enemies in the scene
     private void destroyAllEnemies()
     {
-        GameObject[] enemies = GameObject.FindGameObjectsWithTag("enemy");
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("enemy"); // Find all objects with the enemy tag
         foreach (GameObject enemy in enemies)
         {
             Destroy(enemy);
         }
     }
 
+    // Sets the level winner string (the string that is displayed when the level is finished)
     private void setLevelWinnerString(int lvlScore)
     {
+        string levelNumber = "";
         switch (gameLevel)
         {
             case 1:
-                winnerInLevel = " has won the first level with " + lvlScore + " points!";
+                levelNumber = "1st";
                 break;
             case 2:
-                winnerInLevel = " has won the second level with " + lvlScore + " points!";
+                levelNumber = "2nd";
                 break;
             case 3:
-                winnerInLevel = " has won the third level with " + lvlScore + " points!";
+                levelNumber = "3rd";
                 break;
             case 4:
-                winnerInLevel = " has won the final level with " + lvlScore + " points!";
+                levelNumber = "Final";
                 break;
-            // case 5:
-            //     winnerInLevel = " has won the game with " + lvlScore + " points!!!";
-            // photonView.RPC("SetGameEnded", RpcTarget.AllBuffered, PhotonNetwork.LocalPlayer.NickName);
-            // break;
             default:
+                levelNumber = "Problem with level number senior";
                 Debug.LogWarning("Bad game level: " + gameLevel + " in setLevelWinnerString");
                 break;
         }
+        winnerInLevel = " has won the " + levelNumber + " level with " + lvlScore + " points!";
 
     }
 
+    // Sets the level objective string (the string that is displayed when the level has started)
     private void setLevelObjectiveString()
     {
         switch (gameLevel)
@@ -405,17 +411,26 @@ public class ARGameManager : MonoBehaviourPunCallbacks
                 Debug.LogWarning("Bad game level: " + gameLevel + " in SetLevelObjectiveString");
                 break;
         }
-        levelScore = 0;
-
-
+        levelScore = 0; // Reset the current level score
     }
 
+    // Waits for the next level to start
     private IEnumerator WaitForNextLevel()
     {
+        // Play a Sound fitting for the level winner and loser(s)
+        if (winnerInLevel.Equals(PhotonNetwork.LocalPlayer.NickName))
+        {
+            FindObjectOfType<AudioManager>().Play("Win");
+        }
+        else
+        {
+            FindObjectOfType<AudioManager>().Play("Lose");
+        }
+
         Debug.LogWarning("Waiting for next level");
         yield return new WaitForSeconds(5);
-        shootScript.ResetScore();
-        SetCustomProperties(false, 0, totalScore);
+        shootScript.ResetScore(); // Reset the player's score
+        SetCustomProperties(false, 0, totalScore); // Reset the player's custom properties
         if (!gameEnded)
         {
             objectiveText.text = "Starting the next game level (" + (gameLevel + 1) + ")\n" + lookAtAnchor;
@@ -427,6 +442,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    // Sets the player's custom properties
     private void SetCustomProperties(bool b, int lScore, int tScore)
     {
         // customProperties = new ExitGames.Client.Photon.Hashtable();
@@ -436,26 +452,27 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
     }
 
+    // Sets the image targets children to false as to prevent them from being stuck on the screen when they should be at the image target's position
     private IEnumerator WaitForTrack()
     {
         yield return new WaitForSeconds(3);
         for (int i = 0; i < imageTarget.transform.childCount; i++)
         {
-            imageTarget.transform.GetChild(i).gameObject.SetActive(false);
+            imageTarget.transform.GetChild(i).gameObject.SetActive(false); // Set all children to false
         }
-        restartTrack = true;
+        restartTrack = true; // Allow the image target to be tracked again
     }
 
+    // Sets the image targets children active to the same variable as the tracking itself
     private void RestartImageTargetState()
     {
         for (int i = 0; i < imageTarget.transform.childCount; i++)
         {
             imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
-            // if (!gameStarted)
-            //     imageTarget.transform.GetChild(i).gameObject.transform.LookAt(Camera.main.transform);
         }
     }
 
+    // Sets the image target to the one given
     private void SetImageTarget(GameObject newImageTarget)
     {
         // set imageTarget to from SideLoadImageTarget script
@@ -513,7 +530,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         DefaultObserverEventHandler.isTracking = false;
         SetCustomProperties(false, levelScore, totalScore); // Reset ready status
         gameObject.GetComponent<SideLoadImageTarget>().setTargetChildren();
-        SetImageTarget(GameObject.Find("DynamicImageTarget"));
+        SetImageTarget(GameObject.Find("DynamicImageTarget")); // Sets the image target from the existing game object in the scene
         Debug.LogWarning("Reset Target Object Complete");
     }
 

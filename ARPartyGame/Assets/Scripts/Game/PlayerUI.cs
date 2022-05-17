@@ -9,6 +9,7 @@ public class PlayerUI : MonoBehaviour
 
     private string maxHealth = " / 100";
 
+    // Update the health text to the player's health
     public void UpdateHealth(float newHealth)
     {
         health.text = newHealth + maxHealth;

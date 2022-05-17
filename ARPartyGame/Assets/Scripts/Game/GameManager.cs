@@ -6,6 +6,9 @@ using Photon.Realtime;
 using System.Linq;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+
+// Demo game is used to demonstrate our initial setup and how to use Photon Network and Vuforia in a game
+// This class is used to manage the demo game.
 public class GameManager : MonoBehaviourPunCallbacks
 {
     [Header("Status")]
@@ -27,7 +30,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public Text health;
     private void Awake()
     {
-        if (instance == null)
+        if (instance == null) // Singleton
         {
             instance = this;
         }
@@ -41,14 +44,13 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
         pickedSpawnIndex = new List<int>();
         players = new PlayerController[PhotonNetwork.PlayerList.Length];
-        photonView.RPC("ImInGame", RpcTarget.AllBuffered);
+        photonView.RPC("ImInGame", RpcTarget.AllBuffered); // Tell everyone that we are in the game
         Debug.LogWarning("Number of Players: " + PhotonNetwork.PlayerList.Length);
         DefaultObserverEventHandler.isTracking = false;
 
     }
     private void Update()
     {
-        // Debug.LogWarning("is tracking " + DefaultObserverEventHandler.isTracking);
         if (imageTarget != null)
         {
             foreach (GameObject gameObj in GameObject.FindObjectsOfType(typeof(GameObject)))
@@ -61,10 +63,10 @@ public class GameManager : MonoBehaviourPunCallbacks
             }
             for (int i = 1; i < imageTarget.transform.childCount; i++)
             {
-                imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking);
+                imageTarget.transform.GetChild(i).gameObject.SetActive(DefaultObserverEventHandler.isTracking); // Set all children to tracking state
                 if (!health.enabled)
                 {
-                    health.enabled = DefaultObserverEventHandler.isTracking;
+                    health.enabled = DefaultObserverEventHandler.isTracking; // Set health text to tracking state
                 }
             }
         }
@@ -72,10 +74,10 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             // set imageTarget to from SideLoadImageTarget script
             imageTarget = GameObject.Find("DemoDynamicImageTarget");
-            // imageTarget = SideLoadImageTarget.GetImageTarget();
         }
 
     }
+    // This method is called when a player is added to the game
     [PunRPC]
     void ImInGame()
     {
@@ -89,18 +91,18 @@ public class GameManager : MonoBehaviourPunCallbacks
         hasBeenSpawned = true;
 
     }
+    // This method spawns a player
     void SpawnPlayer()
     {
-        int rand = Random.Range(0, spawnPoints.Length); // random spawn point
-        while (pickedSpawnIndex.Contains(rand)) // check if the random spawn point is already picked
+        int rand = Random.Range(0, spawnPoints.Length); // Random spawn point
+        while (pickedSpawnIndex.Contains(rand)) // Check if the random spawn point is already picked
         {
-            rand = Random.Range(0, spawnPoints.Length); // random spawn point
+            rand = Random.Range(0, spawnPoints.Length); // Random spawn point
         }
-        pickedSpawnIndex.Add(rand); // add the random spawn point to the list
+        pickedSpawnIndex.Add(rand); // Add the random spawn point to the list
         GameObject playerObject = null;
         playerObject = (GameObject)PhotonNetwork.Instantiate(playerPrefabLocation, spawnPoints[rand].position, Quaternion.identity); // spawn player
-        // playerObject.gameObject.SetActive(DefaultObserverEventHandler.isTracking);
-        //intialize the player
+        // Intialize the player
         PlayerController playerScript = playerObject.GetComponent<PlayerController>();
         playerScript.photonView.RPC("Initialize", RpcTarget.All, PhotonNetwork.LocalPlayer);
         Debug.LogWarning(playerScript);
@@ -118,14 +120,15 @@ public class GameManager : MonoBehaviourPunCallbacks
     public PlayerController GetPlayer(int playerID)
     {
         Debug.LogWarning("GetPlayer with id: " + playerID);
-        return players.First(x => x.id == playerID);
+        return players.First(x => x.id == playerID); // return the player with the given id
     }
     public PlayerController GetPlayer(GameObject playerObj)
     {
         Debug.LogWarning("GetPlayer with object: " + playerObj.GetComponent<PlayerController>().id);
-        return players.First(x => x.gameObject == playerObj);
+        return players.First(x => x.gameObject == playerObj); // return the player with the given id
     }
 
+    // Called when a player has clicked on the "Return to Main Menu" button
     public void OnReturnToMainMenu(){
         Destroy(NetworkManager.instance.gameObject); // Destroy network manager
         PhotonNetwork.LeaveRoom();

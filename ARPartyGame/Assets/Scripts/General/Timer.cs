@@ -9,6 +9,7 @@ public class Timer : MonoBehaviour
     private bool timerIsRunning = false;
     public Text timeText;
 
+    // Start the timer and pass it a callback function
     public void StartTimer(Action callback)
     {   
         if (!timerIsRunning)
@@ -18,6 +19,7 @@ public class Timer : MonoBehaviour
         }
     }
 
+    // Countdown the timer and call the callback function when the timer is finished
     private IEnumerator Countdown(Action callback)
     {
         int temp = timeText.fontSize;
@@ -35,10 +37,11 @@ public class Timer : MonoBehaviour
 
         if (callback != null)
         {
-            callback?.Invoke();
+            callback?.Invoke(); // Invoke the callback function
         }
     }
 
+    // Set the time to countdown from
     public void SetTime(int t)
     {
         time = t;

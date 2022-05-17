@@ -10,7 +10,8 @@ public class Tutorial : MonoBehaviour
     public Image origin;
     public Sprite[] tutorialImages;
 
-    private  string[] tutorialTexts =  {
+    // Preset tutorial text
+    private string[] tutorialTexts =  {
         "At first you will need to fill a nickname and room name\n To create a room, click on the button \"Create Room\"\n To join a room, click on the button \"Join Room\"\n ",
         "This is the Lobby, where you can see all the players in the room\n To start the game, click on the button \"Set Anchor Image\"\n ",
         "Now choose if the anchor is a photo from your gallery or a photo from your camera\n ",
@@ -24,7 +25,7 @@ public class Tutorial : MonoBehaviour
     };
 
     public Text tutorialText;
-    public static int index= 0;
+    public static int index = 0;
 
 
     // Update is called once per frame
@@ -34,6 +35,7 @@ public class Tutorial : MonoBehaviour
         tutorialText.text = tutorialTexts[index];
     }
 
+    // Called when the player clicks the "Next" button. Changes the index to the next tutorial image.
     public void Next()
     {
         if (index < tutorialImages.Length - 1)
@@ -48,6 +50,7 @@ public class Tutorial : MonoBehaviour
         }
     }
 
+    // Called when the player clicks the "Previous" button. Changed the index to the previous tutorial image
     public void Previous()
     {
         if (index > 0)

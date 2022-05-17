@@ -10,7 +10,7 @@ public class SideLoadImageTarget : MonoBehaviour
 
     public GameObject targetBoard;
 
-    private ImageTargetBehaviour mTarget = null;
+    private ImageTargetBehaviour mTarget = null; // My target
 
 
     void Start()
@@ -26,13 +26,13 @@ public class SideLoadImageTarget : MonoBehaviour
     {
         Debug.Log("OnEnable");
         mTarget = null;
-        CreateImageTargetFromSideloadedTexture();
+        CreateImageTargetFromSideloadedTexture(); // Create the target
     }
 
     void OnDisable()
     {
         Debug.Log("OnDisable");
-        VuforiaApplication.Instance.OnVuforiaStarted -= CreateImageTargetFromSideloadedTexture;
+        VuforiaApplication.Instance.OnVuforiaStarted -= CreateImageTargetFromSideloadedTexture; // Remove the event when the script is disabled
         Debug.Log("CreateImageTargetFromSideloadedTexture is done");
     }
 
@@ -76,10 +76,6 @@ public class SideLoadImageTarget : MonoBehaviour
             Debug.Log("Target name is not valid");
         }
 
-        // VuforiaApplication.Instance.OnVuforiaStarted -= CreateImageTargetFromSideloadedTexture;
-        // Debug.Log("CreateImageTargetFromSideloadedTexture is done");
-
-
         Debug.Log("Instant Image Target created " + mTarget.TargetName);
 
     }
@@ -100,7 +96,7 @@ public class SideLoadImageTarget : MonoBehaviour
             Debug.LogWarning("VuforiaBehaviour is null");
         }
 
-
+        // Create a new image target
         ImageTargetBehaviour target = VuforiaBehaviour.Instance.ObserverFactory.CreateImageTarget(
                    textureFile,
                    printedTargetSize,
@@ -156,15 +152,9 @@ public class SideLoadImageTarget : MonoBehaviour
         }
 
         GameObject tmpPlayersScores = GameObject.FindGameObjectWithTag("board"); 
-        // if (tmpPlayersScores != null)
-        // {
-        //     Destroy(tmpPlayersScores);
-        //     tmpPlayersScores = null;
-        //     Debug.LogWarning("Players scores board has been destroyed");
-        // }
 
-        if (tmpPlayersScores == null){
-            GameObject playersScores = Instantiate(targetBoard, mTarget.transform) as GameObject;
+        if (tmpPlayersScores == null){ // Prevents the creation of the board if it already exists
+            GameObject playersScores = Instantiate(targetBoard, mTarget.transform) as GameObject; // Create the board from the prefab
             if (playersScores != null)
             {
                 Debug.LogWarning("Plane Scores Background is not null");
@@ -175,11 +165,11 @@ public class SideLoadImageTarget : MonoBehaviour
             }
 
             // Place the plane as mTarget's child
-            playersScores.transform.parent = mTarget.transform;
+            playersScores.transform.parent = mTarget.transform; // Set the parent of the plane to the newly created image target
 
-            playersScores.transform.position = new Vector3(0f, 0f, 0f);
-            playersScores.transform.localScale = new Vector3(0.03f, 1f, 0.03f);
-            playersScores.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+            playersScores.transform.position = new Vector3(0f, 0f, 0f); // Set the position of the plane at the center of the parent object
+            playersScores.transform.localScale = new Vector3(0.03f, 1f, 0.03f); // Set the scale of the plane
+            playersScores.transform.rotation = Quaternion.Euler(0f, 0f, 0f); // Set the rotation of the plane
         }
     }
 

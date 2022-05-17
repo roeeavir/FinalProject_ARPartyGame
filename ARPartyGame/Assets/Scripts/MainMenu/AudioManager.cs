@@ -2,10 +2,10 @@ using UnityEngine;
 using UnityEngine.Audio;
 using System;
 
-public class AudioManager : MonoBehaviour
+// A class to manage the audio in the game
+public class AudioManager : MonoBehaviour 
 {
     public Sound[] sounds;
-    // Start is called before the first frame update
     void Awake()
     {
         foreach (Sound s in sounds)
@@ -18,6 +18,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    // Play a sound by name
     public void Play(string name)
     {
         Sound s = Array.Find(sounds, sound => sound.name == name);

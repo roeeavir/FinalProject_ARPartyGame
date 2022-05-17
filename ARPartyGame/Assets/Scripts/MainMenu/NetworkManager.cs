@@ -20,21 +20,21 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         else
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject); // make sure this object is not destroyed when loading a new scene
         }
     }
     private void Start()
     {
-        PhotonNetwork.ConnectUsingSettings();
+        PhotonNetwork.ConnectUsingSettings(); // Connect to the server
     }
     public void CreateRoom(string roomName)
     {
-        PhotonNetwork.CreateRoom(roomName);
+        PhotonNetwork.CreateRoom(roomName); // Create a room
     }
     public void JoinRoom(string roomName)
     {
         Debug.LogWarning("Joining room: " + roomName);
-        if (PhotonNetwork.PlayerList.Length <= 4)
+        if (PhotonNetwork.PlayerList.Length <= 4) // Prevents room from being joined if it is full
         {
             PhotonNetwork.JoinRoom(roomName);
         }
@@ -46,21 +46,30 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     [PunRPC]
     public void ChangeScene(string sceneName)
     {
-        // PhotonNetwork.AutomaticallySyncScene = true;
-        PhotonNetwork.LoadLevel(sceneName);
+        PhotonNetwork.LoadLevel(sceneName); // Loads the scene
     }
 
     public override void OnDisconnected(DisconnectCause cause)
     {
-        if (this.CanRecoverFromDisconnect(cause))
+        if (this.CanRecoverFromDisconnect(cause)) // If the connection is lost, try to reconnect
         {
             connectionText.enabled = true;
             Debug.LogWarning("Recovering from disconnect...");
             connectionText.text = "Recovering from disconnect...";
             this.Recover();
+            Debug.LogWarning("Reconnecting to the server");
+            PhotonNetwork.ConnectUsingSettings();
+        }
+        else // 
+        {
+            Debug.LogWarning("Disconnected from the server");
+            connectionText.text = "Disconnected from the server";
+            connectionText.enabled = true;
+            StartCoroutine(DisableConnectionText());
         }
     }
 
+    // Check if can recover from disconnect
     private bool CanRecoverFromDisconnect(DisconnectCause cause)
     {
         switch (cause)
@@ -76,6 +85,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         return false;
     }
 
+    // Try to recover from disconnect
     private void Recover()
     {
         if (!PhotonNetwork.ReconnectAndRejoin())
@@ -89,18 +99,22 @@ public class NetworkManager : MonoBehaviourPunCallbacks
                     Debug.LogError("ConnectUsingSettings failed");
                     connectionText.text = "Connection failed";
                 }
-            } else
+            }
+            else
             {
                 Debug.Log("Reconnected");
                 connectionText.text = "Reconnected";
             }
-        } else {
+        }
+        else
+        {
             Debug.Log("Reconnected");
             connectionText.text = "Reconnected";
         }
         StartCoroutine(DisableConnectionText());
     }
 
+    // Disable the connection text after a few seconds
     private IEnumerator DisableConnectionText()
     {
         yield return new WaitForSeconds(3);
@@ -108,6 +122,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         connectionText.enabled = false;
     }
 
+    // When a player has finished joining a room, this is called
     public override void OnJoinedRoom()
     {
         Debug.Log("Joined room");
@@ -116,6 +131,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         StartCoroutine(DisableConnectionText());
     }
 
+    // When a player fails to join the room
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
         Debug.LogWarning("Join room failed");
@@ -123,6 +139,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         base.OnJoinRoomFailed(returnCode, message);
     }
 
+    // Show error message
     public IEnumerator ShowErrorMessage(string message)
     {
         badInputText.text = message;

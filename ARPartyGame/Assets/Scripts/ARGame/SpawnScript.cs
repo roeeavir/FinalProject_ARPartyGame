@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// This class is used to spawn the enemies
 public class SpawnScript : MonoBehaviour
 {
     private Transform[] spawnPoints;
@@ -22,9 +23,9 @@ public class SpawnScript : MonoBehaviour
     void Start()
     {
         StartCoroutine(StartSpawning());
-        // StartCoroutine(MixSpawnPoints());
     }
 
+    // Spawn enemies
     private IEnumerator StartSpawning()
     {
         yield return new WaitForSeconds(nextTimeToSpawn);
@@ -33,19 +34,18 @@ public class SpawnScript : MonoBehaviour
         {
             for (int i = 0; i < numOfSpawnPoints; i++)
             {
-                if (groupId >= 100)
+                if (groupId >= 100) // If the group id is equal or greater than 100, spawn boss
                 {
                     boss.GetComponent<EnemyScript>().groupId = groupId;
-                    Instantiate(boss, spawnPoints[i].position, Quaternion.identity);
-                    // boss.transform.localScale = new Vector3(2f, 2f, 2f);
+                    Instantiate(boss, spawnPoints[i].position, Quaternion.identity); // Spawn the boss
                     bossSpawned = true;
                     break;
                 }
                 if (groupId != 0)
                 {
-                    enemies[i].GetComponent<EnemyScript>().groupId = groupId;
+                    enemies[i].GetComponent<EnemyScript>().groupId = groupId; // Set the group id of the enemy
                 }
-                Instantiate(enemies[i], spawnPoints[i].position, Quaternion.identity);
+                Instantiate(enemies[i], spawnPoints[i].position, Quaternion.identity);// Spawn enemy
                 spawnPoints[i] = SpawnPointsScript.CreateNewSpawnPoint();
             }
 
@@ -53,7 +53,7 @@ public class SpawnScript : MonoBehaviour
 
         if (!bossSpawned)
         {
-            StartCoroutine(StartSpawning());
+            StartCoroutine(StartSpawning()); // Start spawning again (recursive)
         }
 
     }
@@ -71,6 +71,7 @@ public class SpawnScript : MonoBehaviour
         }
     }
 
+    // Sets the next time to spawn enemies variable
     public void SetNextTimeToSpawn(float time)
     {
         nextTimeToSpawn = time;

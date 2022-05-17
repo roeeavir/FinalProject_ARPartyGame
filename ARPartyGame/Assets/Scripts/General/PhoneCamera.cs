@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// This class is used to handle the device's camera
 public class PhoneCamera : MonoBehaviour
 {
     private bool camAvailable;
