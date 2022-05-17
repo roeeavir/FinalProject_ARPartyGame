@@ -273,7 +273,7 @@ public class ShootScript : MonoBehaviourPunCallbacks
         return -hit.transform.gameObject.GetComponent<EnemyScript>().GetScore();
     }
 
-    // Shows the direction of the next location of the boss
+    // Shows the general direction of the next location of the boss
     private IEnumerator ShowNextLocation(Vector3 originalPosition, Vector3 newPosition){
         GameObject tempArrow = Instantiate(arrow, originalPosition, Quaternion.LookRotation(newPosition - originalPosition));
         // Make tempArrow look at newPosition

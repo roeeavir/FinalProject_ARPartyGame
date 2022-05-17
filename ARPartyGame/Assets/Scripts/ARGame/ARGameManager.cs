@@ -309,6 +309,15 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         {
             bossUI.SetActive(false);
         }
+        // Play a Sound fitting for the level winner and loser(s)
+        if (winnerName.Equals(PhotonNetwork.LocalPlayer.NickName))
+        {
+            FindObjectOfType<AudioManager>().Play("Win");
+        }
+        else
+        {
+            FindObjectOfType<AudioManager>().Play("Lose");
+        }
         FindObjectOfType<AudioManager>().Play("Win");
         gameStarted = false;
         startNextLevel = false;
@@ -317,10 +326,7 @@ public class ARGameManager : MonoBehaviourPunCallbacks
         SetPlayersScores();
         DefaultObserverEventHandler.isTracking = false; // Reset Vuforia's image tracking
         Debug.LogWarning("Game level " + gameLevel + " has been finished!");
-        if (gameLevel != 0)
-        {
-            setLevelWinnerString(lvlScore); // Set the level winner string
-        }
+        setLevelWinnerString(lvlScore); // Set the level winner string
         spawnScript.setSpawnPoints(null);
         destroyAllEnemies(); // Destroy all enemies in the scene
         objectiveText.text = winnerName + winnerInLevel;
@@ -417,16 +423,6 @@ public class ARGameManager : MonoBehaviourPunCallbacks
     // Waits for the next level to start
     private IEnumerator WaitForNextLevel()
     {
-        // Play a Sound fitting for the level winner and loser(s)
-        if (winnerInLevel.Equals(PhotonNetwork.LocalPlayer.NickName))
-        {
-            FindObjectOfType<AudioManager>().Play("Win");
-        }
-        else
-        {
-            FindObjectOfType<AudioManager>().Play("Lose");
-        }
-
         Debug.LogWarning("Waiting for next level");
         yield return new WaitForSeconds(5);
         shootScript.ResetScore(); // Reset the player's score
